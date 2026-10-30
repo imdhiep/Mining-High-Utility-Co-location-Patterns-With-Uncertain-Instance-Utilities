@@ -27,6 +27,23 @@ def jac(a, b):
     return round(len(a & b) / max(1, len(a | b)), 4)
 
 
+def caliper_pairs(A, B, score, cal):
+    """Greedy nearest-score matching without replacement: each element of A (in increasing score) is paired with the
+    unused element of B of nearest score if the absolute difference is at most cal; unmatched elements are dropped."""
+    Bl = sorted(B, key=score); bv = np.array([score(x) for x in Bl]); used = np.zeros(len(Bl), bool); out = []
+    for a in sorted(A, key=score):
+        if not len(Bl): break
+        dist = np.abs(bv - score(a)); dist[used] = np.inf; j = int(np.argmin(dist))
+        if dist[j] <= cal: used[j] = True; out.append((a, Bl[j]))
+    return out
+
+
+def table2x2(pairs, hit):
+    """pairs (a, b): counts of (hit_a, hit_b) as both / only_b / only_a / neither."""
+    return dict(both=sum(hit(a) and hit(b) for a, b in pairs), only_b=sum((not hit(a)) and hit(b) for a, b in pairs),
+                only_a=sum(hit(a) and not hit(b) for a, b in pairs), neither=sum((not hit(a)) and (not hit(b)) for a, b in pairs), n=len(pairs))
+
+
 def timed(fn, reps=1):
     ts, out = [], None
     for _ in range(reps):
@@ -136,6 +153,8 @@ class Suite:
                                           only_rej=int(sum(x and not y for x, y in zip(hr_, hm_))), neither=int(sum((not x) and (not y) for x, y in zip(hr_, hm_))),
                                           distinct_kept=len(set(mk_)), max_gap=round(float(max(abs(tr_score(p) - tr_score(q)) for p, q in pairs)), 6),
                                           mean_gap=round(float(np.mean([tr_score(q) - tr_score(p) for p, q in pairs])), 6))
+                    cp = caliper_pairs(rej, kept, tr_score, 0.05 * muK)
+                    row["pair_cal"] = table2x2(cp, lambda p: te_score(p) >= muK)   # a = rejected, b = matched kept
                     row.update(hold_matched=hold(mk_), regr_matched=regr(mk_),
                                train_rej=round(float(np.mean([tr_score(p) for p in rej])), 6),
                                train_matched=round(float(np.mean([tr_score(q) for q in mk_])), 6),
@@ -171,6 +190,7 @@ class Suite:
                             order = np.argsort(np.abs(zv - R0all[p]))
                             jj = next((int(i) for i in order if int(i) not in used_z), int(order[0])); used_z.add(jj); fp.append((p, zl[jj]))
                         hf_, hz_ = [hits[p] for p, _ in fp], [hits[q] for _, q in fp]
+                        filt[key]["pair_cal"] = table2x2(caliper_pairs(only_f, only_z, lambda q: R0all[q], 0.05 * muK), lambda q: hits[q])   # a = only-filter, b = only-UHUCM
                         filt[key]["pair2x2"] = dict(both=int(sum(x and y for x, y in zip(hf_, hz_))), only_z=int(sum((not x) and y for x, y in zip(hf_, hz_))),
                                                     only_f=int(sum(x and not y for x, y in zip(hf_, hz_))), neither=int(sum((not x) and (not y) for x, y in zip(hf_, hz_))),
                                                     mean_gap=round(float(np.mean([R0all[q] - R0all[p] for p, q in fp])), 6))

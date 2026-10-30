@@ -1,6 +1,5 @@
 """Figures for Section VI, generated only from results_db (no hand-entered numbers). Output: PDF files."""
 import os, json, math, csv
-import paths
 import numpy as np
 import figstyle as fs
 from figstyle import plt
@@ -68,7 +67,7 @@ def fig_e2():
     e2 = syn["e2"]["results"]; deltas = [0.01, 0.05, 0.1, 0.2]
     knobs = ["correct", "t3", "prior+0.3", "prior-0.3", "sigma x0.7", "sigma x1.3", "spatial"]
     nice = {"correct": "Correct model", "t3": "$t_3$ noise", "prior+0.3": "Prior +0.3", "prior-0.3": "Prior $-$0.3",
-            "sigma x0.7": r"$\sigma_s\times0.7$", "sigma x1.3": r"$\sigma_s\times1.3$", "spatial": "Spatial $\\theta$"}
+            "sigma x0.7": r"$\sigma_e\times0.7$", "sigma x1.3": r"$\sigma_e\times1.3$", "spatial": "Spatial 0.5"}
     fig, axes = plt.subplots(1, 2, figsize=(W2, 2.0))
     for i, kn in enumerate(knobs):
         f = [e2[kn][f"normal d={d}"]["FDP"] for d in deltas]; p = [e2[kn][f"normal d={d}"]["power"] for d in deltas]
@@ -135,11 +134,12 @@ def fig_eff_d():
 def fig_case():
     import fsq_loader
     from fastmine import Problem, mine, pattern_atoms
+    import paths
     rows, users, NU, info = fsq_loader.load(paths.fsq("NYC"), "NYC")
     names = sorted({r["feat"] for r in rows}); fi = {f: j for j, f in enumerate(names)}
     F = [fi[r["feat"]] for r in rows]; XY = np.array([(r["x"], r["y"]) for r in rows])
     mu = np.array([r["mu"] for r in rows]); s2 = np.array([r["s2"] for r in rows])
-    P0 = Problem(F, XY, mu, s2, 50.0, 0.0, feat_names=names); P1 = Problem(F, XY, mu, s2, 50.0, 1.645, feat_names=names)
+    P0 = Problem(F, XY, mu, s2, 50.0, 0.0, feat_names=names); P1 = Problem(F, XY, mu, s2, 50.0, 2.45, feat_names=names)   # calibrated choice for the activity posterior
     muK = db["FSQ_NYC"]["quality"][300]["mu"]
     R0 = mine(P0, muK)[0]; R1 = mine(P1, muK)[0]
     rej = sorted(set(R0) - set(R1), key=lambda p: -R0[p]); kept = sorted(set(R1), key=lambda p: -R1[p])
@@ -157,7 +157,7 @@ def fig_case():
         ax.set_xlabel("x (km, UTM 18N)"); ax.set_ylabel("y (km)"); ax.grid(False)
         lbl = " + ".join(s.replace("___", " / ").replace("_and_", " & ").replace("_", " ") for s in p)
         caps.append(f"{lab}: {{{lbl}}}")
-        ax.text(0.02, 0.98, f"$|A(P)|$={len(A)}, median $a$={np.median(np.array([rows[j]['a'] for j in a])):.0f}", transform=ax.transAxes, va="top", fontsize=6.5)
+        ax.text(0.02, 0.98, f"$|A(P)|$={len(A)}, median $c$={np.median(np.array([rows[j]['a'] for j in a])):.0f}", transform=ax.transAxes, va="top", fontsize=6.5)
     from matplotlib.lines import Line2D
     h = [Line2D([], [], marker="o", color="w", markerfacecolor=fs.BLUE, label=r"$\mu_a\geq 0$"), Line2D([], [], marker="o", color="w", markerfacecolor=fs.ORANGE, label=r"$\mu_a<0$"),
          Line2D([], [], marker="o", color="w", markerfacecolor="#D9D9D9", label="Other venues")]
@@ -188,7 +188,7 @@ def fig_e2_1c():
     e2 = syn["e2"]["results"]; deltas = [0.01, 0.05, 0.1, 0.2]
     knobs = ["correct", "estimated", "t3", "prior+0.3", "prior-0.3", "sigma x0.7", "spatial"]
     nice = {"correct": "Correct", "estimated": "Estimated", "t3": "$t_3$ noise", "prior+0.3": r"Prior $+0.3\tau$", "prior-0.3": r"Prior $-0.3\tau$",
-            "sigma x0.7": r"$\sigma_s\times0.7$", "spatial": "Spatial"}
+            "sigma x0.7": r"$\sigma_e\times0.7$", "spatial": "Spatial 0.5"}
     fig, ax = plt.subplots(figsize=(W1, 2.0))
     for i, kn in enumerate(knobs):
         ax.plot(deltas, [e2[kn][f"normal d={d}"]["FDP"] for d in deltas], marker=fs.MARKERS[i % 6], color=fs.PALETTE[i], label=nice[kn],
@@ -248,7 +248,7 @@ def fig_e2_2c():
     e2 = syn["e2"]["results"]; deltas = [0.01, 0.05, 0.1, 0.2]
     knobs = ["correct", "estimated", "t3", "prior+0.3", "prior-0.3", "sigma x0.7", "sigma x1.3", "spatial"]
     nice = {"correct": "Correct model", "estimated": "Re-estimated", "t3": "$t_3$ noise", "prior+0.3": r"Prior $+0.3\tau$", "prior-0.3": r"Prior $-0.3\tau$",
-            "sigma x0.7": r"$\sigma_s\times0.7$", "sigma x1.3": r"$\sigma_s\times1.3$", "spatial": r"Spatial $\theta$"}
+            "sigma x0.7": r"$\sigma_e\times0.7$", "sigma x1.3": r"$\sigma_e\times1.3$", "spatial": "Spatial 0.5"}
     fig, axes = plt.subplots(1, 2, figsize=(W2, 2.0))
     for i, kn in enumerate(knobs):
         st = dict(marker=fs.MARKERS[i % 6], color=fs.PALETTE[i], label=nice[kn], linestyle="-" if i < 6 else "--")

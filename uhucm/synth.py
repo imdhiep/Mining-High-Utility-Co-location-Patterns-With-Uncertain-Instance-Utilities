@@ -270,6 +270,39 @@ def e2b(nseed=100):
         json.dump(dict(nseed=nseed, results=res), open(f"{OUT}/e2b.json", "w"), indent=1)
 
 
+def e2c(nseed=100):
+    """Activity posterior (Def. 4) combined with spatially correlated latent log-rates: FDP and detection at delta = 0.05
+    for the normal (1.645) and sub-Gaussian (2.45) choices, with rho = 0 and with the robust measure at the estimated rho."""
+    res = {}
+    for frac in (0.1, 0.25, 0.5):
+        acc = collections.defaultdict(list); rh = []
+        for seed in range(nseed):
+            G = evigen2(400, 8, 1000 + seed, activity=True, spatial=frac)
+            P0 = problem(G, G["pm"], G["pv"], 0.0)
+            if P0.Z <= 0 or len(P0.cliques) == 0: continue
+            R0all = fastmine.mine(P0, -1e9)[0]
+            if len(R0all) < 20: continue
+            tv = truth_sets(G, P0, R0all)
+            tau = float(np.quantile(list(tv.values()), 0.7)); ntrue = sum(v >= tau for v in tv.values())
+            def ev(z, rho=0.0):
+                Pb = fastmine.Problem(G["feat"], G["xy"], G["pm"], G["pv"], G["d"], z, rho)
+                if Pb.Z <= 0: return None
+                R = fastmine.mine(Pb, tau / Pb.Z)[0]
+                return (len(R), sum(tv[p] < tau for p in R) / len(R) if R else 0.0, sum(tv[p] >= tau for p in R) / max(1, ntrue))
+            r = max(0.0, rho_hat(G, P0)); rh.append(r)
+            for zn, z in (("normal", norm.ppf(0.95)), ("subG", math.sqrt(2 * math.log(20)))):
+                acc[f"{zn} rho=0"].append(ev(z)); acc[f"{zn} robust rho_hat"].append(ev(z, r))
+            acc["z=0"].append(ev(0.0))
+        out = {"rho_hat_mean": round(st.mean(rh), 4), "rho_hat_sd": round(st.stdev(rh), 4)}
+        for m, L in acc.items():
+            L = [x for x in L if x]
+            out[m] = dict(seeds=len(L), FDP=round(st.mean(x[1] for x in L), 4), FDP_sd=round(st.stdev(x[1] for x in L), 4),
+                          power=round(st.mean(x[2] for x in L), 4))
+        res[f"activity+spatial {frac}"] = out
+        print("E2c", frac, json.dumps(out), flush=True)
+        json.dump(dict(nseed=nseed, results=res), open(f"{OUT}/e2c.json", "w"), indent=1)
+
+
 if __name__ == "__main__":
     exp = sys.argv[1]
-    {"e1": e1, "e2": e2, "e2b": e2b, "scale_n": scale_n, "scale_k": scale_k, "stress": stress}[exp]()
+    {"e1": e1, "e2": e2, "e2b": e2b, "e2c": e2c, "scale_n": scale_n, "scale_k": scale_k, "stress": stress}[exp]()
