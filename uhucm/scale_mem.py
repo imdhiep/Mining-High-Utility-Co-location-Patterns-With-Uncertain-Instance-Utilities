@@ -1,7 +1,7 @@
 """Scalability with dispersion and peak memory. Each configuration runs in a fresh process (3 seeds for EviGen,
 3 repetitions for D4/D5); peak resident memory is ru_maxrss of that process, reported together with the resident
 memory after imports (baseline). Usage: python scale_mem.py [worker args]"""
-import sys, os, json, time, resource, subprocess, statistics as st
+import sys, os, json, time, resource, subprocess, statistics as st, tempfile
 import paths
 H = os.path.dirname(os.path.abspath(__file__))
 
@@ -19,7 +19,7 @@ def worker(kind, a, b, seed, method, mem=False):
         import fsq_loader, functools
         from suite import Suite
         rows, users, NU, info = fsq_loader.load(a, b)
-        S = Suite("x", rows, 50.0, "/tmp", log=lambda s: None)
+        S = Suite("x", rows, 50.0, tempfile.gettempdir(), log=lambda s: None)
         P0 = S.mk(); R, sc = S.topk(P0, 300); muK = sc[299]; del P0, R; gc.collect()
         if mem: memtrack.start()
         t = time.time(); Pz = S.mk(z=1.645); tb = time.time() - t

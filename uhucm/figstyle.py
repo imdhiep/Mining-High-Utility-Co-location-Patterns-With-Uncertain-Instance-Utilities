@@ -6,12 +6,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib import font_manager as fm
 
-for f in ("/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf",
-          "/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf",
-          "/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf"):
-    try: fm.fontManager.addfont(f)
-    except Exception: pass
-
 BLUE, ORANGE, GRAY, YELLOW, LBLUE, GREEN = "#4472C4", "#ED7D31", "#A5A5A5", "#FFC000", "#5B9BD5", "#70AD47"
 PALETTE = [BLUE, ORANGE, GRAY, YELLOW, LBLUE, GREEN, "#264478", "#9E480E", "#636363"]
 MARKERS = ["o", "s", "^", "D", "v", "x"]

@@ -1,6 +1,6 @@
 """Revision extras: (1) ablation on EviGen with negative-only features, where FUB and the non-positive tier act;
 (2) kappa_iota sensitivity of the interaction atoms on Foursquare. Writes out_synth/rev_extra.json."""
-import json, time, functools, sys
+import json, time, functools, sys, tempfile
 import numpy as np
 import synth, fastmine, fsq_loader, paths
 from suite import Suite, jac, ZMAIN
@@ -18,7 +18,7 @@ for seed in (7, 8, 9):
         print("ABL", json.dumps(row), flush=True); res["ablation"].append(row)
 for c in ("NYC", "TKY"):
     rows, users, NU, info = fsq_loader.load(paths.fsq(c), c)
-    S = Suite("x", rows, 50.0, "/tmp", log=lambda s: None)
+    S = Suite("x", rows, 50.0, tempfile.gettempdir(), log=lambda s: None)
     P0 = S.mk(); R0all, sc = S.topk(P0, 100); A0 = {p for p, v in R0all.items() if v >= sc[99]}
     out = {}
     for kap in (2.5, 5.0, 10.0):

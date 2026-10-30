@@ -1,4 +1,4 @@
-# Transcribed from /kaggle/working/summary.txt (Kaggle notebook duongvanhiepk18hl/notebookee8680da19), run 2026-10-27.
+# Transcribed from summary.txt written by the Kaggle notebook (kexp2.py), run 2026-10-27.
 # S name n features cliques omega Z insig_1645 insig_245 neg ev_median test_cov
 # Q name K mu R0 R1.645 R2.45 R4.36 nested med_ev_rej med_ev_kept size_rej size_kept atoms_rej atoms_kept J_raw R_FE FE_miss
 # T name K hold_kept hold_rej hold_matched regr_kept regr_rej regr_matched train_rej train_matched regr_diff perm_p test_cov_rej Lg_miss_z0 Ls_miss_z0 Lg_miss_z1.645 Ls_miss_z1.645 FE_bins
