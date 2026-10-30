@@ -1,0 +1,68 @@
+{
+ "edges": [
+  0,
+  50,
+  100,
+  200,
+  400,
+  800,
+  1600
+ ],
+ "rho": [
+  0.1225,
+  0.0685,
+  0.0259,
+  0.0129,
+  0.0065,
+  0.0065
+ ],
+ "rho_used": [
+  0.1225,
+  0.0685,
+  0.0259,
+  0.0129,
+  0.0065,
+  0.0065
+ ],
+ "K": {
+  "100": {
+   "R0": 100,
+   "R_indep": 56,
+   "R_banded": 51,
+   "R_equi": 0,
+   "banded_subset": true,
+   "J_banded_indep": 0.9107,
+   "nodes_indep": 550,
+   "nodes_banded": 550,
+   "hold_banded": 0.9608,
+   "hold_removed_by_band": 1.0,
+   "hold_rej_indep": 0.7273
+  },
+  "300": {
+   "R0": 300,
+   "R_indep": 199,
+   "R_banded": 187,
+   "R_equi": 85,
+   "banded_subset": true,
+   "J_banded_indep": 0.9397,
+   "nodes_indep": 925,
+   "nodes_banded": 925,
+   "hold_banded": 0.9893,
+   "hold_removed_by_band": 0.8333,
+   "hold_rej_indep": 0.8614
+  },
+  "1000": {
+   "R0": 1000,
+   "R_indep": 550,
+   "R_banded": 498,
+   "R_equi": 295,
+   "banded_subset": true,
+   "J_banded_indep": 0.9055,
+   "nodes_indep": 1715,
+   "nodes_banded": 1715,
+   "hold_banded": 0.9839,
+   "hold_removed_by_band": 0.9231,
+   "hold_rej_indep": 0.6889
+  }
+ }
+}

@@ -12,8 +12,8 @@ are the summed posterior means and variances of the participating atoms (instanc
 | File | Content |
 |---|---|
 | `uhucm/uhucm.py` | Reference implementation and brute force (definitions, bounds, exact miner) |
-| `uhucm/fastmine.py` | Vectorized UHUCM used in all experiments: prefix-optimal exact bound, chord bound, FUB, PCB, suffix bound, robust (equicorrelated) bound |
-| `uhucm/test_fastmine.py` | `fastmine` vs. brute force on random instances (mixed signs, variances, interactions, rho) |
+| `uhucm/fastmine.py` | Vectorized UHUCM used in all experiments: prefix-optimal exact bound, chord bound, FUB, PCB, suffix bound located by binary search, robust (equicorrelated) bound, distance-banded non-negative covariance |
+| `uhucm/test_fastmine.py`, `uhucm/test_bands.py` | `fastmine` vs. brute force on random instances (mixed signs, variances, interactions, rho; banded covariance) |
 | `uhucm/evigen.py`, `uhucm/synth.py` | EviGen generator; E1 exactness, E2 calibration (incl. misspecification), scalability, clique stress test |
 | `uhucm/fsq_loader.py` | Foursquare TSMC2014 -> atoms (Gamma-Poisson relative-performance utility) and interaction pairs |
 | `uhucm/yelp_full.py` | Yelp Open Dataset -> atoms (Normal-Normal rating posterior) and interaction pairs |
@@ -23,8 +23,10 @@ are the summed posterior means and variances of the participating atoms (instanc
 | `uhucm/ext_baselines.py`, `uhucm/run_ext_fsq.py`, `uhucm/cq_rerun.py` | External baselines with the authors' PSO-MUCP and CQ-HUCPM code |
 | `uhucm/d8/` | Comparison with the authors' PSO-MUCP code on their public data (called D6 in the paper) and the Strategy-4 audit |
 | `uhucm/rev_extra.py`, `uhucm/scale_mem.py`, `uhucm/scale_mem_fsq.py` | Ablation with all-negative features, interaction sensitivity, scalability and peak memory |
-| `uhucm/results_db.py`, `uhucm/stats_rev.py`, `uhucm/stats_tests.py` | Collect results; Wilson intervals, Friedman/Nemenyi, Holm, Wilcoxon |
-| `uhucm/make_rev_tables.py`, `uhucm/make_figures.py`, `uhucm/figstyle.py` | Tables and figures, generated only from the result files |
+| `uhucm/run_timing_k.py`, `uhucm/run_timing_k2.py` | Repeated timing (10 runs) on D4/D5 with k = 20-80 features, ablation, d = 70 m |
+| `uhucm/run_bands_fsq.py`, `uhucm/run_mc_fsq.py` | Distance-banded residual correlation and mining (E8); Monte Carlo check of the normal approximation on D4/D5 |
+| `uhucm/results_db.py`, `uhucm/stats_rev.py`, `uhucm/stats_rev2.py`, `uhucm/stats_tests.py`, `uhucm/stats_timing2.py` | Collect results; Wilson intervals, score matching, Friedman, Wilcoxon with Holm, Nemenyi, Welch tests on timings |
+| `uhucm/make_rev_tables.py`, `uhucm/make_rev3_tables.py`, `uhucm/make_figures.py`, `uhucm/figstyle.py` | Tables and figures, generated only from the result files |
 | `uhucm/out_*`, `uhucm/results_kaggle/`, `uhucm/d8/d8_results.jsonl` | Result files behind the reported numbers |
 
 Yelp runs were executed in a Kaggle notebook; their outputs were copied into `uhucm/results_kaggle/`
@@ -52,13 +54,19 @@ All commands run from `uhucm/`.
 python test_fastmine.py                                  # exactness check against brute force
 python synth.py e1                                       # E1 on 2,000 random datasets
 python synth.py e2 && python synth.py e2b                # E2 calibration on EviGen
-python synth.py scale_n && python synth.py scale_k && python synth.py stress
+python test_bands.py                                     # banded covariance vs. enumeration
+python synth.py e2c && python synth.py e2d               # activity + spatial settings, banded covariance
+python scale_mem.py && python synth.py stress            # scalability, peak memory, clique stress test
 python run_suite_fsq.py $FSQ_DIR/dataset_TSMC2014_NYC.txt NYC out_suite
 python run_fsq_d.py    $FSQ_DIR/dataset_TSMC2014_NYC.txt NYC out_suite_d 30
 python run_ext_fsq.py NYC                                # external baselines (needs PSO-MUCP)
 (cd d8 && python run_d8_all.py cal && python run_d8_all.py lv)
 python kexp4.py YELP_ROOT OUT 2019-01-01 2020-01-01 "Philadelphia;New Orleans;Tampa"   # Yelp, on Kaggle
-python stats_rev.py && python make_rev_tables.py && python make_figures.py
+python run_timing_k.py NYC && python run_timing_k2.py TKY 40 60 80   # repeated timing (also run_timing_k.py TKY for k = 20)
+python run_bands_fsq.py NYC && python run_mc_fsq.py NYC             # E8 banded covariance, Monte Carlo check
+(cd d8 && python rerun_d6_time.py)                                 # D6 timing, three runs
+python stats_rev2.py && python stats_timing2.py && python make_rev3_tables.py && python make_figures.py
 ```
 
-Seeds are fixed in the scripts (EviGen calibration seeds 1000-1099, timing seeds 7-9, D6 utilities seed 2026).
+Seeds are fixed in the scripts (EviGen calibration seeds 1000-1099, E1 seeds 0-1999, timing seeds 7-9, D6 utilities seed 2026, bootstrap/permutation and Monte Carlo seed 0).
+Reported runs used Python 3.13 with NumPy 2.1/SciPy 1.16 (Kaggle) and NumPy 2.5/SciPy 1.18 (local).

@@ -1,0 +1,107 @@
+{
+ "nseed": 100,
+ "results": {
+  "activity+spatial 0.1": {
+   "rho_hat_mean": 0.0488,
+   "rho_hat_sd": 0.0344,
+   "normal rho=0": {
+    "seeds": 100,
+    "FDP": 0.0382,
+    "FDP_sd": 0.0797,
+    "power": 0.1329
+   },
+   "normal robust rho_hat": {
+    "seeds": 100,
+    "FDP": 0.0245,
+    "FDP_sd": 0.0764,
+    "power": 0.0977
+   },
+   "subG rho=0": {
+    "seeds": 100,
+    "FDP": 0.0057,
+    "FDP_sd": 0.0341,
+    "power": 0.062
+   },
+   "subG robust rho_hat": {
+    "seeds": 100,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "power": 0.0421
+   },
+   "z=0": {
+    "seeds": 100,
+    "FDP": 0.2516,
+    "FDP_sd": 0.1218,
+    "power": 0.5126
+   }
+  },
+  "activity+spatial 0.25": {
+   "rho_hat_mean": 0.1279,
+   "rho_hat_sd": 0.0459,
+   "normal rho=0": {
+    "seeds": 100,
+    "FDP": 0.0382,
+    "FDP_sd": 0.094,
+    "power": 0.1751
+   },
+   "normal robust rho_hat": {
+    "seeds": 100,
+    "FDP": 0.0101,
+    "FDP_sd": 0.0542,
+    "power": 0.0965
+   },
+   "subG rho=0": {
+    "seeds": 100,
+    "FDP": 0.0144,
+    "FDP_sd": 0.1027,
+    "power": 0.0871
+   },
+   "subG robust rho_hat": {
+    "seeds": 100,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "power": 0.0428
+   },
+   "z=0": {
+    "seeds": 100,
+    "FDP": 0.2217,
+    "FDP_sd": 0.1258,
+    "power": 0.5618
+   }
+  },
+  "activity+spatial 0.5": {
+   "rho_hat_mean": 0.2609,
+   "rho_hat_sd": 0.0575,
+   "normal rho=0": {
+    "seeds": 100,
+    "FDP": 0.0311,
+    "FDP_sd": 0.0796,
+    "power": 0.2073
+   },
+   "normal robust rho_hat": {
+    "seeds": 100,
+    "FDP": 0.0061,
+    "FDP_sd": 0.0402,
+    "power": 0.0942
+   },
+   "subG rho=0": {
+    "seeds": 100,
+    "FDP": 0.0083,
+    "FDP_sd": 0.0395,
+    "power": 0.1187
+   },
+   "subG robust rho_hat": {
+    "seeds": 100,
+    "FDP": 0.0009,
+    "FDP_sd": 0.0091,
+    "power": 0.0481
+   },
+   "z=0": {
+    "seeds": 100,
+    "FDP": 0.1715,
+    "FDP_sd": 0.1216,
+    "power": 0.5689
+   }
+  }
+ }
+}

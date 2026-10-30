@@ -65,11 +65,11 @@ def line(ax, x, series, labels=True, fmt="{:.2f}", xlabel="", ylabel="", logy=Fa
     ax.set_xlabel(xlabel); ax.set_ylabel(ylabel)
 
 
-def finalize(fig, axes, labels, handles=None, legend_labels=None, ncol=4, bottom=0.34, leg_y=0.13, lab_y=0.015):
+def finalize(fig, axes, labels, handles=None, legend_labels=None, ncol=4, bottom=0.34, leg_y=0.13, lab_y=0.015, fontsize=8):
     """Template layout: axes, then one shared legend, then the sub-captions (a), (b) at the bottom."""
     fig.subplots_adjust(bottom=bottom)
     if handles is not None:
         fig.legend(handles, legend_labels, loc="upper center", bbox_to_anchor=(0.5, leg_y), ncol=ncol)
     for ax, lab in zip(axes, labels):
         bb = ax.get_position()
-        fig.text((bb.x0 + bb.x1) / 2, lab_y, lab, ha="center", va="bottom", fontsize=8)
+        fig.text((bb.x0 + bb.x1) / 2, lab_y, lab, ha="center", va="bottom", fontsize=fontsize)

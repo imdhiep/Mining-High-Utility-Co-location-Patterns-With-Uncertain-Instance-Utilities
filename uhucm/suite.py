@@ -323,25 +323,32 @@ class Suite:
                 self.R("EFFd", d=d, status="memory"); break
         self.rec["efficiency"] = dict(vs_mu=vs_mu, ablation=abl, vs_z=vs_z, vs_d=vs_d)
 
-    def timing(self, Ks=(30, 100, 300, 1000, 3000), reps=10, ds=None, z=None, abl_K=300):
+    def timing(self, Ks=(30, 100, 300, 1000, 3000), reps=10, ds=None, z=None, abl_K=300, np_once=False):
         """Repeated wall-clock timing of the mining step (clique build excluded): exact bound, mean bound and NoPrune at
         each rank threshold and distance, plus the bound/strategy ablation at K = abl_K; the variants are run in
-        interleaved order, reps times each, and every time is recorded."""
+        interleaved order, reps times each, and every time is recorded. NoPrune evaluates the same nodes at every
+        threshold; with np_once it is timed at the first threshold only and its record is reused for the others."""
         z = self.zmain if z is None else z; out = {}
         V = [("exact", (1, 1, 1, 1), "exact"), ("mean", (1, 1, 1, 1), "mean"), ("noprune", (0, 0, 0, 0), "exact")]
-        A = [("noFUB", (0, 1, 1, 1), "exact"), ("noPCB", (1, 0, 1, 1), "exact"), ("noSB", (1, 1, 0, 1), "exact"), ("noNP", (1, 1, 1, 0), "exact"), ("chord", (1, 1, 1, 1), "chord")]
+        A = [("noFUB", (0, 1, 1, 1), "exact"), ("noPCB", (1, 0, 1, 1), "exact"), ("noSB", (1, 1, 0, 1), "exact"), ("noNP", (1, 1, 1, 0), "exact"),
+             ("chord", (1, 1, 1, 1), "chord"), ("nosearch", (1, 1, 1, 1), "exact")]
         for d in (ds or (self.d,)):
             P0d = self.mk(d=d); _, scd = self.topk(P0d, max(Ks)); Pzd = self.mk(z=z, d=d); res = {"cliques": len(P0d.cliques)}
             for K in Ks:
                 if K > len(scd): continue
-                m = scd[K - 1]; VV = V + (A if (K == abl_K and d == self.d) else []); rec = {n: dict(times=[]) for n, _, _ in VV}
+                m = scd[K - 1]; VV = V + (A if (K == abl_K and d == self.d) else [])
+                if np_once and res.get("_np"): VV = [v for v in VV if v[0] != "noprune"]
+                rec = {n: dict(times=[]) for n, _, _ in VV}
                 for _ in range(reps):
                     for n, use, kind in VV:
-                        t = time.time(); R, stt, _ = mine(Pzd, m, use, kind); rec[n]["times"].append(round(time.time() - t, 4))
+                        t = time.time(); R, stt, _ = mine(Pzd, m, use, kind, search=(n != "nosearch")); rec[n]["times"].append(round(time.time() - t, 4))
                         rec[n]["evaluated"], rec[n]["R"] = stt["evaluated"], len(R)
+                if np_once:
+                    if "noprune" in rec: res["_np"] = rec["noprune"]
+                    else: rec["noprune"] = res["_np"]
                 res[K] = rec
                 self.R("TIME", d=d, K=K, **{n: f"{np.mean(r['times']):.4f}+-{np.std(r['times'], ddof=1):.4f}/{r['evaluated']}" for n, r in rec.items()})
-            out[d] = res
+            res.pop("_np", None); out[d] = res
         self.rec["timing"] = out
         return out
 

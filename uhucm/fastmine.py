@@ -24,7 +24,7 @@ class Problem:
         self.n = len(feat); self.feat = np.asarray(feat); self.k = int(self.feat.max()) + 1
         self.names = feat_names or [str(f) for f in range(self.k)]
         self.z, self.rho, self.beta, self.d = z, rho, beta, d
-        xy = np.asarray(xy, float)
+        xy = np.asarray(xy, float); self.xy = xy; self.bands = None
         self.nb = self._neighbours(xy, d)
         self.cliques = self._maximal_cliques()
         C = len(self.cliques)
@@ -121,8 +121,27 @@ class Problem:
             Pm = self.Pid[np.ix_(L, fs, fs)].ravel(); mark[Pm[Pm >= 0]] = True
         return np.flatnonzero(mark)
 
+    def set_bands(self, edges, rhos):
+        """Distance-banded correlation of instance atoms: corr(a, b) = rhos[k] for distances in (edges[k], edges[k+1]]
+        (the first band includes 0) and 0 beyond edges[-1]. All rhos must be non-negative, so the variance can only
+        grow and the bounds computed under independence (rho = 0) remain valid upper bounds."""
+        assert self.rho == 0 and all(r >= 0 for r in rhos) and len(edges) == len(rhos) + 1
+        self.bands = (np.asarray(edges[1:], float), np.append(np.asarray(rhos, float), 0.0))
+
+    def _banded_extra(self, inst):
+        if len(inst) < 2: return 0.0
+        s = np.sqrt(self.as2[inst]); X = self.xy[inst]; e, rr = self.bands; tot = 0.0
+        for a in range(0, len(inst), 1024):
+            D = np.sqrt(((X[a:a + 1024, None, :] - X[None, :, :]) ** 2).sum(-1))
+            R = rr[np.searchsorted(e, D, side="left")]
+            tot += float(s[a:a + 1024] @ (R @ s))
+        return tot - rr[0] * float((s * s).sum())          # remove the diagonal (distance 0 falls in the first band)
+
     def score(self, A):
         m = self.amu[A].sum(); v = self.as2[A]
+        if self.bands is not None:
+            V = v.sum() + self._banded_extra(A[A < self.n])
+            return (m - self.z * math.sqrt(max(V, 0.0))) / self.Z
         if self.rho > 0:
             V = (1 - self.rho) * v.sum() + self.rho * np.sqrt(v).sum() ** 2
         else:
@@ -252,11 +271,82 @@ class Problem:
         return out
 
 
+    def suffix_search(self, L, P, T, kind="two", st=None, thr=None, need_sb=True):
+        """Same pruning decisions as suffix_bounds, with O(log |T|) bound evaluations per node: the candidate sets of
+        the suffix bound are nested (I[j+1] is a subset of I[j]), so the exact bound is non-increasing in j
+        (Proposition 7) and the first j with a bound below thr is found by binary search. The chord (or mean) bound is
+        only used as a cheaper sufficient test inside each probe. Returns (pcb_prunes, brk)."""
+        P = list(P); T = list(T); cols = P + T; nP = len(P); nT = len(T)
+        Msub = self.Mem[np.ix_(L, cols)]
+        posT = np.full(len(cols), -1); posT[nP:] = np.arange(nT)
+        present = Msub >= 0
+        tp = np.where(present[:, nP:], np.arange(nT)[None, :], -1)
+        maxpos = tp.max(1)
+        keyP = np.repeat(maxpos[:, None], nP, 1) if nP else np.zeros((len(L), 0), int)
+        keyT = np.where(present[:, nP:], np.arange(nT)[None, :], -1)
+        key = np.concatenate([keyP, keyT], 1)
+        inst = Msub[present]; ikey = key[present]
+        parts_r = [self.rank[inst]]; parts_k = [ikey]
+        if self.Pid is not None and len(cols) > 1:
+            Pm = self.Pid[np.ix_(L, cols, cols)]
+            ok = Pm >= 0
+            if ok.any():
+                rr, a, b = np.nonzero(ok)
+                pa, pb = posT[a], posT[b]
+                k2 = np.where((pa < 0) & (pb < 0), maxpos[rr], np.where(pa < 0, pb, np.where(pb < 0, pa, np.minimum(pa, pb))))
+                parts_r.append(self.rank[Pm[ok]]); parts_k.append(k2)
+        r = np.concatenate(parts_r); k = np.concatenate(parts_k)
+        keep = (r >= 0) & (k >= 0); r, k = r[keep], k[keep]
+        if len(r) == 0: return True, 0
+        bestall = np.full(len(self.smu), -1); np.maximum.at(bestall, r, k)
+        u = np.flatnonzero(bestall >= 0); best = bestall[u]
+        mu, s2 = self.smu[u], self.ss2[u]
+        mean_only = kind == "mean" or self.z <= 0
+
+        def below(j):
+            m = best >= j
+            if not m.any(): return True
+            mj, sj = mu[m], s2[m]
+            msum = float(mj.sum())
+            if msum < thr: return True                      # the mean bound already prunes
+            if mean_only: return False
+            if self.rho > 0:
+                b1 = self._sr_sorted(mj, sj, self.z * math.sqrt(1 - self.rho))
+                b2 = float(np.clip(mj - self.z * math.sqrt(self.rho) * np.sqrt(sj), 0, None).sum())
+                return min(b1, b2) < thr
+            if kind in ("chord", "two"):
+                Vb = sj.sum()
+                ch = msum if Vb <= 0 else float(np.clip(mj - self.z * sj / math.sqrt(Vb), 0, None).sum())
+                if st is not None: st["chord"] += 1
+                if ch < thr:
+                    if st is not None: st["chord_pruned"] += 1
+                    return True
+                if kind == "chord": return False
+            if st is not None: st["exact"] += 1
+            return self._sr_sorted(mj, sj, self.z) < thr
+
+        if st is not None: st["probe"] += 1
+        if below(0): return True, 0
+        if not need_sb: return False, nT
+        if kind == "chord":                                  # the chord bound is not monotone in j: linear scan
+            for j in range(1, nT):
+                if st is not None: st["probe"] += 1
+                if below(j): return False, j
+            return False, nT
+        lo, hi = 1, nT                                       # invariant: below(lo - 1) is False; answer in [lo, hi]
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if st is not None: st["probe"] += 1
+            if below(mid): hi = mid
+            else: lo = mid + 1
+        return False, lo
+
+
 class Timeout(Exception):
     pass
 
 
-def mine(Pb, mu, use=(1, 1, 1, 1), kind='two', max_size=None, rule_l=None, deadline=None):
+def mine(Pb, mu, use=(1, 1, 1, 1), kind='two', max_size=None, rule_l=None, deadline=None, search=True):
     """Returns (results {tuple(sorted feature names): score}, counters, info).
     rule_l: None | 'global' | 'sum'  -- the local pruning Rule L of Section III (for the audit E4 only; unsafe).
       'global': prune P+{g} if L(P) < mu and every atom of feature g (all its instances and pairs) has mean <= 0.
@@ -319,7 +409,15 @@ def mine(Pb, mu, use=(1, 1, 1, 1), kind='two', max_size=None, rule_l=None, deadl
         if len(Lp) == 0: return
         thr = (mu - tol) * Pb.Z
         brk = len(T)
-        if use[1] or use[2]:
+        if (use[1] or use[2]) and search:
+            pcb, brk_ = Pb.suffix_search(Lp, P, T, kind, st, thr, need_sb=bool(use[2]))
+            st['bound'] += 1
+            if pcb:
+                if use[1]:
+                    st['ps2'] += 1; return
+                if use[2]: brk = 0                       # PCB off: the suffix bound of T[0:] still applies
+            elif use[2] and brk_ < len(T): brk = brk_; st['ps3'] += 1
+        elif use[1] or use[2]:
             sb = Pb.suffix_bounds(Lp, P, T, kind, st, thr)   # 'two': chord first, exact only where needed
             st['bound'] += 1 + (len(T) if use[2] else 0)
             if use[1] and sb[0] < thr:

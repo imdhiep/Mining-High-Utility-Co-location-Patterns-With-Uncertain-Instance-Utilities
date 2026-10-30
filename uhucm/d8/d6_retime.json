@@ -1,0 +1,80 @@
+[
+ {
+  "dataset": "LasVegas_POI 10f.csv",
+  "minutil": 0.02,
+  "n": 171,
+  "same": true,
+  "seconds": [
+   2.24,
+   1.91,
+   1.98
+  ],
+  "median": 1.98,
+  "authors": 37.28
+ },
+ {
+  "dataset": "LasVegas_POI 10f.csv",
+  "minutil": 0.05,
+  "n": 45,
+  "same": true,
+  "seconds": [
+   1.7,
+   1.89,
+   1.83
+  ],
+  "median": 1.83,
+  "authors": 35.64
+ },
+ {
+  "dataset": "California_POI 13f.csv",
+  "minutil": 0.02,
+  "n": 62,
+  "same": true,
+  "seconds": [
+   4.9,
+   4.76,
+   4.67
+  ],
+  "median": 4.76,
+  "authors": 83.88
+ },
+ {
+  "dataset": "LasVegas_POI 10f.csv",
+  "minutil": 0.1,
+  "n": 7,
+  "same": true,
+  "seconds": [
+   1.83,
+   1.89,
+   1.79
+  ],
+  "median": 1.83,
+  "authors": 37.73
+ },
+ {
+  "dataset": "California_POI 13f.csv",
+  "minutil": 0.05,
+  "n": 40,
+  "same": true,
+  "seconds": [
+   4.26,
+   4.29,
+   4.49
+  ],
+  "median": 4.29,
+  "authors": 86.03
+ },
+ {
+  "dataset": "California_POI 13f.csv",
+  "minutil": 0.1,
+  "n": 3,
+  "same": true,
+  "seconds": [
+   3.64,
+   3.45,
+   3.94
+  ],
+  "median": 3.64,
+  "authors": 78.82
+ }
+]

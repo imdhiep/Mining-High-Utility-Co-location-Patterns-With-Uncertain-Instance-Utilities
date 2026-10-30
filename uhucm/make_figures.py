@@ -145,24 +145,24 @@ def fig_case():
     rej = sorted(set(R0) - set(R1), key=lambda p: -R0[p]); kept = sorted(set(R1), key=lambda p: -R1[p])
     pr, pk = rej[0], kept[0]
     Ar = pattern_atoms(P0, pr); Ak = pattern_atoms(P0, pk)
-    fig, axes = plt.subplots(1, 2, figsize=(W2, 3.1)); caps = []
+    fig, axes = plt.subplots(1, 2, figsize=(W1, 1.98)); caps = []
     for ax, A, p, lab, sc in ((axes[0], Ak, pk, "(a) Kept", R1[pk]), (axes[1], Ar, pr, "(b) Rejected", R0[pr])):
         ax.scatter(XY[:, 0] / 1000, XY[:, 1] / 1000, s=0.3, color="#D9D9D9", linewidths=0, rasterized=True)
         a = A[A < P0.n]; sig = np.sqrt(s2[a]); col = np.where(mu[a] >= 0, fs.BLUE, fs.ORANGE)
         alpha = np.clip(1 - sig / (sig.max() + 1e-12), 0.25, 1)
         for i, j in enumerate(a):
-            ax.scatter(XY[j, 0] / 1000, XY[j, 1] / 1000, s=8, color=col[i], alpha=float(alpha[i]), linewidths=0)
+            ax.scatter(XY[j, 0] / 1000, XY[j, 1] / 1000, s=3, color=col[i], alpha=float(alpha[i]), linewidths=0)
         cx, cy = XY[a, 0].mean() / 1000, XY[a, 1].mean() / 1000; span = max(np.ptp(XY[a, 0]), np.ptp(XY[a, 1])) / 1000 / 2 + 1.0
         ax.set_xlim(cx - span, cx + span); ax.set_ylim(cy - span, cy + span); ax.set_aspect("equal")
-        ax.set_xlabel("x (km, UTM 18N)"); ax.set_ylabel("y (km)"); ax.grid(False)
+        ax.set_xlabel("x (km, UTM 18N)", fontsize=7, labelpad=1); ax.set_ylabel("y (km)", fontsize=7, labelpad=1); ax.tick_params(labelsize=6); ax.grid(False)
         lbl = " + ".join(s.replace("___", " / ").replace("_and_", " & ").replace("_", " ") for s in p)
         caps.append(f"{lab}: {{{lbl}}}")
-        ax.text(0.02, 0.98, f"$|A(P)|$={len(A)}, median $c$={np.median(np.array([rows[j]['a'] for j in a])):.0f}", transform=ax.transAxes, va="top", fontsize=6.5)
+        ax.text(0.02, 0.98, f"$|A(P)|$={len(A)}, median $c$={np.median(np.array([rows[j]['a'] for j in a])):.0f}", transform=ax.transAxes, va="top", fontsize=5.5)
     from matplotlib.lines import Line2D
     h = [Line2D([], [], marker="o", color="w", markerfacecolor=fs.BLUE, label=r"$\mu_a\geq 0$"), Line2D([], [], marker="o", color="w", markerfacecolor=fs.ORANGE, label=r"$\mu_a<0$"),
          Line2D([], [], marker="o", color="w", markerfacecolor="#D9D9D9", label="Other venues")]
-    fig.subplots_adjust(wspace=0.3)
-    fs.finalize(fig, axes, caps, h, [x.get_label() for x in h], ncol=3, bottom=0.30, leg_y=0.135); save(fig, "fig_case.pdf")
+    fig.subplots_adjust(wspace=0.38, left=0.12, right=0.99, top=0.99)
+    fs.finalize(fig, axes, caps, h, [x.get_label() for x in h], ncol=3, bottom=0.345, leg_y=0.175, lab_y=0.01, fontsize=6.5); save(fig, "fig_case.pdf")
     json.dump(dict(kept=list(pk), kept_score=R1[pk], kept_atoms=int(len(Ak)), rejected=list(pr), rejected_s0=R0[pr], rejected_lb=float(P1.score(Ar)), rejected_atoms=int(len(Ar)), muK=muK),
               open(os.path.join(OUT, "fig_case.json"), "w"), indent=1)
 
@@ -249,7 +249,7 @@ def fig_e2_2c():
     knobs = ["correct", "estimated", "t3", "prior+0.3", "prior-0.3", "sigma x0.7", "sigma x1.3", "spatial"]
     nice = {"correct": "Correct model", "estimated": "Re-estimated", "t3": "$t_3$ noise", "prior+0.3": r"Prior $+0.3\tau$", "prior-0.3": r"Prior $-0.3\tau$",
             "sigma x0.7": r"$\sigma_e\times0.7$", "sigma x1.3": r"$\sigma_e\times1.3$", "spatial": "Spatial 0.5"}
-    fig, axes = plt.subplots(1, 2, figsize=(W2, 2.0))
+    fig, axes = plt.subplots(1, 2, figsize=(W1, 2.45))
     for i, kn in enumerate(knobs):
         st = dict(marker=fs.MARKERS[i % 6], color=fs.PALETTE[i], label=nice[kn], linestyle="-" if i < 6 else "--")
         axes[0].plot(deltas, [e2[kn][f"normal d={d}"]["FDP"] for d in deltas], **st)
@@ -257,8 +257,9 @@ def fig_e2_2c():
     axes[0].plot(deltas, deltas, color="black", linewidth=0.7, linestyle=":", label=r"FDP $=\delta$")
     axes[0].set_ylabel("Mean FDP"); axes[1].set_ylabel("Detection rate")
     for ax in axes: ax.set_xticks(deltas); ax.set_xlabel(r"$\delta$ ($z=\Phi^{-1}(1-\delta)$)")
-    _sub(axes[0], "(a) False discovery proportion", -0.40); _sub(axes[1], "(b) Detection rate", -0.40)
-    fig.subplots_adjust(wspace=0.25, bottom=0.42); _leg(fig, axes[0], 9, 0.02); save(fig, "fig_e2w.pdf")
+    for ax in axes: ax.set_xlabel(r"$\delta$"); ax.set_xticklabels(["0.01", "0.05", "0.1", "0.2"], fontsize=6.5)
+    _sub(axes[0], "(a) Mean FDP", -0.31); _sub(axes[1], "(b) Detection rate", -0.31)
+    fig.subplots_adjust(wspace=0.42, left=0.13, right=0.98, top=0.97, bottom=0.50); _leg(fig, axes[0], 3, 0.31); save(fig, "fig_e2.pdf")
 
 
 def fig_eff_2c():
@@ -279,6 +280,31 @@ def fig_eff_2c():
             from matplotlib.ticker import FixedLocator, FixedFormatter
             lo, hi = ax.get_ylim(); tk = [t for t in (0.25, 0.5, 1, 1.5, 2, 3, 4, 6, 8) if lo <= t <= hi]; ax.yaxis.set_major_locator(FixedLocator(tk)); ax.yaxis.set_major_formatter(FixedFormatter([str(t) for t in tk]))
     fig.subplots_adjust(wspace=0.42, bottom=0.36); _leg(fig, axes[0], 3, 0.03); save(fig, "fig_effw.pdf")
+
+
+def fig_eff_v2():
+    """Mining time (mean and SD of 10 runs, binary-search suffix bound) of UHUCM, the mean bound and NoPrune:
+    (a), (b) against the rank threshold K on D1 and D5 (k = 20); (c), (d) against the number of features k at K = 300."""
+    T = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out_synth", "stats_timing2.json")))
+    meth = (("exact", "UHUCM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
+    fig, axes = plt.subplots(1, 4, figsize=(W2, 1.9))
+    def vsK(ax, key):
+        R = T[key]["rows"]; Ks = sorted(R, key=int)
+        for k, lbl, c, m in meth:
+            ax.errorbar([int(K) for K in Ks], [R[K]["table"][k][0] for K in Ks], yerr=[R[K]["table"][k][1] for K in Ks], color=c, marker=m, label=lbl, capsize=1.5, elinewidth=0.6)
+        ax.set_xscale("log"); ax.set_xlabel("$K$"); ax.set_xticks([int(K) for K in Ks]); ax.set_xticklabels([("1k" if int(K) == 1000 else "3k" if int(K) == 3000 else K) for K in Ks]); ax.minorticks_off()
+    def vsk(ax, city):
+        ks = sorted(int(x.split("|")[2]) for x in T if x.startswith(city + "|50|"))
+        for k, lbl, c, m in meth:
+            ys = [T[f"{city}|50|{kk}"]["rows"]["300"]["table"][k] for kk in ks]
+            ax.errorbar(ks, [y[0] for y in ys], yerr=[y[1] for y in ys], color=c, marker=m, label=lbl, capsize=1.5, elinewidth=0.6)
+        ax.set_xlabel("Number of features $k$"); ax.set_xticks(ks)
+    first = "D1" if "D1|50|20" in T else "D4"
+    vsK(axes[0], f"{first}|50|20"); vsK(axes[1], "D5|50|20"); vsk(axes[2], "D4"); vsk(axes[3], "D5")
+    caps = [f"(a) {first}, $k=20$", "(b) D5, $k=20$", "(c) D4, $K=300$", "(d) D5, $K=300$"]
+    for ax, cp in zip(axes, caps):
+        ax.set_yscale("log"); ax.set_ylabel("Mining time (s)", labelpad=1); _sub(ax, cp, -0.36)
+    fig.subplots_adjust(wspace=0.45, bottom=0.36); _leg(fig, axes[0], 3, 0.03); save(fig, "fig_effw.pdf")
 
 
 def fig_scale_2c():

@@ -303,6 +303,57 @@ def e2c(nseed=100):
         json.dump(dict(nseed=nseed, results=res), open(f"{OUT}/e2c.json", "w"), indent=1)
 
 
+def band_rhos(G, edges):
+    """Correlation of posterior residuals (posterior mean minus prior mean) between instances in distance bands
+    (edges in units of d); negative estimates are set to 0."""
+    from scipy.spatial import cKDTree
+    xy = np.asarray(G["xy"], float); r = G["pm"] - G["m0"]; T = cKDTree(xy); out = []
+    for lo, hi in zip(edges[:-1], edges[1:]):
+        P = T.query_pairs(hi * G["d"], output_type="ndarray")
+        if len(P):
+            dd = np.linalg.norm(xy[P[:, 0]] - xy[P[:, 1]], axis=1); P = P[dd > lo * G["d"]]
+        if len(P) < 3: out.append(0.0); continue
+        a, b = r[P[:, 0]], r[P[:, 1]]; out.append(max(0.0, float(np.corrcoef(np.r_[a, b], np.r_[b, a])[0, 1])))
+    return out
+
+
+def e2d(nseed=100):
+    """Distance-banded dependence (bands 0-1-2-4-8-16 d, residual correlations estimated per seed) in the spatial
+    settings: FDP and detection at delta = 0.05 with the normal and sub-Gaussian choices, under independence and under
+    the banded covariance; rating setting (field fraction 0.5) and activity setting (field fractions 0.1, 0.25, 0.5)."""
+    EDGES = [0, 1, 2, 4, 8, 16]
+    settings = {"rating spatial 0.5": dict(spatial=0.5)}
+    for frac in (0.1, 0.25, 0.5): settings[f"activity+spatial {frac}"] = dict(activity=True, spatial=frac)
+    res = {}
+    for name, kw in settings.items():
+        acc = collections.defaultdict(list); rb = []
+        for seed in range(nseed):
+            G = evigen2(400, 8, 1000 + seed, **kw)
+            P0 = problem(G, G["pm"], G["pv"], 0.0)
+            if P0.Z <= 0 or len(P0.cliques) == 0: continue
+            R0all = fastmine.mine(P0, -1e9)[0]
+            if len(R0all) < 20: continue
+            tv = truth_sets(G, P0, R0all)
+            tau = float(np.quantile(list(tv.values()), 0.7)); ntrue = sum(v >= tau for v in tv.values())
+            rhos = band_rhos(G, EDGES); rb.append(rhos)
+            def ev(z, banded):
+                Pb = fastmine.Problem(G["feat"], G["xy"], G["pm"], G["pv"], G["d"], z)
+                if Pb.Z <= 0: return None
+                if banded: Pb.set_bands(EDGES, rhos)
+                R = fastmine.mine(Pb, tau / Pb.Z)[0]
+                return (len(R), sum(tv[p] < tau for p in R) / len(R) if R else 0.0, sum(tv[p] >= tau for p in R) / max(1, ntrue))
+            for zn, z in (("normal", norm.ppf(0.95)), ("subG", math.sqrt(2 * math.log(20)))):
+                acc[f"{zn} indep"].append(ev(z, False)); acc[f"{zn} banded"].append(ev(z, True))
+        out = {"rho_bands_mean": [round(float(x), 4) for x in np.mean(rb, 0)]}
+        for m, L in acc.items():
+            L = [x for x in L if x]
+            out[m] = dict(seeds=len(L), FDP=round(st.mean(x[1] for x in L), 4), FDP_sd=round(st.stdev(x[1] for x in L), 4),
+                          power=round(st.mean(x[2] for x in L), 4), reported=round(st.mean(x[0] for x in L), 2))
+        res[name] = out
+        print("E2d", name, json.dumps(out), flush=True)
+        json.dump(dict(nseed=nseed, edges=EDGES, results=res), open(f"{OUT}/e2d.json", "w"), indent=1)
+
+
 if __name__ == "__main__":
     exp = sys.argv[1]
-    {"e1": e1, "e2": e2, "e2b": e2b, "e2c": e2c, "scale_n": scale_n, "scale_k": scale_k, "stress": stress}[exp]()
+    {"e1": e1, "e2": e2, "e2b": e2b, "e2c": e2c, "e2d": e2d, "scale_n": scale_n, "scale_k": scale_k, "stress": stress}[exp]()
