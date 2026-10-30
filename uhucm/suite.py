@@ -40,8 +40,8 @@ def caliper_pairs(A, B, score, cal):
 
 def table2x2(pairs, hit):
     """pairs (a, b): counts of (hit_a, hit_b) as both / only_b / only_a / neither."""
-    return dict(both=sum(hit(a) and hit(b) for a, b in pairs), only_b=sum((not hit(a)) and hit(b) for a, b in pairs),
-                only_a=sum(hit(a) and not hit(b) for a, b in pairs), neither=sum((not hit(a)) and (not hit(b)) for a, b in pairs), n=len(pairs))
+    return dict(both=int(sum(bool(hit(a) and hit(b)) for a, b in pairs)), only_b=int(sum(bool((not hit(a)) and hit(b)) for a, b in pairs)),
+                only_a=int(sum(bool(hit(a) and not hit(b)) for a, b in pairs)), neither=int(sum(bool((not hit(a)) and (not hit(b))) for a, b in pairs)), n=len(pairs))
 
 
 def timed(fn, reps=1):
