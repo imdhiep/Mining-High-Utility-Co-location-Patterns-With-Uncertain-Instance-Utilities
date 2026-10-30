@@ -36,11 +36,12 @@ def timed(fn, reps=1):
 
 class Suite:
     def __init__(self, name, rows, d, out, recompute=None, variants=(), users=None, NU=None, interactions=None,
-                 resid=None, log=print, deadline=900, reps=3):
+                 resid=None, log=print, deadline=900, reps=3, zmain=ZMAIN):
         self.name, self.rows, self.d, self.out = name, rows, d, out
         self.recompute, self.variants = recompute, variants
         self.users, self.NU, self.interactions, self.resid = users, NU, interactions, resid
         self.log, self.deadline, self.reps = log, deadline, reps
+        self.zmain = zmain
         self.names = sorted({r["feat"] for r in rows}); fi = {f: j for j, f in enumerate(self.names)}
         self.F = [fi[r["feat"]] for r in rows]; self.XY = [(r["x"], r["y"]) for r in rows]
         self.mu = np.array([r["mu"] for r in rows], float); self.s2 = np.array([r["s2"] for r in rows], float)
@@ -70,7 +71,9 @@ class Suite:
             m /= 2
 
     # ------------------------------------------------------------------ stats + E0/E3/E7/E4/CASE
-    def quality(self, Ks=(100, 300, 1000)):
+    def quality(self, Ks=(100, 300, 1000), zmain=None):
+        """zmain: z that splits kept/rejected (1.645 normal choice; 2.45 sub-Gaussian choice for the activity posterior)."""
+        zmain = self.zmain if zmain is None else zmain
         t = time.time(); P0 = self.mk(); tb = time.time() - t
         act = self.mu != 0
         stats = dict(n=len(self.rows), features=len(self.names), cliques=len(P0.cliques),
@@ -82,21 +85,22 @@ class Suite:
         self.R("stats", **stats); self.rec["stats"] = stats
         R0all, sc = self.topk(P0, max(Ks))
         self.P0, self.R0all, self.sc = P0, R0all, sc
-        Pz = {z: self.mk(z=z) for z in ZS}
+        ZQ = tuple(sorted(set(ZS) | {zmain}))
+        Pz = {z: self.mk(z=z) for z in ZQ}
         Praw = self.mk(mu=self.raw, s2=np.zeros_like(self.raw))
-        fe = self.mu - ZMAIN * np.sqrt(self.s2); Pfe = self.mk(mu=fe, s2=np.zeros_like(fe))
+        fe = self.mu - zmain * np.sqrt(self.s2); Pfe = self.mk(mu=fe, s2=np.zeros_like(fe))
         has_t = ~np.isnan(self.mut); Zt = float(np.clip(self.mut[has_t], 0, None).sum())
         rows = []
         for K in Ks:
             if K > len(sc): continue
             muK = sc[K - 1]; tau = muK * P0.Z
             R0 = {p for p, v in R0all.items() if v >= muK}
-            Rz = {z: set(mine(Pz[z], muK)[0]) for z in ZS}
-            kept, rej = R0 & Rz[ZMAIN], R0 - Rz[ZMAIN]
+            Rz = {z: set(mine(Pz[z], muK)[0]) for z in ZQ}
+            kept, rej = R0 & Rz[zmain], R0 - Rz[zmain]
             A = {p: pattern_atoms(P0, p) for p in R0}
             med = lambda Ps: float(st.median(float(np.median(self.ev[A[p][A[p] < P0.n]])) for p in Ps)) if Ps else None
-            row = dict(K=K, mu=round(muK, 6), R0=len(R0), **{f"R{z}": len(Rz[z]) for z in ZS},
-                       **{f"J{z}": jac(R0, Rz[z]) for z in ZS}, nested=all(Rz[z] <= R0 for z in ZS),
+            row = dict(K=K, mu=round(muK, 6), R0=len(R0), zmain=zmain, **{f"R{z}": len(Rz[z]) for z in ZQ},
+                       **{f"J{z}": jac(R0, Rz[z]) for z in ZQ}, nested=all(Rz[z] <= R0 for z in ZQ),
                        med_ev_rej=med(rej), med_ev_kept=med(kept),
                        size_rej=round(st.mean(map(len, rej)), 2) if rej else None,
                        size_kept=round(st.mean(map(len, kept)), 2) if kept else None,
@@ -104,7 +108,7 @@ class Suite:
                        atoms_kept=float(st.median(len(A[p]) for p in kept)) if kept else None)
             Rr = set(mine(Praw, tau / Praw.Z)[0]); row["J_raw"] = jac(R0, Rr); row["R_raw"] = len(Rr)
             # E3
-            Rf = set(mine(Pfe, tau / Pfe.Z)[0]); Ru = Rz[ZMAIN]
+            Rf = set(mine(Pfe, tau / Pfe.Z)[0]); Ru = Rz[zmain]
             Au = {p: (A[p] if p in A else pattern_atoms(P0, p)) for p in Ru}
             bins = [(1, 10), (11, 50), (51, 200), (201, 10 ** 9)]
             row.update(R_FE=len(Rf), FE_miss=round(len(Ru - Rf) / max(1, len(Ru)), 4),
@@ -127,6 +131,11 @@ class Suite:
                     rng = np.random.default_rng(0); obs = diff.mean()
                     flips = rng.choice([-1.0, 1.0], size=(10000, len(diff)))
                     pval = float((np.abs((flips * diff).mean(1)) >= abs(obs) - 1e-15).mean())
+                    hr_, hm_ = [te_score(p) >= muK for p, _ in pairs], [te_score(q) >= muK for _, q in pairs]
+                    row["pair2x2"] = dict(both=int(sum(x and y for x, y in zip(hr_, hm_))), only_matched=int(sum((not x) and y for x, y in zip(hr_, hm_))),
+                                          only_rej=int(sum(x and not y for x, y in zip(hr_, hm_))), neither=int(sum((not x) and (not y) for x, y in zip(hr_, hm_))),
+                                          distinct_kept=len(set(mk_)), max_gap=round(float(max(abs(tr_score(p) - tr_score(q)) for p, q in pairs)), 6),
+                                          mean_gap=round(float(np.mean([tr_score(q) - tr_score(p) for p, q in pairs])), 6))
                     row.update(hold_matched=hold(mk_), regr_matched=regr(mk_),
                                train_rej=round(float(np.mean([tr_score(p) for p in rej])), 6),
                                train_matched=round(float(np.mean([tr_score(q) for q in mk_])), 6),
@@ -141,7 +150,7 @@ class Suite:
                     return dict(minpi=int(min(c[j] for j in fid)), pi=float(min(c[j] / nf[j] for j in fid)), ev=float(np.median(self.ev[ins])))
                 PS = {p: pstats(p) for p in R0}
                 hits = {p: te_score(p) >= muK for p in R0}
-                Rzs = Rz[ZMAIN]; target = len(Rzs); filt = {}
+                Rzs = Rz[zmain]; target = len(Rzs); filt = {}
                 for key in ("minpi", "pi", "ev"):
                     vals = sorted({PS[p][key] for p in R0})
                     best = None
@@ -152,13 +161,25 @@ class Suite:
                     only_f, only_z = S_ - Rzs, Rzs - S_
                     hr = lambda Ps: round(float(np.mean([hits[p] for p in Ps])), 4) if Ps else None
                     filt[key] = dict(th=th, n=len(S_), J=jac(S_, Rzs), hold=hr(S_), hold_z=hr(Rzs), n_only_f=len(only_f), n_only_z=len(only_z),
-                                     hold_only_f=hr(only_f), hold_only_z=hr(only_z))
+                                     hold_only_f=hr(only_f), hold_only_z=hr(only_z),
+                                     hits_only_f=int(sum(hits[p] for p in only_f)), hits_only_z=int(sum(hits[p] for p in only_z)),
+                                     train_only_f=round(float(np.mean([R0all[p] for p in only_f])), 6) if only_f else None,
+                                     train_only_z=round(float(np.mean([R0all[p] for p in only_z])), 6) if only_z else None)
+                    if only_f and only_z:   # score-matched: each only-filter pattern paired with the only-UHUCM pattern of nearest training score
+                        zl = sorted(only_z, key=lambda q: R0all[q]); zv = np.array([R0all[q] for q in zl]); used_z = set(); fp = []
+                        for p in sorted(only_f, key=lambda q: R0all[q]):
+                            order = np.argsort(np.abs(zv - R0all[p]))
+                            jj = next((int(i) for i in order if int(i) not in used_z), int(order[0])); used_z.add(jj); fp.append((p, zl[jj]))
+                        hf_, hz_ = [hits[p] for p, _ in fp], [hits[q] for _, q in fp]
+                        filt[key]["pair2x2"] = dict(both=int(sum(x and y for x, y in zip(hf_, hz_))), only_z=int(sum((not x) and y for x, y in zip(hf_, hz_))),
+                                                    only_f=int(sum(x and not y for x, y in zip(hf_, hz_))), neither=int(sum((not x) and (not y) for x, y in zip(hf_, hz_))),
+                                                    mean_gap=round(float(np.mean([R0all[q] - R0all[p] for p, q in fp])), 6))
                 row["filters"] = filt
                 row["n_kept"], row["n_rej"] = len(kept), len(rej)
                 row["hits_kept"] = int(sum(hits[p] for p in kept)); row["hits_rej"] = int(sum(hits[p] for p in rej))
                 if rej and kept: row["hits_matched"] = int(sum(hits[q] for q in mk_)); row["n_matched"] = len(mk_)
             # E4 (Rule L), z = 0 and z = 1.645
-            for z, Pb in ((0.0, P0), (ZMAIN, Pz[ZMAIN])):
+            for z, Pb in ((0.0, P0), (zmain, Pz[zmain])):
                 Rfull = R0 if z == 0 else Ru
                 for var in ("global", "sum"):
                     RL = set(mine(Pb, muK, rule_l=var)[0])
@@ -166,7 +187,7 @@ class Suite:
             # CASE (K = 300): five rejected patterns with the largest train score
             if K == 300 and rej:
                 top = sorted(rej, key=lambda p: -R0all[p])[:5]
-                row["case"] = [dict(p="+".join(p), s0=round(R0all[p], 5), lb=round(Pz[ZMAIN].score(A[p]), 5), atoms=int(len(A[p])),
+                row["case"] = [dict(p="+".join(p), s0=round(R0all[p], 5), lb=round(Pz[zmain].score(A[p]), 5), atoms=int(len(A[p])),
                                     med_ev=float(np.median(self.ev[A[p][A[p] < P0.n]]))) for p in top]
             rows.append(row)
             short = {k: v for k, v in row.items() if k not in ("case", "FE_bins", "filters")}
@@ -184,7 +205,7 @@ class Suite:
         out = dict(pairs=len(pairs), pos=round(float((iv[:, 0] > 0).mean()), 3) if len(iv) else 0, var=round(float(iv[:, 1].mean()), 5) if len(iv) else 0)
         A0 = {p for p, v in self.R0all.items() if v >= self.sc[K - 1]}
         for b in betas:
-            Pb0 = self.mk(pairs=pairs, beta=b); Pb1 = self.mk(z=ZMAIN, pairs=pairs, beta=b)
+            Pb0 = self.mk(pairs=pairs, beta=b); Pb1 = self.mk(z=self.zmain, pairs=pairs, beta=b)
             Rb0, scb = self.topk(Pb0, K)
             mK = scb[K - 1]; B0 = {p for p, v in Rb0.items() if v >= mK}; B1 = set(mine(Pb1, mK)[0])
             out[f"beta{b}"] = dict(R0=len(B0), Rz=len(B1), J=jac(B0, B1), J_vs_beta0=jac(B0, A0))
@@ -195,10 +216,10 @@ class Suite:
     def sensitivity(self, K=300):
         if self.recompute is None: return
         muK = self.sc[K - 1]
-        base = set(mine(self.mk(z=ZMAIN), muK)[0]); out = {}
+        base = set(mine(self.mk(z=self.zmain), muK)[0]); out = {}
         for name, kw in self.variants:
             mu, s2 = self.recompute(**kw)
-            Pb = self.mk(mu=np.array(mu), s2=np.array(s2), z=ZMAIN)
+            Pb = self.mk(mu=np.array(mu), s2=np.array(s2), z=self.zmain)
             P0v = self.mk(mu=np.array(mu), s2=np.array(s2))
             # same rank-based threshold: the K-th z=0 score of the variant
             _, scv = self.topk(P0v, K)
@@ -221,7 +242,7 @@ class Suite:
         muK = self.sc[K - 1]; prev = None; rows = {}
         rhos = [0.0, 0.3, 0.6] + ([max(0.0, out["rho_hat"])] if out.get("rho_hat") is not None else [])
         for rho in sorted(set(round(x, 4) for x in rhos)):
-            Pb = self.mk(z=ZMAIN, rho=rho)
+            Pb = self.mk(z=self.zmain, rho=rho)
             (R, s, _), t = timed(lambda: mine(Pb, muK))
             rows[str(rho)] = dict(R=len(R), evaluated=s["evaluated"], time=round(t, 2), set=set(R))
         ks = sorted(rows, key=float)
@@ -281,6 +302,28 @@ class Suite:
             except MemoryError:
                 self.R("EFFd", d=d, status="memory"); break
         self.rec["efficiency"] = dict(vs_mu=vs_mu, ablation=abl, vs_z=vs_z, vs_d=vs_d)
+
+    def timing(self, Ks=(30, 100, 300, 1000, 3000), reps=10, ds=None, z=None, abl_K=300):
+        """Repeated wall-clock timing of the mining step (clique build excluded): exact bound, mean bound and NoPrune at
+        each rank threshold and distance, plus the bound/strategy ablation at K = abl_K; the variants are run in
+        interleaved order, reps times each, and every time is recorded."""
+        z = self.zmain if z is None else z; out = {}
+        V = [("exact", (1, 1, 1, 1), "exact"), ("mean", (1, 1, 1, 1), "mean"), ("noprune", (0, 0, 0, 0), "exact")]
+        A = [("noFUB", (0, 1, 1, 1), "exact"), ("noPCB", (1, 0, 1, 1), "exact"), ("noSB", (1, 1, 0, 1), "exact"), ("noNP", (1, 1, 1, 0), "exact"), ("chord", (1, 1, 1, 1), "chord")]
+        for d in (ds or (self.d,)):
+            P0d = self.mk(d=d); _, scd = self.topk(P0d, max(Ks)); Pzd = self.mk(z=z, d=d); res = {"cliques": len(P0d.cliques)}
+            for K in Ks:
+                if K > len(scd): continue
+                m = scd[K - 1]; VV = V + (A if (K == abl_K and d == self.d) else []); rec = {n: dict(times=[]) for n, _, _ in VV}
+                for _ in range(reps):
+                    for n, use, kind in VV:
+                        t = time.time(); R, stt, _ = mine(Pzd, m, use, kind); rec[n]["times"].append(round(time.time() - t, 4))
+                        rec[n]["evaluated"], rec[n]["R"] = stt["evaluated"], len(R)
+                res[K] = rec
+                self.R("TIME", d=d, K=K, **{n: f"{np.mean(r['times']):.4f}+-{np.std(r['times'], ddof=1):.4f}/{r['evaluated']}" for n, r in rec.items()})
+            out[d] = res
+        self.rec["timing"] = out
+        return out
 
     def save(self):
         json.dump(self.rec, open(os.path.join(self.out, f"suite_{self.name}.json"), "w"), indent=1, default=str)
