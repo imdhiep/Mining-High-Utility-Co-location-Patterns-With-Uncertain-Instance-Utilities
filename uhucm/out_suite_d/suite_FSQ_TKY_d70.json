@@ -1,0 +1,344 @@
+{
+ "name": "FSQ_TKY_d70",
+ "d": 70.0,
+ "stats": {
+  "n": 29774,
+  "features": 20,
+  "cliques": 293380,
+  "omega": 14,
+  "Z": 17410.11,
+  "build_s": 3.2,
+  "insig_1645": 0.548,
+  "insig_245": 0.655,
+  "neg": 0.302,
+  "ev_median": 2.0,
+  "test_cov": 1.0
+ },
+ "quality": [
+  {
+   "K": 100,
+   "mu": 0.048579,
+   "R0": 100,
+   "R1.645": 87,
+   "R2.45": 82,
+   "R4.36": 62,
+   "J1.645": 0.87,
+   "J2.45": 0.82,
+   "J4.36": 0.62,
+   "nested": true,
+   "med_ev_rej": 2.0,
+   "med_ev_kept": 2.0,
+   "size_rej": 3.46,
+   "size_kept": 3.3,
+   "atoms_rej": 1253.0,
+   "atoms_kept": 1685.0,
+   "J_raw": 0.83,
+   "R_raw": 83,
+   "R_FE": 0,
+   "FE_miss": 1.0,
+   "FE_bins": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     0
+    ],
+    [
+     87,
+     87
+    ]
+   ],
+   "hold_kept": 0.954,
+   "hold_rej": 0.6923,
+   "regr_kept": -0.014712,
+   "regr_rej": -0.007207,
+   "hold_matched": 0.8462,
+   "regr_matched": -0.004933,
+   "train_rej": 0.04996,
+   "train_matched": 0.052817,
+   "regr_diff": -0.002274,
+   "perm_p": 0.6927,
+   "test_cov_rej": 1.0,
+   "filters": {
+    "minpi": {
+     "th": 157,
+     "n": 87,
+     "J": 0.8125,
+     "hold": 0.931,
+     "hold_z": 0.954,
+     "n_only_f": 9,
+     "n_only_z": 9,
+     "hold_only_f": 0.7778,
+     "hold_only_z": 1.0
+    },
+    "pi": {
+     "th": 0.08015430775825118,
+     "n": 87,
+     "J": 0.8316,
+     "hold": 0.9195,
+     "hold_z": 0.954,
+     "n_only_f": 8,
+     "n_only_z": 8,
+     "hold_only_f": 0.625,
+     "hold_only_z": 1.0
+    },
+    "ev": {
+     "th": 2.0,
+     "n": 80,
+     "J": 0.67,
+     "hold": 0.9,
+     "hold_z": 0.954,
+     "n_only_f": 13,
+     "n_only_z": 20,
+     "hold_only_f": 0.6923,
+     "hold_only_z": 1.0
+    }
+   },
+   "n_kept": 87,
+   "n_rej": 13,
+   "hits_kept": 83,
+   "hits_rej": 9,
+   "hits_matched": 11,
+   "n_matched": 13,
+   "Lglobal_miss_z0.0": 0,
+   "Lsum_miss_z0.0": 0,
+   "Lglobal_miss_z1.645": 0,
+   "Lsum_miss_z1.645": 0
+  },
+  {
+   "K": 300,
+   "mu": 0.028829,
+   "R0": 300,
+   "R1.645": 257,
+   "R2.45": 235,
+   "R4.36": 202,
+   "J1.645": 0.8567,
+   "J2.45": 0.7833,
+   "J4.36": 0.6733,
+   "nested": true,
+   "med_ev_rej": 2.0,
+   "med_ev_kept": 2.0,
+   "size_rej": 4.19,
+   "size_kept": 3.55,
+   "atoms_rej": 715.0,
+   "atoms_kept": 1105.0,
+   "J_raw": 0.8433,
+   "R_raw": 253,
+   "R_FE": 0,
+   "FE_miss": 1.0,
+   "FE_bins": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     0
+    ],
+    [
+     257,
+     257
+    ]
+   ],
+   "hold_kept": 0.9339,
+   "hold_rej": 0.7209,
+   "regr_kept": -0.007948,
+   "regr_rej": -0.00207,
+   "hold_matched": 0.814,
+   "regr_matched": -0.003016,
+   "train_rej": 0.029801,
+   "train_matched": 0.032113,
+   "regr_diff": 0.000946,
+   "perm_p": 0.5594,
+   "test_cov_rej": 1.0,
+   "filters": {
+    "minpi": {
+     "th": 86,
+     "n": 257,
+     "J": 0.8489,
+     "hold": 0.9105,
+     "hold_z": 0.9339,
+     "n_only_f": 21,
+     "n_only_z": 21,
+     "hold_only_f": 0.6667,
+     "hold_only_z": 0.9524
+    },
+    "pi": {
+     "th": 0.048435490784397774,
+     "n": 257,
+     "J": 0.8292,
+     "hold": 0.9105,
+     "hold_z": 0.9339,
+     "n_only_f": 24,
+     "n_only_z": 24,
+     "hold_only_f": 0.7083,
+     "hold_only_z": 0.9583
+    },
+    "ev": {
+     "th": 2.0,
+     "n": 261,
+     "J": 0.7324,
+     "hold": 0.8927,
+     "hold_z": 0.9339,
+     "n_only_f": 42,
+     "n_only_z": 38,
+     "hold_only_f": 0.7143,
+     "hold_only_z": 0.9737
+    }
+   },
+   "n_kept": 257,
+   "n_rej": 43,
+   "hits_kept": 240,
+   "hits_rej": 31,
+   "hits_matched": 35,
+   "n_matched": 43,
+   "Lglobal_miss_z0.0": 0,
+   "Lsum_miss_z0.0": 0,
+   "Lglobal_miss_z1.645": 0,
+   "Lsum_miss_z1.645": 0,
+   "case": [
+    {
+     "p": "Caf\u00e9+Food_and_Drink_Shop",
+     "s0": 0.03105,
+     "lb": 0.02865,
+     "atoms": 943,
+     "med_ev": 2.0
+    },
+    {
+     "p": "Caf\u00e9+Coffee_Shop+Italian_Restaurant+Japanese_Restaurant",
+     "s0": 0.03081,
+     "lb": 0.02866,
+     "atoms": 797,
+     "med_ev": 2.0
+    },
+    {
+     "p": "Bar+Convenience_Store+Italian_Restaurant+Japanese_Restaurant+Ramen____Noodle_House",
+     "s0": 0.03079,
+     "lb": 0.02851,
+     "atoms": 849,
+     "med_ev": 2.0
+    },
+    {
+     "p": "Bar+Caf\u00e9+Coffee_Shop+Convenience_Store+Japanese_Restaurant",
+     "s0": 0.0307,
+     "lb": 0.02879,
+     "atoms": 639,
+     "med_ev": 2.0
+    },
+    {
+     "p": "BBQ_Joint+Bar+Fast_Food_Restaurant+Japanese_Restaurant+Ramen____Noodle_House",
+     "s0": 0.03068,
+     "lb": 0.02862,
+     "atoms": 750,
+     "med_ev": 2.0
+    }
+   ]
+  },
+  {
+   "K": 1000,
+   "mu": 0.015822,
+   "R0": 1000,
+   "R1.645": 845,
+   "R2.45": 783,
+   "R4.36": 628,
+   "J1.645": 0.845,
+   "J2.45": 0.783,
+   "J4.36": 0.628,
+   "nested": true,
+   "med_ev_rej": 2.0,
+   "med_ev_kept": 2.0,
+   "size_rej": 4.45,
+   "size_kept": 4.05,
+   "atoms_rej": 404.0,
+   "atoms_kept": 624.0,
+   "J_raw": 0.8802,
+   "R_raw": 884,
+   "R_FE": 0,
+   "FE_miss": 1.0,
+   "FE_bins": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     0
+    ],
+    [
+     845,
+     845
+    ]
+   ],
+   "hold_kept": 0.8876,
+   "hold_rej": 0.5871,
+   "regr_kept": -0.003136,
+   "regr_rej": -1.6e-05,
+   "hold_matched": 0.7226,
+   "regr_matched": -0.000743,
+   "train_rej": 0.01657,
+   "train_matched": 0.01834,
+   "regr_diff": 0.000728,
+   "perm_p": 0.2571,
+   "test_cov_rej": 1.0,
+   "filters": {
+    "minpi": {
+     "th": 44,
+     "n": 845,
+     "J": 0.7903,
+     "hold": 0.8462,
+     "hold_z": 0.8876,
+     "n_only_f": 99,
+     "n_only_z": 99,
+     "hold_only_f": 0.4848,
+     "hold_only_z": 0.8384
+    },
+    "pi": {
+     "th": 0.025510204081632654,
+     "n": 845,
+     "J": 0.7998,
+     "hold": 0.8497,
+     "hold_z": 0.8876,
+     "n_only_f": 94,
+     "n_only_z": 94,
+     "hold_only_f": 0.4894,
+     "hold_only_z": 0.8298
+    },
+    "ev": {
+     "th": 2.0,
+     "n": 920,
+     "J": 0.781,
+     "hold": 0.8315,
+     "hold_z": 0.8876,
+     "n_only_f": 146,
+     "n_only_z": 71,
+     "hold_only_f": 0.5753,
+     "hold_only_z": 0.9718
+    }
+   },
+   "n_kept": 845,
+   "n_rej": 155,
+   "hits_kept": 750,
+   "hits_rej": 91,
+   "hits_matched": 112,
+   "n_matched": 155,
+   "Lglobal_miss_z0.0": 0,
+   "Lsum_miss_z0.0": 0,
+   "Lglobal_miss_z1.645": 0,
+   "Lsum_miss_z1.645": 0
+  }
+ ]
+}

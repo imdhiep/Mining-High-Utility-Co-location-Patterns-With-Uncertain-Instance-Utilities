@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+data/
+external/
+uhucm/out_baseline/*_authors.csv
+uhucm/out_baseline/*_u_point.json
+.DS_Store

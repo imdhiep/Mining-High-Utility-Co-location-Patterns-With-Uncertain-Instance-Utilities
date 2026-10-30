@@ -1,0 +1,344 @@
+{
+ "name": "FSQ_NYC_d30",
+ "d": 30.0,
+ "stats": {
+  "n": 13932,
+  "features": 20,
+  "cliques": 3241,
+  "omega": 8,
+  "Z": 7991.73,
+  "build_s": 0.4,
+  "insig_1645": 0.582,
+  "insig_245": 0.691,
+  "neg": 0.368,
+  "ev_median": 2.0,
+  "test_cov": 1.0
+ },
+ "quality": [
+  {
+   "K": 100,
+   "mu": 0.004293,
+   "R0": 100,
+   "R1.645": 64,
+   "R2.45": 49,
+   "R4.36": 25,
+   "J1.645": 0.64,
+   "J2.45": 0.49,
+   "J4.36": 0.25,
+   "nested": true,
+   "med_ev_rej": 3.0,
+   "med_ev_kept": 17.75,
+   "size_rej": 3.08,
+   "size_kept": 3.92,
+   "atoms_rej": 57.0,
+   "atoms_kept": 25.5,
+   "J_raw": 0.8,
+   "R_raw": 80,
+   "R_FE": 19,
+   "FE_miss": 0.7031,
+   "FE_bins": [
+    [
+     6,
+     10
+    ],
+    [
+     10,
+     25
+    ],
+    [
+     25,
+     25
+    ],
+    [
+     4,
+     4
+    ]
+   ],
+   "hold_kept": 0.9531,
+   "hold_rej": 0.75,
+   "regr_kept": -0.001218,
+   "regr_rej": -0.001252,
+   "hold_matched": 1.0,
+   "regr_matched": -0.000709,
+   "train_rej": 0.004676,
+   "train_matched": 0.005093,
+   "regr_diff": -0.000543,
+   "perm_p": 0.4296,
+   "test_cov_rej": 1.0,
+   "filters": {
+    "minpi": {
+     "th": 2,
+     "n": 58,
+     "J": 0.3708,
+     "hold": 0.7931,
+     "hold_z": 0.9531,
+     "n_only_f": 25,
+     "n_only_z": 31,
+     "hold_only_f": 0.64,
+     "hold_only_z": 1.0
+    },
+    "pi": {
+     "th": 0.0013315579227696406,
+     "n": 66,
+     "J": 0.4444,
+     "hold": 0.8182,
+     "hold_z": 0.9531,
+     "n_only_f": 26,
+     "n_only_z": 24,
+     "hold_only_f": 0.6538,
+     "hold_only_z": 1.0
+    },
+    "ev": {
+     "th": 3.0,
+     "n": 65,
+     "J": 0.5176,
+     "hold": 0.9692,
+     "hold_z": 0.9531,
+     "n_only_f": 21,
+     "n_only_z": 20,
+     "hold_only_f": 0.9048,
+     "hold_only_z": 0.85
+    }
+   },
+   "n_kept": 64,
+   "n_rej": 36,
+   "hits_kept": 61,
+   "hits_rej": 27,
+   "hits_matched": 36,
+   "n_matched": 36,
+   "Lglobal_miss_z0.0": 0,
+   "Lsum_miss_z0.0": 0,
+   "Lglobal_miss_z1.645": 0,
+   "Lsum_miss_z1.645": 0
+  },
+  {
+   "K": 300,
+   "mu": 0.002115,
+   "R0": 300,
+   "R1.645": 252,
+   "R2.45": 234,
+   "R4.36": 184,
+   "J1.645": 0.84,
+   "J2.45": 0.78,
+   "J4.36": 0.6133,
+   "nested": true,
+   "med_ev_rej": 3.0,
+   "med_ev_kept": 35.0,
+   "size_rej": 2.46,
+   "size_kept": 3.85,
+   "atoms_rej": 34.0,
+   "atoms_kept": 10.0,
+   "J_raw": 0.9601,
+   "R_raw": 290,
+   "R_FE": 160,
+   "FE_miss": 0.3651,
+   "FE_bins": [
+    [
+     10,
+     138
+    ],
+    [
+     28,
+     60
+    ],
+    [
+     49,
+     49
+    ],
+    [
+     5,
+     5
+    ]
+   ],
+   "hold_kept": 0.9802,
+   "hold_rej": 0.7708,
+   "regr_kept": -0.000772,
+   "regr_rej": -0.000829,
+   "hold_matched": 0.9375,
+   "regr_matched": -0.000416,
+   "train_rej": 0.002451,
+   "train_matched": 0.002707,
+   "regr_diff": -0.000413,
+   "perm_p": 0.1396,
+   "test_cov_rej": 1.0,
+   "filters": {
+    "minpi": {
+     "th": 1,
+     "n": 300,
+     "J": 0.84,
+     "hold": 0.9467,
+     "hold_z": 0.9802,
+     "n_only_f": 48,
+     "n_only_z": 0,
+     "hold_only_f": 0.7708,
+     "hold_only_z": null
+    },
+    "pi": {
+     "th": 0.000877963125548727,
+     "n": 216,
+     "J": 0.5705,
+     "hold": 0.9259,
+     "hold_z": 0.9802,
+     "n_only_f": 46,
+     "n_only_z": 82,
+     "hold_only_f": 0.7609,
+     "hold_only_z": 1.0
+    },
+    "ev": {
+     "th": 2.5,
+     "n": 238,
+     "J": 0.7438,
+     "hold": 0.9706,
+     "hold_z": 0.9802,
+     "n_only_f": 29,
+     "n_only_z": 43,
+     "hold_only_f": 0.8621,
+     "hold_only_z": 0.9535
+    }
+   },
+   "n_kept": 252,
+   "n_rej": 48,
+   "hits_kept": 247,
+   "hits_rej": 37,
+   "hits_matched": 45,
+   "n_matched": 48,
+   "Lglobal_miss_z0.0": 0,
+   "Lsum_miss_z0.0": 0,
+   "Lglobal_miss_z1.645": 0,
+   "Lsum_miss_z1.645": 0,
+   "case": [
+    {
+     "p": "Drugstore___Pharmacy+Pizza_Place",
+     "s0": 0.00331,
+     "lb": 0.002,
+     "atoms": 64,
+     "med_ev": 2.0
+    },
+    {
+     "p": "Pizza_Place+Subway",
+     "s0": 0.00303,
+     "lb": 0.00211,
+     "atoms": 45,
+     "med_ev": 3.0
+    },
+    {
+     "p": "Food_and_Drink_Shop+Salon___Barbershop",
+     "s0": 0.00301,
+     "lb": 0.00189,
+     "atoms": 43,
+     "med_ev": 2.0
+    },
+    {
+     "p": "Bank+Gym___Fitness_Center",
+     "s0": 0.00301,
+     "lb": 0.002,
+     "atoms": 46,
+     "med_ev": 2.5
+    },
+    {
+     "p": "Chinese_Restaurant+Medical_Center",
+     "s0": 0.00285,
+     "lb": 0.00194,
+     "atoms": 26,
+     "med_ev": 2.0
+    }
+   ]
+  },
+  {
+   "K": 1000,
+   "mu": 0.000221,
+   "R0": 1003,
+   "R1.645": 649,
+   "R2.45": 523,
+   "R4.36": 356,
+   "J1.645": 0.6471,
+   "J2.45": 0.5214,
+   "J4.36": 0.3549,
+   "nested": true,
+   "med_ev_rej": 2.0,
+   "med_ev_kept": 5.0,
+   "size_rej": 3.51,
+   "size_kept": 3.46,
+   "atoms_rej": 5.0,
+   "atoms_kept": 9.0,
+   "J_raw": 0.9792,
+   "R_raw": 992,
+   "R_FE": 309,
+   "FE_miss": 0.5239,
+   "FE_bins": [
+    [
+     140,
+     398
+    ],
+    [
+     134,
+     185
+    ],
+    [
+     61,
+     61
+    ],
+    [
+     5,
+     5
+    ]
+   ],
+   "hold_kept": 0.9322,
+   "hold_rej": 0.7429,
+   "regr_kept": -0.000372,
+   "regr_rej": -0.000107,
+   "hold_matched": 0.8757,
+   "regr_matched": -2e-05,
+   "train_rej": 0.000407,
+   "train_matched": 0.001008,
+   "regr_diff": -8.7e-05,
+   "perm_p": 0.0486,
+   "test_cov_rej": 1.0,
+   "filters": {
+    "minpi": {
+     "th": 2,
+     "n": 468,
+     "J": 0.4121,
+     "hold": 0.9466,
+     "hold_z": 0.9322,
+     "n_only_f": 142,
+     "n_only_z": 323,
+     "hold_only_f": 0.8662,
+     "hold_only_z": 0.8824
+    },
+    "pi": {
+     "th": 0.0011627906976744186,
+     "n": 649,
+     "J": 0.4733,
+     "hold": 0.8798,
+     "hold_z": 0.9322,
+     "n_only_f": 232,
+     "n_only_z": 232,
+     "hold_only_f": 0.7888,
+     "hold_only_z": 0.9353
+    },
+    "ev": {
+     "th": 3.0,
+     "n": 676,
+     "J": 0.6399,
+     "hold": 0.8846,
+     "hold_z": 0.9322,
+     "n_only_f": 159,
+     "n_only_z": 132,
+     "hold_only_f": 0.7421,
+     "hold_only_z": 0.947
+    }
+   },
+   "n_kept": 649,
+   "n_rej": 354,
+   "hits_kept": 605,
+   "hits_rej": 263,
+   "hits_matched": 310,
+   "n_matched": 354,
+   "Lglobal_miss_z0.0": 0,
+   "Lsum_miss_z0.0": 2,
+   "Lglobal_miss_z1.645": 0,
+   "Lsum_miss_z1.645": 2
+  }
+ ]
+}

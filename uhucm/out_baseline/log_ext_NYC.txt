@@ -1,0 +1,4 @@
+X|FSQ_NYC|FL|K=100|{"J_fl_R0": 0.695, "J_fl_Rz": 0.551, "fl_inst_hucp": 0.82, "hold_fl": 0.75, "hold_R0": 0.86, "hold_Rz": 0.955, "authors_n": 100, "authors_seconds": 5.66, "authors_missing": 0, "authors_extra": 0, "authors_extra_below": 0}
+X|FSQ_NYC|FL|K=300|{"J_fl_R0": 0.395, "J_fl_Rz": 0.32, "fl_inst_hucp": 0.567, "hold_fl": 0.683, "hold_R0": 0.94, "hold_Rz": 0.978, "authors_n": 300, "authors_seconds": 7.03, "authors_missing": 0, "authors_extra": 0, "authors_extra_below": 0}
+X|FSQ_NYC|CQ|K=300|{"U_all": 4975.424619699788, "n": 300, "seconds": 197.88, "ours_z0_seconds": 0.2, "missing": 0, "extra": 0, "extra_below": 0}
+X|FSQ_NYC|MEM|{"uhucm": {"peak_mb": 8.1, "seconds_traced": 4.52, "evaluated": 961}, "noprune": {"peak_mb": 7.4, "seconds_traced": 3.13, "evaluated": 3481}}

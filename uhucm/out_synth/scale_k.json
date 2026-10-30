@@ -1,0 +1,116 @@
+[
+ {
+  "n": 10000,
+  "k": 5,
+  "seed": 7,
+  "cliques": 9510,
+  "omega": 5,
+  "build_s": 0.46,
+  "mu": 0.0016479975239321655,
+  "uhucm": {
+   "time": 0.02,
+   "evaluated": 26,
+   "R": 19
+  },
+  "noprune": {
+   "time": 0.01,
+   "evaluated": 26,
+   "R": 19
+  }
+ },
+ {
+  "n": 10000,
+  "k": 10,
+  "seed": 7,
+  "cliques": 7975,
+  "omega": 9,
+  "build_s": 0.55,
+  "mu": 0.0019660739992733026,
+  "uhucm": {
+   "time": 0.26,
+   "evaluated": 582,
+   "R": 200
+  },
+  "noprune": {
+   "time": 0.05,
+   "evaluated": 863,
+   "R": 200
+  }
+ },
+ {
+  "n": 10000,
+  "k": 15,
+  "seed": 7,
+  "cliques": 7371,
+  "omega": 9,
+  "build_s": 0.7,
+  "mu": 0.003671137659896764,
+  "uhucm": {
+   "time": 0.38,
+   "evaluated": 1146,
+   "R": 186
+  },
+  "noprune": {
+   "time": 0.31,
+   "evaluated": 5154,
+   "R": 186
+  }
+ },
+ {
+  "n": 10000,
+  "k": 20,
+  "seed": 7,
+  "cliques": 7140,
+  "omega": 9,
+  "build_s": 0.53,
+  "mu": 0.005661568070381026,
+  "uhucm": {
+   "time": 0.52,
+   "evaluated": 1171,
+   "R": 200
+  },
+  "noprune": {
+   "time": 0.75,
+   "evaluated": 12262,
+   "R": 200
+  }
+ },
+ {
+  "n": 10000,
+  "k": 25,
+  "seed": 7,
+  "cliques": 7062,
+  "omega": 10,
+  "build_s": 0.48,
+  "mu": 0.004501560764406125,
+  "uhucm": {
+   "time": 0.74,
+   "evaluated": 1761,
+   "R": 182
+  },
+  "noprune": {
+   "time": 0.91,
+   "evaluated": 15626,
+   "R": 182
+  }
+ },
+ {
+  "n": 10000,
+  "k": 30,
+  "seed": 7,
+  "cliques": 6917,
+  "omega": 10,
+  "build_s": 0.57,
+  "mu": 0.004109207197581724,
+  "uhucm": {
+   "time": 1.38,
+   "evaluated": 2492,
+   "R": 207
+  },
+  "noprune": {
+   "time": 1.63,
+   "evaluated": 26987,
+   "R": 207
+  }
+ }
+]

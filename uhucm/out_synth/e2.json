@@ -1,0 +1,672 @@
+{
+ "n": 400,
+ "k": 8,
+ "nseed": 100,
+ "quantile": 0.7,
+ "results": {
+  "correct": {
+   "normal d=0.01": {
+    "seeds": 100,
+    "reported": 17.97,
+    "FDP": 0.0015,
+    "FDP_sd": 0.0084,
+    "FDP_p90": 0.0,
+    "power": 0.3497,
+    "power_sd": 0.1136
+   },
+   "normal d=0.05": {
+    "seeds": 100,
+    "reported": 23.64,
+    "FDP": 0.0074,
+    "FDP_sd": 0.0202,
+    "FDP_p90": 0.0336,
+    "power": 0.4578,
+    "power_sd": 0.1236
+   },
+   "normal d=0.1": {
+    "seeds": 100,
+    "reported": 27.76,
+    "FDP": 0.0161,
+    "FDP_sd": 0.0271,
+    "FDP_p90": 0.059,
+    "power": 0.5317,
+    "power_sd": 0.1286
+   },
+   "normal d=0.2": {
+    "seeds": 100,
+    "reported": 33.2,
+    "FDP": 0.041,
+    "FDP_sd": 0.0429,
+    "FDP_p90": 0.1009,
+    "power": 0.6176,
+    "power_sd": 0.1299
+   },
+   "subG d=0.05": {
+    "seeds": 100,
+    "reported": 17.03,
+    "FDP": 0.0015,
+    "FDP_sd": 0.0089,
+    "FDP_p90": 0.0,
+    "power": 0.3311,
+    "power_sd": 0.1101
+   },
+   "Cantelli d=0.05": {
+    "seeds": 100,
+    "reported": 6.93,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.1347,
+    "power_sd": 0.0736
+   },
+   "z=0 (shrunk)": {
+    "seeds": 100,
+    "reported": 47.6,
+    "FDP": 0.124,
+    "FDP_sd": 0.0802,
+    "FDP_p90": 0.2309,
+    "power": 0.8024,
+    "power_sd": 0.1113
+   },
+   "raw": {
+    "seeds": 100,
+    "reported": 61.29,
+    "FDP": 0.335,
+    "FDP_sd": 0.11,
+    "FDP_p90": 0.4805,
+    "power": 0.7641,
+    "power_sd": 0.111
+   },
+   "FE": {
+    "seeds": 100,
+    "reported": 0.07,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.0012,
+    "power_sd": 0.0066
+   }
+  },
+  "t3": {
+   "normal d=0.01": {
+    "seeds": 100,
+    "reported": 17.85,
+    "FDP": 0.0028,
+    "FDP_sd": 0.0126,
+    "FDP_p90": 0.0,
+    "power": 0.3459,
+    "power_sd": 0.1271
+   },
+   "normal d=0.05": {
+    "seeds": 100,
+    "reported": 23.55,
+    "FDP": 0.0076,
+    "FDP_sd": 0.0198,
+    "FDP_p90": 0.0357,
+    "power": 0.4532,
+    "power_sd": 0.1401
+   },
+   "normal d=0.1": {
+    "seeds": 100,
+    "reported": 27.54,
+    "FDP": 0.0177,
+    "FDP_sd": 0.0301,
+    "FDP_p90": 0.0625,
+    "power": 0.5248,
+    "power_sd": 0.1426
+   },
+   "normal d=0.2": {
+    "seeds": 100,
+    "reported": 33.26,
+    "FDP": 0.0411,
+    "FDP_sd": 0.0466,
+    "FDP_p90": 0.1084,
+    "power": 0.6185,
+    "power_sd": 0.1399
+   },
+   "subG d=0.05": {
+    "seeds": 100,
+    "reported": 16.95,
+    "FDP": 0.0023,
+    "FDP_sd": 0.0125,
+    "FDP_p90": 0.0,
+    "power": 0.3285,
+    "power_sd": 0.125
+   },
+   "Cantelli d=0.05": {
+    "seeds": 100,
+    "reported": 7.18,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.1402,
+    "power_sd": 0.0783
+   },
+   "z=0 (shrunk)": {
+    "seeds": 100,
+    "reported": 47.47,
+    "FDP": 0.1242,
+    "FDP_sd": 0.0791,
+    "FDP_p90": 0.2205,
+    "power": 0.8006,
+    "power_sd": 0.1159
+   },
+   "raw": {
+    "seeds": 100,
+    "reported": 58.71,
+    "FDP": 0.2979,
+    "FDP_sd": 0.1155,
+    "FDP_p90": 0.46,
+    "power": 0.7739,
+    "power_sd": 0.1253
+   },
+   "FE": {
+    "seeds": 100,
+    "reported": 0.08,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.0013,
+    "power_sd": 0.0059
+   }
+  },
+  "prior+0.3": {
+   "normal d=0.01": {
+    "seeds": 100,
+    "reported": 29.22,
+    "FDP": 0.0258,
+    "FDP_sd": 0.0351,
+    "FDP_p90": 0.0791,
+    "power": 0.552,
+    "power_sd": 0.1318
+   },
+   "normal d=0.05": {
+    "seeds": 100,
+    "reported": 37.95,
+    "FDP": 0.0682,
+    "FDP_sd": 0.0561,
+    "FDP_p90": 0.1463,
+    "power": 0.6838,
+    "power_sd": 0.128
+   },
+   "normal d=0.1": {
+    "seeds": 100,
+    "reported": 43.38,
+    "FDP": 0.1006,
+    "FDP_sd": 0.0685,
+    "FDP_p90": 0.1968,
+    "power": 0.7534,
+    "power_sd": 0.1207
+   },
+   "normal d=0.2": {
+    "seeds": 100,
+    "reported": 51.14,
+    "FDP": 0.1565,
+    "FDP_sd": 0.0809,
+    "FDP_p90": 0.2701,
+    "power": 0.8301,
+    "power_sd": 0.1036
+   },
+   "subG d=0.05": {
+    "seeds": 100,
+    "reported": 27.8,
+    "FDP": 0.021,
+    "FDP_sd": 0.0303,
+    "FDP_p90": 0.0669,
+    "power": 0.5288,
+    "power_sd": 0.1285
+   },
+   "Cantelli d=0.05": {
+    "seeds": 100,
+    "reported": 12.8,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.249,
+    "power_sd": 0.0956
+   },
+   "z=0 (shrunk)": {
+    "seeds": 100,
+    "reported": 69.42,
+    "FDP": 0.296,
+    "FDP_sd": 0.0889,
+    "FDP_p90": 0.43,
+    "power": 0.9369,
+    "power_sd": 0.0695
+   },
+   "raw": {
+    "seeds": 100,
+    "reported": 61.29,
+    "FDP": 0.335,
+    "FDP_sd": 0.11,
+    "FDP_p90": 0.4805,
+    "power": 0.7641,
+    "power_sd": 0.111
+   },
+   "FE": {
+    "seeds": 100,
+    "reported": 0.41,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.008,
+    "power_sd": 0.0155
+   }
+  },
+  "prior-0.3": {
+   "normal d=0.01": {
+    "seeds": 100,
+    "reported": 9.23,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.1806,
+    "power_sd": 0.087
+   },
+   "normal d=0.05": {
+    "seeds": 100,
+    "reported": 13.51,
+    "FDP": 0.0006,
+    "FDP_sd": 0.0063,
+    "FDP_p90": 0.0,
+    "power": 0.2639,
+    "power_sd": 0.1036
+   },
+   "normal d=0.1": {
+    "seeds": 100,
+    "reported": 16.37,
+    "FDP": 0.0021,
+    "FDP_sd": 0.0106,
+    "FDP_p90": 0.0,
+    "power": 0.3192,
+    "power_sd": 0.1148
+   },
+   "normal d=0.2": {
+    "seeds": 100,
+    "reported": 20.14,
+    "FDP": 0.0053,
+    "FDP_sd": 0.0169,
+    "FDP_p90": 0.0027,
+    "power": 0.3908,
+    "power_sd": 0.1193
+   },
+   "subG d=0.05": {
+    "seeds": 100,
+    "reported": 8.65,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.1692,
+    "power_sd": 0.0835
+   },
+   "Cantelli d=0.05": {
+    "seeds": 100,
+    "reported": 3.25,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.0634,
+    "power_sd": 0.0498
+   },
+   "z=0 (shrunk)": {
+    "seeds": 100,
+    "reported": 29.52,
+    "FDP": 0.0268,
+    "FDP_sd": 0.0357,
+    "FDP_p90": 0.0666,
+    "power": 0.5591,
+    "power_sd": 0.1292
+   },
+   "raw": {
+    "seeds": 100,
+    "reported": 61.29,
+    "FDP": 0.335,
+    "FDP_sd": 0.11,
+    "FDP_p90": 0.4805,
+    "power": 0.7641,
+    "power_sd": 0.111
+   },
+   "FE": {
+    "seeds": 100,
+    "reported": 0.01,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.0002,
+    "power_sd": 0.0015
+   }
+  },
+  "sigma x0.7": {
+   "normal d=0.01": {
+    "seeds": 100,
+    "reported": 20.8,
+    "FDP": 0.0059,
+    "FDP_sd": 0.02,
+    "FDP_p90": 0.0021,
+    "power": 0.4033,
+    "power_sd": 0.1139
+   },
+   "normal d=0.05": {
+    "seeds": 100,
+    "reported": 26.94,
+    "FDP": 0.0172,
+    "FDP_sd": 0.0304,
+    "FDP_p90": 0.0556,
+    "power": 0.5154,
+    "power_sd": 0.1256
+   },
+   "normal d=0.1": {
+    "seeds": 100,
+    "reported": 30.7,
+    "FDP": 0.0328,
+    "FDP_sd": 0.041,
+    "FDP_p90": 0.0874,
+    "power": 0.577,
+    "power_sd": 0.13
+   },
+   "normal d=0.2": {
+    "seeds": 100,
+    "reported": 36.27,
+    "FDP": 0.0582,
+    "FDP_sd": 0.0542,
+    "FDP_p90": 0.1393,
+    "power": 0.6609,
+    "power_sd": 0.1305
+   },
+   "subG d=0.05": {
+    "seeds": 100,
+    "reported": 19.72,
+    "FDP": 0.0041,
+    "FDP_sd": 0.0155,
+    "FDP_p90": 0.0,
+    "power": 0.3828,
+    "power_sd": 0.1124
+   },
+   "Cantelli d=0.05": {
+    "seeds": 100,
+    "reported": 8.89,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.1738,
+    "power_sd": 0.0834
+   },
+   "z=0 (shrunk)": {
+    "seeds": 100,
+    "reported": 49.12,
+    "FDP": 0.1406,
+    "FDP_sd": 0.0832,
+    "FDP_p90": 0.254,
+    "power": 0.8103,
+    "power_sd": 0.1119
+   },
+   "raw": {
+    "seeds": 100,
+    "reported": 61.29,
+    "FDP": 0.335,
+    "FDP_sd": 0.11,
+    "FDP_p90": 0.4805,
+    "power": 0.7641,
+    "power_sd": 0.111
+   },
+   "FE": {
+    "seeds": 100,
+    "reported": 0.43,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.0085,
+    "power_sd": 0.0174
+   }
+  },
+  "sigma x1.3": {
+   "normal d=0.01": {
+    "seeds": 100,
+    "reported": 16.23,
+    "FDP": 0.0011,
+    "FDP_sd": 0.0074,
+    "FDP_p90": 0.0,
+    "power": 0.3157,
+    "power_sd": 0.1102
+   },
+   "normal d=0.05": {
+    "seeds": 100,
+    "reported": 22.1,
+    "FDP": 0.0063,
+    "FDP_sd": 0.0179,
+    "FDP_p90": 0.0334,
+    "power": 0.4279,
+    "power_sd": 0.1242
+   },
+   "normal d=0.1": {
+    "seeds": 100,
+    "reported": 26.2,
+    "FDP": 0.0147,
+    "FDP_sd": 0.0272,
+    "FDP_p90": 0.0625,
+    "power": 0.5028,
+    "power_sd": 0.1303
+   },
+   "normal d=0.2": {
+    "seeds": 100,
+    "reported": 31.77,
+    "FDP": 0.036,
+    "FDP_sd": 0.0397,
+    "FDP_p90": 0.0835,
+    "power": 0.5944,
+    "power_sd": 0.1346
+   },
+   "subG d=0.05": {
+    "seeds": 100,
+    "reported": 15.33,
+    "FDP": 0.0011,
+    "FDP_sd": 0.0078,
+    "FDP_p90": 0.0,
+    "power": 0.298,
+    "power_sd": 0.1073
+   },
+   "Cantelli d=0.05": {
+    "seeds": 100,
+    "reported": 6.01,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.1173,
+    "power_sd": 0.0677
+   },
+   "z=0 (shrunk)": {
+    "seeds": 100,
+    "reported": 46.92,
+    "FDP": 0.1229,
+    "FDP_sd": 0.082,
+    "FDP_p90": 0.2329,
+    "power": 0.7921,
+    "power_sd": 0.116
+   },
+   "raw": {
+    "seeds": 100,
+    "reported": 61.29,
+    "FDP": 0.335,
+    "FDP_sd": 0.11,
+    "FDP_p90": 0.4805,
+    "power": 0.7641,
+    "power_sd": 0.111
+   },
+   "FE": {
+    "seeds": 100,
+    "reported": 0.01,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.0002,
+    "power_sd": 0.0015
+   }
+  },
+  "spatial": {
+   "normal d=0.01": {
+    "seeds": 100,
+    "reported": 17.54,
+    "FDP": 0.0073,
+    "FDP_sd": 0.0268,
+    "FDP_p90": 0.0038,
+    "power": 0.3386,
+    "power_sd": 0.128
+   },
+   "normal d=0.05": {
+    "seeds": 100,
+    "reported": 23.35,
+    "FDP": 0.0231,
+    "FDP_sd": 0.0444,
+    "FDP_p90": 0.0671,
+    "power": 0.4421,
+    "power_sd": 0.1427
+   },
+   "normal d=0.1": {
+    "seeds": 100,
+    "reported": 27.28,
+    "FDP": 0.0359,
+    "FDP_sd": 0.0482,
+    "FDP_p90": 0.1021,
+    "power": 0.5086,
+    "power_sd": 0.1502
+   },
+   "normal d=0.2": {
+    "seeds": 100,
+    "reported": 33.05,
+    "FDP": 0.069,
+    "FDP_sd": 0.0684,
+    "FDP_p90": 0.1607,
+    "power": 0.592,
+    "power_sd": 0.1605
+   },
+   "subG d=0.05": {
+    "seeds": 100,
+    "reported": 16.67,
+    "FDP": 0.0055,
+    "FDP_sd": 0.0226,
+    "FDP_p90": 0.0,
+    "power": 0.3225,
+    "power_sd": 0.1257
+   },
+   "Cantelli d=0.05": {
+    "seeds": 100,
+    "reported": 6.95,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.1358,
+    "power_sd": 0.0765
+   },
+   "z=0 (shrunk)": {
+    "seeds": 100,
+    "reported": 47.07,
+    "FDP": 0.157,
+    "FDP_sd": 0.1017,
+    "FDP_p90": 0.3021,
+    "power": 0.7542,
+    "power_sd": 0.1399
+   },
+   "raw": {
+    "seeds": 100,
+    "reported": 57.5,
+    "FDP": 0.2989,
+    "FDP_sd": 0.0991,
+    "FDP_p90": 0.4091,
+    "power": 0.7724,
+    "power_sd": 0.1184
+   },
+   "FE": {
+    "seeds": 100,
+    "reported": 0.1,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.0019,
+    "power_sd": 0.0078
+   }
+  },
+  "estimated": {
+   "normal d=0.01": {
+    "seeds": 100,
+    "reported": 20.61,
+    "FDP": 0.0192,
+    "FDP_sd": 0.0359,
+    "FDP_p90": 0.0769,
+    "power": 0.3929,
+    "power_sd": 0.1496
+   },
+   "normal d=0.05": {
+    "seeds": 100,
+    "reported": 26.23,
+    "FDP": 0.0315,
+    "FDP_sd": 0.0425,
+    "FDP_p90": 0.1071,
+    "power": 0.4929,
+    "power_sd": 0.1512
+   },
+   "normal d=0.1": {
+    "seeds": 100,
+    "reported": 29.95,
+    "FDP": 0.0475,
+    "FDP_sd": 0.0507,
+    "FDP_p90": 0.1178,
+    "power": 0.5526,
+    "power_sd": 0.1517
+   },
+   "normal d=0.2": {
+    "seeds": 100,
+    "reported": 34.86,
+    "FDP": 0.0742,
+    "FDP_sd": 0.0643,
+    "FDP_p90": 0.1802,
+    "power": 0.6244,
+    "power_sd": 0.1555
+   },
+   "subG d=0.05": {
+    "seeds": 100,
+    "reported": 19.82,
+    "FDP": 0.0152,
+    "FDP_sd": 0.031,
+    "FDP_p90": 0.0588,
+    "power": 0.3798,
+    "power_sd": 0.1503
+   },
+   "Cantelli d=0.05": {
+    "seeds": 100,
+    "reported": 9.89,
+    "FDP": 0.0076,
+    "FDP_sd": 0.0304,
+    "FDP_p90": 0.0,
+    "power": 0.1905,
+    "power_sd": 0.114
+   },
+   "z=0 (shrunk)": {
+    "seeds": 100,
+    "reported": 47.93,
+    "FDP": 0.1555,
+    "FDP_sd": 0.087,
+    "FDP_p90": 0.2759,
+    "power": 0.7787,
+    "power_sd": 0.1347
+   },
+   "raw": {
+    "seeds": 100,
+    "reported": 61.27,
+    "FDP": 0.3348,
+    "FDP_sd": 0.11,
+    "FDP_p90": 0.4805,
+    "power": 0.7643,
+    "power_sd": 0.1112
+   },
+   "FE": {
+    "seeds": 100,
+    "reported": 2.08,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "FDP_p90": 0.0,
+    "power": 0.0407,
+    "power_sd": 0.0637
+   }
+  }
+ }
+}

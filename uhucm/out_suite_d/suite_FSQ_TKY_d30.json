@@ -1,0 +1,344 @@
+{
+ "name": "FSQ_TKY_d30",
+ "d": 30.0,
+ "stats": {
+  "n": 29774,
+  "features": 20,
+  "cliques": 15231,
+  "omega": 9,
+  "Z": 17410.11,
+  "build_s": 0.9,
+  "insig_1645": 0.548,
+  "insig_245": 0.655,
+  "neg": 0.302,
+  "ev_median": 2.0,
+  "test_cov": 1.0
+ },
+ "quality": [
+  {
+   "K": 100,
+   "mu": 0.007539,
+   "R0": 100,
+   "R1.645": 76,
+   "R2.45": 73,
+   "R4.36": 57,
+   "J1.645": 0.76,
+   "J2.45": 0.73,
+   "J4.36": 0.57,
+   "nested": true,
+   "med_ev_rej": 2.0,
+   "med_ev_kept": 2.0,
+   "size_rej": 2.79,
+   "size_kept": 2.45,
+   "atoms_rej": 221.0,
+   "atoms_kept": 412.0,
+   "J_raw": 0.87,
+   "R_raw": 87,
+   "R_FE": 0,
+   "FE_miss": 1.0,
+   "FE_bins": [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     0
+    ],
+    [
+     2,
+     2
+    ],
+    [
+     74,
+     74
+    ]
+   ],
+   "hold_kept": 0.8816,
+   "hold_rej": 0.8333,
+   "regr_kept": -0.002326,
+   "regr_rej": -9.4e-05,
+   "hold_matched": 0.7083,
+   "regr_matched": 0.000488,
+   "train_rej": 0.008034,
+   "train_matched": 0.01037,
+   "regr_diff": -0.000582,
+   "perm_p": 0.681,
+   "test_cov_rej": 1.0,
+   "filters": {
+    "minpi": {
+     "th": 71,
+     "n": 76,
+     "J": 0.7882,
+     "hold": 0.8684,
+     "hold_z": 0.8816,
+     "n_only_f": 9,
+     "n_only_z": 9,
+     "hold_only_f": 0.7778,
+     "hold_only_z": 0.8889
+    },
+    "pi": {
+     "th": 0.02486069438491213,
+     "n": 76,
+     "J": 0.7273,
+     "hold": 0.8684,
+     "hold_z": 0.8816,
+     "n_only_f": 12,
+     "n_only_z": 12,
+     "hold_only_f": 0.8333,
+     "hold_only_z": 0.9167
+    },
+    "ev": {
+     "th": 2.0,
+     "n": 79,
+     "J": 0.5979,
+     "hold": 0.8481,
+     "hold_z": 0.8816,
+     "n_only_f": 21,
+     "n_only_z": 18,
+     "hold_only_f": 0.8095,
+     "hold_only_z": 0.9444
+    }
+   },
+   "n_kept": 76,
+   "n_rej": 24,
+   "hits_kept": 67,
+   "hits_rej": 20,
+   "hits_matched": 17,
+   "n_matched": 24,
+   "Lglobal_miss_z0.0": 0,
+   "Lsum_miss_z0.0": 0,
+   "Lglobal_miss_z1.645": 0,
+   "Lsum_miss_z1.645": 0
+  },
+  {
+   "K": 300,
+   "mu": 0.003013,
+   "R0": 300,
+   "R1.645": 235,
+   "R2.45": 211,
+   "R4.36": 155,
+   "J1.645": 0.7833,
+   "J2.45": 0.7033,
+   "J4.36": 0.5167,
+   "nested": true,
+   "med_ev_rej": 2.0,
+   "med_ev_kept": 2.0,
+   "size_rej": 3.18,
+   "size_kept": 2.82,
+   "atoms_rej": 80.0,
+   "atoms_kept": 181.0,
+   "J_raw": 0.9338,
+   "R_raw": 284,
+   "R_FE": 0,
+   "FE_miss": 1.0,
+   "FE_bins": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     131,
+     131
+    ],
+    [
+     103,
+     103
+    ]
+   ],
+   "hold_kept": 0.8936,
+   "hold_rej": 0.5385,
+   "regr_kept": -0.000617,
+   "regr_rej": 0.000644,
+   "hold_matched": 0.8462,
+   "regr_matched": 0.000267,
+   "train_rej": 0.003357,
+   "train_matched": 0.004315,
+   "regr_diff": 0.000377,
+   "perm_p": 0.5412,
+   "test_cov_rej": 1.0,
+   "filters": {
+    "minpi": {
+     "th": 23,
+     "n": 237,
+     "J": 0.7678,
+     "hold": 0.827,
+     "hold_z": 0.8936,
+     "n_only_f": 32,
+     "n_only_z": 30,
+     "hold_only_f": 0.4375,
+     "hold_only_z": 0.9333
+    },
+    "pi": {
+     "th": 0.009001285897985427,
+     "n": 236,
+     "J": 0.764,
+     "hold": 0.8305,
+     "hold_z": 0.8936,
+     "n_only_f": 32,
+     "n_only_z": 31,
+     "hold_only_f": 0.4688,
+     "hold_only_z": 0.9355
+    },
+    "ev": {
+     "th": 2.0,
+     "n": 258,
+     "J": 0.6884,
+     "hold": 0.8062,
+     "hold_z": 0.8936,
+     "n_only_f": 57,
+     "n_only_z": 34,
+     "hold_only_f": 0.5614,
+     "hold_only_z": 1.0
+    }
+   },
+   "n_kept": 235,
+   "n_rej": 65,
+   "hits_kept": 210,
+   "hits_rej": 35,
+   "hits_matched": 55,
+   "n_matched": 65,
+   "Lglobal_miss_z0.0": 0,
+   "Lsum_miss_z0.0": 0,
+   "Lglobal_miss_z1.645": 0,
+   "Lsum_miss_z1.645": 0,
+   "case": [
+    {
+     "p": "Japanese_Restaurant+Train_Station",
+     "s0": 0.0042,
+     "lb": 0.00285,
+     "atoms": 395,
+     "med_ev": 3.0
+    },
+    {
+     "p": "Drugstore___Pharmacy+Medical_Center",
+     "s0": 0.00385,
+     "lb": 0.00299,
+     "atoms": 126,
+     "med_ev": 1.0
+    },
+    {
+     "p": "Bookstore+Italian_Restaurant",
+     "s0": 0.00383,
+     "lb": 0.003,
+     "atoms": 114,
+     "med_ev": 2.0
+    },
+    {
+     "p": "Coffee_Shop+Fast_Food_Restaurant",
+     "s0": 0.0038,
+     "lb": 0.00294,
+     "atoms": 225,
+     "med_ev": 4.0
+    },
+    {
+     "p": "Bar+Drugstore___Pharmacy+Japanese_Restaurant",
+     "s0": 0.00379,
+     "lb": 0.0029,
+     "atoms": 111,
+     "med_ev": 1.0
+    }
+   ]
+  },
+  {
+   "K": 1000,
+   "mu": 0.001227,
+   "R0": 1000,
+   "R1.645": 682,
+   "R2.45": 567,
+   "R4.36": 341,
+   "J1.645": 0.682,
+   "J2.45": 0.567,
+   "J4.36": 0.341,
+   "nested": true,
+   "med_ev_rej": 3.0,
+   "med_ev_kept": 2.0,
+   "size_rej": 4.23,
+   "size_kept": 3.62,
+   "atoms_rej": 30.0,
+   "atoms_kept": 71.0,
+   "J_raw": 0.9263,
+   "R_raw": 934,
+   "R_FE": 3,
+   "FE_miss": 0.9956,
+   "FE_bins": [
+    [
+     0,
+     0
+    ],
+    [
+     221,
+     223
+    ],
+    [
+     349,
+     350
+    ],
+    [
+     109,
+     109
+    ]
+   ],
+   "hold_kept": 0.7478,
+   "hold_rej": 0.4088,
+   "regr_kept": 0.000116,
+   "regr_rej": 0.00031,
+   "hold_matched": 0.5629,
+   "regr_matched": 0.000509,
+   "train_rej": 0.001406,
+   "train_matched": 0.001944,
+   "regr_diff": -0.000199,
+   "perm_p": 0.0257,
+   "test_cov_rej": 1.0,
+   "filters": {
+    "minpi": {
+     "th": 7,
+     "n": 662,
+     "J": 0.639,
+     "hold": 0.7825,
+     "hold_z": 0.7478,
+     "n_only_f": 138,
+     "n_only_z": 158,
+     "hold_only_f": 0.558,
+     "hold_only_z": 0.4367
+    },
+    "pi": {
+     "th": 0.0025353132922854038,
+     "n": 682,
+     "J": 0.6553,
+     "hold": 0.7801,
+     "hold_z": 0.7478,
+     "n_only_f": 142,
+     "n_only_z": 142,
+     "hold_only_f": 0.5563,
+     "hold_only_z": 0.4014
+    },
+    "ev": {
+     "th": 2.5,
+     "n": 461,
+     "J": 0.3337,
+     "hold": 0.4013,
+     "hold_z": 0.7478,
+     "n_only_f": 175,
+     "n_only_z": 396,
+     "hold_only_f": 0.1943,
+     "hold_only_z": 0.9066
+    }
+   },
+   "n_kept": 682,
+   "n_rej": 318,
+   "hits_kept": 510,
+   "hits_rej": 130,
+   "hits_matched": 179,
+   "n_matched": 318,
+   "Lglobal_miss_z0.0": 0,
+   "Lsum_miss_z0.0": 0,
+   "Lglobal_miss_z1.645": 0,
+   "Lsum_miss_z1.645": 0
+  }
+ ]
+}

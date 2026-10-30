@@ -1,0 +1,511 @@
+{
+ "d50": [
+  {
+   "K": 100,
+   "R0": 100,
+   "R1.645": 90,
+   "R2.45": 90,
+   "R4.36": 82,
+   "hits_kept": 77,
+   "n_kept": 90,
+   "hold_kept": 0.8556,
+   "hits_rej": 5,
+   "n_rej": 10,
+   "hold_rej": 0.5,
+   "hits_matched": 6,
+   "n_matched": 10,
+   "hold_matched": 0.6,
+   "perm_p": 0.718,
+   "FE_miss": 0.644,
+   "cliques": 15625,
+   "filters": {
+    "minpi": {
+     "J": 0.856,
+     "hold_only_f": 0.571,
+     "hold_only_z": 0.714,
+     "n_only_f": 7,
+     "n_only_z": 7
+    },
+    "pi": {
+     "J": 0.837,
+     "hold_only_f": 0.625,
+     "hold_only_z": 0.875,
+     "n_only_f": 8,
+     "n_only_z": 8
+    },
+    "ev": {
+     "J": 0.79,
+     "hold_only_f": 0.5,
+     "hold_only_z": 0.273,
+     "n_only_f": 10,
+     "n_only_z": 11
+    }
+   }
+  },
+  {
+   "K": 300,
+   "R0": 300,
+   "R1.645": 265,
+   "R2.45": 254,
+   "R4.36": 225,
+   "hits_kept": 234,
+   "n_kept": 265,
+   "hold_kept": 0.883,
+   "hits_rej": 26,
+   "n_rej": 35,
+   "hold_rej": 0.7429,
+   "hits_matched": 23,
+   "n_matched": 35,
+   "hold_matched": 0.6571,
+   "perm_p": 0.399,
+   "FE_miss": 0.596,
+   "cliques": 15625,
+   "filters": {
+    "minpi": {
+     "J": 0.841,
+     "hold_only_f": 0.708,
+     "hold_only_z": 0.864,
+     "n_only_f": 24,
+     "n_only_z": 22
+    },
+    "pi": {
+     "J": 0.834,
+     "hold_only_f": 0.708,
+     "hold_only_z": 0.833,
+     "n_only_f": 24,
+     "n_only_z": 24
+    },
+    "ev": {
+     "J": 0.807,
+     "hold_only_f": 0.839,
+     "hold_only_z": 0.538,
+     "n_only_f": 31,
+     "n_only_z": 26
+    }
+   }
+  },
+  {
+   "K": 1000,
+   "R0": 1000,
+   "R1.645": 902,
+   "R2.45": 846,
+   "R4.36": 745,
+   "hits_kept": 814,
+   "n_kept": 902,
+   "hold_kept": 0.9024,
+   "hits_rej": 63,
+   "n_rej": 98,
+   "hold_rej": 0.6429,
+   "hits_matched": 71,
+   "n_matched": 98,
+   "hold_matched": 0.7245,
+   "perm_p": 0.419,
+   "FE_miss": 0.493,
+   "cliques": 15625,
+   "filters": {
+    "minpi": {
+     "J": 0.846,
+     "hold_only_f": 0.671,
+     "hold_only_z": 0.867,
+     "n_only_f": 76,
+     "n_only_z": 75
+    },
+    "pi": {
+     "J": 0.852,
+     "hold_only_f": 0.653,
+     "hold_only_z": 0.75,
+     "n_only_f": 72,
+     "n_only_z": 72
+    },
+    "ev": {
+     "J": 0.807,
+     "hold_only_f": 0.663,
+     "hold_only_z": 0.696,
+     "n_only_f": 89,
+     "n_only_z": 102
+    }
+   }
+  }
+ ],
+ "s0med": [
+  {
+   "K": 100,
+   "R0": 100,
+   "R1.645": 66,
+   "R2.45": 49,
+   "R4.36": 31,
+   "hits_kept": 39,
+   "n_kept": 66,
+   "hold_kept": 0.5909,
+   "hits_rej": 17,
+   "n_rej": 34,
+   "hold_rej": 0.5,
+   "hits_matched": 18,
+   "n_matched": 34,
+   "hold_matched": 0.5294,
+   "perm_p": 0.305,
+   "FE_miss": 0.985,
+   "filters": {
+    "minpi": {
+     "J": 0.622,
+     "hold_only_f": 0.562,
+     "hold_only_z": 0.467,
+     "n_only_f": 16,
+     "n_only_z": 15
+    },
+    "pi": {
+     "J": 0.61,
+     "hold_only_f": 0.625,
+     "hold_only_z": 0.5,
+     "n_only_f": 16,
+     "n_only_z": 16
+    },
+    "ev": {
+     "J": 0.512,
+     "hold_only_f": 0.55,
+     "hold_only_z": 0.182,
+     "n_only_f": 20,
+     "n_only_z": 22
+    }
+   }
+  },
+  {
+   "K": 300,
+   "R0": 300,
+   "R1.645": 169,
+   "R2.45": 122,
+   "R4.36": 61,
+   "hits_kept": 136,
+   "n_kept": 169,
+   "hold_kept": 0.8047,
+   "hits_rej": 83,
+   "n_rej": 131,
+   "hold_rej": 0.6336,
+   "hits_matched": 104,
+   "n_matched": 131,
+   "hold_matched": 0.7939,
+   "perm_p": 0.131,
+   "FE_miss": 0.988,
+   "filters": {
+    "minpi": {
+     "J": 0.529,
+     "hold_only_f": 0.667,
+     "hold_only_z": 0.706,
+     "n_only_f": 54,
+     "n_only_z": 51
+    },
+    "pi": {
+     "J": 0.541,
+     "hold_only_f": 0.667,
+     "hold_only_z": 0.72,
+     "n_only_f": 51,
+     "n_only_z": 50
+    },
+    "ev": {
+     "J": 0.312,
+     "hold_only_f": 0.736,
+     "hold_only_z": 0.685,
+     "n_only_f": 87,
+     "n_only_z": 89
+    }
+   }
+  },
+  {
+   "K": 1000,
+   "R0": 1000,
+   "R1.645": 550,
+   "R2.45": 397,
+   "R4.36": 188,
+   "hits_kept": 461,
+   "n_kept": 550,
+   "hold_kept": 0.8382,
+   "hits_rej": 286,
+   "n_rej": 450,
+   "hold_rej": 0.6356,
+   "hits_matched": 370,
+   "n_matched": 450,
+   "hold_matched": 0.8222,
+   "perm_p": 0.071,
+   "FE_miss": 0.989,
+   "filters": {
+    "minpi": {
+     "J": 0.476,
+     "hold_only_f": 0.708,
+     "hold_only_z": 0.868,
+     "n_only_f": 209,
+     "n_only_z": 189
+    },
+    "pi": {
+     "J": 0.463,
+     "hold_only_f": 0.693,
+     "hold_only_z": 0.852,
+     "n_only_f": 202,
+     "n_only_z": 202
+    },
+    "ev": {
+     "J": 0.359,
+     "hold_only_f": 0.732,
+     "hold_only_z": 0.769,
+     "n_only_f": 257,
+     "n_only_z": 260
+    }
+   }
+  }
+ ],
+ "d30": [
+  {
+   "K": 100,
+   "R0": 100,
+   "R1.645": 94,
+   "R2.45": 86,
+   "R4.36": 77,
+   "hits_kept": 85,
+   "n_kept": 94,
+   "hold_kept": 0.9043,
+   "hits_rej": 6,
+   "n_rej": 6,
+   "hold_rej": 1.0,
+   "hits_matched": 5,
+   "n_matched": 6,
+   "hold_matched": 0.8333,
+   "perm_p": 0.694,
+   "FE_miss": 0.532,
+   "cliques": 3809,
+   "filters": {
+    "minpi": {
+     "J": 0.959,
+     "hold_only_f": 1.0,
+     "hold_only_z": 1.0,
+     "n_only_f": 3,
+     "n_only_z": 1
+    },
+    "pi": {
+     "J": 0.929,
+     "hold_only_f": 1.0,
+     "hold_only_z": 0.667,
+     "n_only_f": 4,
+     "n_only_z": 3
+    },
+    "ev": {
+     "J": 0.89,
+     "hold_only_f": 1.0,
+     "hold_only_z": 0.8,
+     "n_only_f": 6,
+     "n_only_z": 5
+    }
+   }
+  },
+  {
+   "K": 300,
+   "R0": 300,
+   "R1.645": 269,
+   "R2.45": 256,
+   "R4.36": 225,
+   "hits_kept": 243,
+   "n_kept": 269,
+   "hold_kept": 0.9033,
+   "hits_rej": 25,
+   "n_rej": 31,
+   "hold_rej": 0.8065,
+   "hits_matched": 22,
+   "n_matched": 31,
+   "hold_matched": 0.7097,
+   "perm_p": 0.184,
+   "FE_miss": 0.435,
+   "cliques": 3809,
+   "filters": {
+    "minpi": {
+     "J": 0.841,
+     "hold_only_f": 0.905,
+     "hold_only_z": 0.68,
+     "n_only_f": 21,
+     "n_only_z": 25
+    },
+    "pi": {
+     "J": 0.843,
+     "hold_only_f": 0.913,
+     "hold_only_z": 0.652,
+     "n_only_f": 23,
+     "n_only_z": 23
+    },
+    "ev": {
+     "J": 0.806,
+     "hold_only_f": 0.8,
+     "hold_only_z": 0.679,
+     "n_only_f": 30,
+     "n_only_z": 28
+    }
+   }
+  },
+  {
+   "K": 1000,
+   "R0": 1000,
+   "R1.645": 863,
+   "R2.45": 787,
+   "R4.36": 637,
+   "hits_kept": 770,
+   "n_kept": 863,
+   "hold_kept": 0.8922,
+   "hits_rej": 90,
+   "n_rej": 137,
+   "hold_rej": 0.6569,
+   "hits_matched": 109,
+   "n_matched": 137,
+   "hold_matched": 0.7956,
+   "perm_p": 0.018,
+   "FE_miss": 0.434,
+   "cliques": 3809,
+   "filters": {
+    "minpi": {
+     "J": 0.804,
+     "hold_only_f": 0.722,
+     "hold_only_z": 0.527,
+     "n_only_f": 97,
+     "n_only_z": 91
+    },
+    "pi": {
+     "J": 0.8,
+     "hold_only_f": 0.727,
+     "hold_only_z": 0.559,
+     "n_only_f": 99,
+     "n_only_z": 93
+    },
+    "ev": {
+     "J": 0.759,
+     "hold_only_f": 0.658,
+     "hold_only_z": 0.765,
+     "n_only_f": 117,
+     "n_only_z": 119
+    }
+   }
+  }
+ ],
+ "d70": [
+  {
+   "K": 100,
+   "R0": 100,
+   "R1.645": 91,
+   "R2.45": 90,
+   "R4.36": 84,
+   "hits_kept": 79,
+   "n_kept": 91,
+   "hold_kept": 0.8681,
+   "hits_rej": 3,
+   "n_rej": 9,
+   "hold_rej": 0.3333,
+   "hits_matched": 6,
+   "n_matched": 9,
+   "hold_matched": 0.6667,
+   "perm_p": 0.308,
+   "FE_miss": 0.802,
+   "cliques": 118374,
+   "filters": {
+    "minpi": {
+     "J": 0.838,
+     "hold_only_f": 0.375,
+     "hold_only_z": 0.875,
+     "n_only_f": 8,
+     "n_only_z": 8
+    },
+    "pi": {
+     "J": 0.849,
+     "hold_only_f": 0.375,
+     "hold_only_z": 0.857,
+     "n_only_f": 8,
+     "n_only_z": 7
+    },
+    "ev": {
+     "J": 0.838,
+     "hold_only_f": 0.375,
+     "hold_only_z": 0.375,
+     "n_only_f": 8,
+     "n_only_z": 8
+    }
+   }
+  },
+  {
+   "K": 300,
+   "R0": 300,
+   "R1.645": 277,
+   "R2.45": 262,
+   "R4.36": 240,
+   "hits_kept": 244,
+   "n_kept": 277,
+   "hold_kept": 0.8809,
+   "hits_rej": 13,
+   "n_rej": 23,
+   "hold_rej": 0.5652,
+   "hits_matched": 17,
+   "n_matched": 23,
+   "hold_matched": 0.7391,
+   "perm_p": 0.21,
+   "FE_miss": 0.726,
+   "cliques": 118374,
+   "filters": {
+    "minpi": {
+     "J": 0.875,
+     "hold_only_f": 0.556,
+     "hold_only_z": 0.842,
+     "n_only_f": 18,
+     "n_only_z": 19
+    },
+    "pi": {
+     "J": 0.869,
+     "hold_only_f": 0.5,
+     "hold_only_z": 0.842,
+     "n_only_f": 20,
+     "n_only_z": 19
+    },
+    "ev": {
+     "J": 0.859,
+     "hold_only_f": 0.65,
+     "hold_only_z": 0.318,
+     "n_only_f": 20,
+     "n_only_z": 22
+    }
+   }
+  },
+  {
+   "K": 1000,
+   "R0": 1000,
+   "R1.645": 905,
+   "R2.45": 868,
+   "R4.36": 775,
+   "hits_kept": 806,
+   "n_kept": 905,
+   "hold_kept": 0.8906,
+   "hits_rej": 66,
+   "n_rej": 95,
+   "hold_rej": 0.6947,
+   "hits_matched": 71,
+   "n_matched": 95,
+   "hold_matched": 0.7474,
+   "perm_p": 0.233,
+   "FE_miss": 0.653,
+   "cliques": 118374,
+   "filters": {
+    "minpi": {
+     "J": 0.874,
+     "hold_only_f": 0.642,
+     "hold_only_z": 0.929,
+     "n_only_f": 67,
+     "n_only_z": 56
+    },
+    "pi": {
+     "J": 0.869,
+     "hold_only_f": 0.677,
+     "hold_only_z": 0.903,
+     "n_only_f": 65,
+     "n_only_z": 62
+    },
+    "ev": {
+     "J": 0.825,
+     "hold_only_f": 0.736,
+     "hold_only_z": 0.506,
+     "n_only_f": 87,
+     "n_only_z": 87
+    }
+   }
+  }
+ ]
+}

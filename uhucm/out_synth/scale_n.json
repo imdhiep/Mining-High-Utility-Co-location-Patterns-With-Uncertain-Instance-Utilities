@@ -1,0 +1,97 @@
+[
+ {
+  "n": 1000,
+  "k": 10,
+  "seed": 7,
+  "cliques": 742,
+  "omega": 6,
+  "build_s": 0.08,
+  "mu": 0.00013237982100163778,
+  "uhucm": {
+   "time": 0.09,
+   "evaluated": 331,
+   "R": 104
+  },
+  "noprune": {
+   "time": 0.02,
+   "evaluated": 380,
+   "R": 104
+  }
+ },
+ {
+  "n": 3000,
+  "k": 10,
+  "seed": 7,
+  "cliques": 2411,
+  "omega": 7,
+  "build_s": 0.12,
+  "mu": 0.0027649229531719276,
+  "uhucm": {
+   "time": 0.07,
+   "evaluated": 477,
+   "R": 151
+  },
+  "noprune": {
+   "time": 0.06,
+   "evaluated": 692,
+   "R": 151
+  }
+ },
+ {
+  "n": 10000,
+  "k": 10,
+  "seed": 7,
+  "cliques": 7975,
+  "omega": 9,
+  "build_s": 0.65,
+  "mu": 0.0019660739992733026,
+  "uhucm": {
+   "time": 0.13,
+   "evaluated": 582,
+   "R": 200
+  },
+  "noprune": {
+   "time": 0.04,
+   "evaluated": 863,
+   "R": 200
+  }
+ },
+ {
+  "n": 30000,
+  "k": 10,
+  "seed": 7,
+  "cliques": 25212,
+  "omega": 9,
+  "build_s": 2.48,
+  "mu": 0.002604755072140907,
+  "uhucm": {
+   "time": 0.45,
+   "evaluated": 614,
+   "R": 226
+  },
+  "noprune": {
+   "time": 0.23,
+   "evaluated": 970,
+   "R": 226
+  }
+ },
+ {
+  "n": 100000,
+  "k": 10,
+  "seed": 7,
+  "cliques": 81331,
+  "omega": 10,
+  "build_s": 9.9,
+  "mu": 0.002811613282247543,
+  "uhucm": {
+   "time": 0.85,
+   "evaluated": 645,
+   "R": 254
+  },
+  "noprune": {
+   "time": 0.42,
+   "evaluated": 1013,
+   "R": 254
+  }
+ }
+]

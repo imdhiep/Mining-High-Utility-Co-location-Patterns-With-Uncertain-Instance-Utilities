@@ -1,0 +1,962 @@
+[
+ {
+  "kind": "syn",
+  "n": 1000,
+  "k": 10,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 0.023,
+    "mine_s": 0.033,
+    "evaluated": 331,
+    "R": 104,
+    "cliques": 742,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.023,
+    "mine_s": 0.045,
+    "evaluated": 300,
+    "R": 160,
+    "cliques": 767,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.023,
+    "mine_s": 0.038,
+    "evaluated": 324,
+    "R": 155,
+    "cliques": 783,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 0.188,
+   "mine_s": 0.165,
+   "evaluated": 331,
+   "R": 104,
+   "cliques": 742,
+   "peak_mb": 0.8
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 1000,
+  "k": 10,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 0.024,
+    "mine_s": 0.013,
+    "evaluated": 380,
+    "R": 104,
+    "cliques": 742,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.023,
+    "mine_s": 0.016,
+    "evaluated": 487,
+    "R": 160,
+    "cliques": 767,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.024,
+    "mine_s": 0.015,
+    "evaluated": 482,
+    "R": 155,
+    "cliques": 783,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 0.162,
+   "mine_s": 0.044,
+   "evaluated": 380,
+   "R": 104,
+   "cliques": 742,
+   "peak_mb": 0.7
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 3000,
+  "k": 10,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 0.079,
+    "mine_s": 0.068,
+    "evaluated": 477,
+    "R": 151,
+    "cliques": 2411,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.072,
+    "mine_s": 0.055,
+    "evaluated": 393,
+    "R": 200,
+    "cliques": 2391,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.075,
+    "mine_s": 0.06,
+    "evaluated": 398,
+    "R": 215,
+    "cliques": 2460,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 0.561,
+   "mine_s": 0.244,
+   "evaluated": 477,
+   "R": 151,
+   "cliques": 2411,
+   "peak_mb": 2.6
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 3000,
+  "k": 10,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 0.076,
+    "mine_s": 0.025,
+    "evaluated": 692,
+    "R": 151,
+    "cliques": 2411,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.07,
+    "mine_s": 0.023,
+    "evaluated": 666,
+    "R": 200,
+    "cliques": 2391,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.074,
+    "mine_s": 0.025,
+    "evaluated": 728,
+    "R": 215,
+    "cliques": 2460,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 0.59,
+   "mine_s": 0.089,
+   "evaluated": 692,
+   "R": 151,
+   "cliques": 2411,
+   "peak_mb": 2.6
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 10,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 0.317,
+    "mine_s": 0.136,
+    "evaluated": 582,
+    "R": 200,
+    "cliques": 7975,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.313,
+    "mine_s": 0.101,
+    "evaluated": 422,
+    "R": 251,
+    "cliques": 7934,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.361,
+    "mine_s": 0.097,
+    "evaluated": 426,
+    "R": 234,
+    "cliques": 8242,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 2.385,
+   "mine_s": 0.427,
+   "evaluated": 582,
+   "R": 200,
+   "cliques": 7975,
+   "peak_mb": 8.2
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 10,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 0.353,
+    "mine_s": 0.06,
+    "evaluated": 863,
+    "R": 200,
+    "cliques": 7975,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.309,
+    "mine_s": 0.043,
+    "evaluated": 831,
+    "R": 251,
+    "cliques": 7934,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.301,
+    "mine_s": 0.051,
+    "evaluated": 907,
+    "R": 234,
+    "cliques": 8242,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 1.993,
+   "mine_s": 0.205,
+   "evaluated": 863,
+   "R": 200,
+   "cliques": 7975,
+   "peak_mb": 8.2
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 30000,
+  "k": 10,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 1.276,
+    "mine_s": 0.231,
+    "evaluated": 614,
+    "R": 226,
+    "cliques": 25212,
+    "peak_mb": null
+   },
+   {
+    "build_s": 1.154,
+    "mine_s": 0.196,
+    "evaluated": 473,
+    "R": 272,
+    "cliques": 24593,
+    "peak_mb": null
+   },
+   {
+    "build_s": 1.242,
+    "mine_s": 0.22,
+    "evaluated": 440,
+    "R": 272,
+    "cliques": 24594,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 6.449,
+   "mine_s": 0.518,
+   "evaluated": 614,
+   "R": 226,
+   "cliques": 25212,
+   "peak_mb": 26.5
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 30000,
+  "k": 10,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 1.183,
+    "mine_s": 0.098,
+    "evaluated": 970,
+    "R": 226,
+    "cliques": 25212,
+    "peak_mb": null
+   },
+   {
+    "build_s": 1.125,
+    "mine_s": 0.09,
+    "evaluated": 959,
+    "R": 272,
+    "cliques": 24593,
+    "peak_mb": null
+   },
+   {
+    "build_s": 1.197,
+    "mine_s": 0.097,
+    "evaluated": 975,
+    "R": 272,
+    "cliques": 24594,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 6.212,
+   "mine_s": 0.217,
+   "evaluated": 970,
+   "R": 226,
+   "cliques": 25212,
+   "peak_mb": 26.5
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 100000,
+  "k": 10,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 6.534,
+    "mine_s": 0.647,
+    "evaluated": 645,
+    "R": 254,
+    "cliques": 81331,
+    "peak_mb": null
+   },
+   {
+    "build_s": 6.244,
+    "mine_s": 0.593,
+    "evaluated": 487,
+    "R": 285,
+    "cliques": 81304,
+    "peak_mb": null
+   },
+   {
+    "build_s": 6.137,
+    "mine_s": 0.574,
+    "evaluated": 478,
+    "R": 288,
+    "cliques": 81490,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 25.092,
+   "mine_s": 0.986,
+   "evaluated": 645,
+   "R": 254,
+   "cliques": 81331,
+   "peak_mb": 86.8
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 100000,
+  "k": 10,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 6.536,
+    "mine_s": 0.302,
+    "evaluated": 1013,
+    "R": 254,
+    "cliques": 81331,
+    "peak_mb": null
+   },
+   {
+    "build_s": 6.403,
+    "mine_s": 0.267,
+    "evaluated": 1003,
+    "R": 285,
+    "cliques": 81304,
+    "peak_mb": null
+   },
+   {
+    "build_s": 6.207,
+    "mine_s": 0.263,
+    "evaluated": 1001,
+    "R": 288,
+    "cliques": 81490,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 24.59,
+   "mine_s": 0.433,
+   "evaluated": 1013,
+   "R": 254,
+   "cliques": 81331,
+   "peak_mb": 86.8
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 5,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 0.287,
+    "mine_s": 0.018,
+    "evaluated": 26,
+    "R": 19,
+    "cliques": 9510,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.325,
+    "mine_s": 0.021,
+    "evaluated": 26,
+    "R": 21,
+    "cliques": 10047,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.308,
+    "mine_s": 0.02,
+    "evaluated": 26,
+    "R": 24,
+    "cliques": 9633,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 1.864,
+   "mine_s": 0.032,
+   "evaluated": 26,
+   "R": 19,
+   "cliques": 9510,
+   "peak_mb": 8.0
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 5,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 0.3,
+    "mine_s": 0.016,
+    "evaluated": 26,
+    "R": 19,
+    "cliques": 9510,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.331,
+    "mine_s": 0.01,
+    "evaluated": 26,
+    "R": 21,
+    "cliques": 10047,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.392,
+    "mine_s": 0.014,
+    "evaluated": 26,
+    "R": 24,
+    "cliques": 9633,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 1.975,
+   "mine_s": 0.013,
+   "evaluated": 26,
+   "R": 19,
+   "cliques": 9510,
+   "peak_mb": 7.9
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 15,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 0.291,
+    "mine_s": 0.214,
+    "evaluated": 1146,
+    "R": 186,
+    "cliques": 7371,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.335,
+    "mine_s": 0.223,
+    "evaluated": 987,
+    "R": 202,
+    "cliques": 7739,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.307,
+    "mine_s": 0.209,
+    "evaluated": 830,
+    "R": 215,
+    "cliques": 7674,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 1.995,
+   "mine_s": 1.118,
+   "evaluated": 1146,
+   "R": 186,
+   "cliques": 7371,
+   "peak_mb": 8.3
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 15,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 0.391,
+    "mine_s": 0.167,
+    "evaluated": 5154,
+    "R": 186,
+    "cliques": 7371,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.305,
+    "mine_s": 0.2,
+    "evaluated": 5948,
+    "R": 202,
+    "cliques": 7739,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.317,
+    "mine_s": 0.234,
+    "evaluated": 6829,
+    "R": 215,
+    "cliques": 7674,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 2.233,
+   "mine_s": 0.659,
+   "evaluated": 5154,
+   "R": 186,
+   "cliques": 7371,
+   "peak_mb": 8.3
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 20,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 0.371,
+    "mine_s": 0.352,
+    "evaluated": 1171,
+    "R": 200,
+    "cliques": 7140,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.309,
+    "mine_s": 0.352,
+    "evaluated": 1310,
+    "R": 201,
+    "cliques": 7185,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.299,
+    "mine_s": 0.304,
+    "evaluated": 1215,
+    "R": 174,
+    "cliques": 7282,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 1.946,
+   "mine_s": 1.49,
+   "evaluated": 1171,
+   "R": 200,
+   "cliques": 7140,
+   "peak_mb": 8.4
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 20,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 0.326,
+    "mine_s": 0.381,
+    "evaluated": 12262,
+    "R": 200,
+    "cliques": 7140,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.422,
+    "mine_s": 0.406,
+    "evaluated": 10943,
+    "R": 201,
+    "cliques": 7185,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.297,
+    "mine_s": 0.364,
+    "evaluated": 11757,
+    "R": 174,
+    "cliques": 7282,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 1.975,
+   "mine_s": 1.639,
+   "evaluated": 12262,
+   "R": 200,
+   "cliques": 7140,
+   "peak_mb": 8.2
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 25,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 0.348,
+    "mine_s": 0.412,
+    "evaluated": 1761,
+    "R": 182,
+    "cliques": 7062,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.284,
+    "mine_s": 0.472,
+    "evaluated": 1914,
+    "R": 203,
+    "cliques": 7168,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.447,
+    "mine_s": 0.462,
+    "evaluated": 1840,
+    "R": 203,
+    "cliques": 6977,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 2.299,
+   "mine_s": 2.456,
+   "evaluated": 1761,
+   "R": 182,
+   "cliques": 7062,
+   "peak_mb": 8.9
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 25,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 0.39,
+    "mine_s": 0.544,
+    "evaluated": 15626,
+    "R": 182,
+    "cliques": 7062,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.312,
+    "mine_s": 0.705,
+    "evaluated": 23051,
+    "R": 203,
+    "cliques": 7168,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.319,
+    "mine_s": 0.814,
+    "evaluated": 26234,
+    "R": 203,
+    "cliques": 6977,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 1.976,
+   "mine_s": 2.338,
+   "evaluated": 15626,
+   "R": 182,
+   "cliques": 7062,
+   "peak_mb": 8.6
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 30,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 0.3,
+    "mine_s": 0.681,
+    "evaluated": 2492,
+    "R": 207,
+    "cliques": 6917,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.368,
+    "mine_s": 0.681,
+    "evaluated": 2587,
+    "R": 203,
+    "cliques": 6947,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.3,
+    "mine_s": 0.724,
+    "evaluated": 2542,
+    "R": 233,
+    "cliques": 7020,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 2.095,
+   "mine_s": 3.704,
+   "evaluated": 2492,
+   "R": 207,
+   "cliques": 6917,
+   "peak_mb": 9.1
+  }
+ },
+ {
+  "kind": "syn",
+  "n": 10000,
+  "k": 30,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 0.305,
+    "mine_s": 0.951,
+    "evaluated": 26987,
+    "R": 207,
+    "cliques": 6917,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.348,
+    "mine_s": 0.931,
+    "evaluated": 26745,
+    "R": 203,
+    "cliques": 6947,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.315,
+    "mine_s": 1.149,
+    "evaluated": 32255,
+    "R": 233,
+    "cliques": 7020,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 2.186,
+   "mine_s": 4.837,
+   "evaluated": 26987,
+   "R": 207,
+   "cliques": 6917,
+   "peak_mb": 8.8
+  }
+ },
+ {
+  "kind": "fsq",
+  "n": "NYC",
+  "k": null,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 0.327,
+    "mine_s": 0.198,
+    "evaluated": 961,
+    "R": 224,
+    "cliques": 5375,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.42,
+    "mine_s": 0.231,
+    "evaluated": 961,
+    "R": 224,
+    "cliques": 5375,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.536,
+    "mine_s": 0.267,
+    "evaluated": 961,
+    "R": 224,
+    "cliques": 5375,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 2.48,
+   "mine_s": 0.974,
+   "evaluated": 961,
+   "R": 224,
+   "cliques": 5375,
+   "peak_mb": 8.2
+  }
+ },
+ {
+  "kind": "fsq",
+  "n": "NYC",
+  "k": null,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 0.362,
+    "mine_s": 0.148,
+    "evaluated": 3481,
+    "R": 224,
+    "cliques": 5375,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.498,
+    "mine_s": 0.165,
+    "evaluated": 3481,
+    "R": 224,
+    "cliques": 5375,
+    "peak_mb": null
+   },
+   {
+    "build_s": 0.305,
+    "mine_s": 0.166,
+    "evaluated": 3481,
+    "R": 224,
+    "cliques": 5375,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 2.393,
+   "mine_s": 0.51,
+   "evaluated": 3481,
+   "R": 224,
+   "cliques": 5375,
+   "peak_mb": 7.6
+  }
+ },
+ {
+  "kind": "fsq",
+  "n": "TKY",
+  "k": null,
+  "method": "uhucm",
+  "reps": [
+   {
+    "build_s": 1.206,
+    "mine_s": 1.99,
+    "evaluated": 1697,
+    "R": 253,
+    "cliques": 49510,
+    "peak_mb": null
+   },
+   {
+    "build_s": 1.531,
+    "mine_s": 2.492,
+    "evaluated": 1697,
+    "R": 253,
+    "cliques": 49510,
+    "peak_mb": null
+   },
+   {
+    "build_s": 1.212,
+    "mine_s": 2.039,
+    "evaluated": 1697,
+    "R": 253,
+    "cliques": 49510,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 8.506,
+   "mine_s": 4.151,
+   "evaluated": 1697,
+   "R": 253,
+   "cliques": 49510,
+   "peak_mb": 68.7
+  }
+ },
+ {
+  "kind": "fsq",
+  "n": "TKY",
+  "k": null,
+  "method": "noprune",
+  "reps": [
+   {
+    "build_s": 1.314,
+    "mine_s": 3.251,
+    "evaluated": 33376,
+    "R": 253,
+    "cliques": 49510,
+    "peak_mb": null
+   },
+   {
+    "build_s": 1.382,
+    "mine_s": 3.483,
+    "evaluated": 33376,
+    "R": 253,
+    "cliques": 49510,
+    "peak_mb": null
+   },
+   {
+    "build_s": 1.406,
+    "mine_s": 2.732,
+    "evaluated": 33376,
+    "R": 253,
+    "cliques": 49510,
+    "peak_mb": null
+   }
+  ],
+  "mem": {
+   "build_s": 9.468,
+   "mine_s": 7.058,
+   "evaluated": 33376,
+   "R": 253,
+   "cliques": 49510,
+   "peak_mb": 41.0
+  }
+ }
+]

@@ -1,0 +1,3 @@
+X|FSQ_TKY|FL|K=100|{"J_fl_R0": 0.786, "J_fl_Rz": 0.767, "fl_inst_hucp": 0.88, "hold_fl": 0.92, "hold_R0": 0.88, "hold_Rz": 0.915, "authors_n": 100, "authors_seconds": 122.94, "authors_missing": 0, "authors_extra": 0, "authors_extra_below": 0}
+X|FSQ_TKY|FL|K=300|{"J_fl_R0": 0.824, "J_fl_Rz": 0.778, "fl_inst_hucp": 0.903, "hold_fl": 0.89, "hold_R0": 0.88, "hold_Rz": 0.921, "authors_n": 300, "authors_seconds": 167.4, "authors_missing": 0, "authors_extra": 0, "authors_extra_below": 0}
+X|FSQ_TKY|CQ|K=300|{"U_all": 12428.434153690461, "n": 300, "seconds": 1879.15, "runner": "memo", "missing": 0, "extra": 0, "extra_below": 0}
