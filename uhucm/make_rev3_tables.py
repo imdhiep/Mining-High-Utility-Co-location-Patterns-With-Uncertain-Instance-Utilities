@@ -57,7 +57,7 @@ if os.path.exists(P2):
     g = lambda l, v: T2[f"{l}|50|20"]["rows"]["300"]["table"][v]
     def node(v): return " & ".join(f"{g(l, v)[2]:,}" for l in labs)
     def tim(v): return " & ".join(f"{g(l, v)[0]:.2f}$\\pm${g(l, v)[1]:.2f}" for l in labs)
-    names = [("exact", "UHUCM"), ("chord", "Chord bound only"), ("mean", "Mean bound only"), ("nosearch", "Linear suffix scan"),
+    names = [("exact", "UHUCM"), ("mean", "Mean bound only"), ("nosearch", "Linear suffix scan"),
              ("noSB", "Without SB"), ("noprune", "NoPrune")]
     rows = [f"{n} & {node(v)} \\\\" for v, n in names if v != "nosearch"] + ["\\midrule"] + [f"{n} & {tim(v)} \\\\" for v, n in names]
     T["ablation"] = "\n".join(rows); T["ablation_labs"] = labs

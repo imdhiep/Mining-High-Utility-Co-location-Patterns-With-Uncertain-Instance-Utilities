@@ -292,6 +292,7 @@ def e2c(nseed=100):
             r = max(0.0, rho_hat(G, P0)); rh.append(r)
             for zn, z in (("normal", norm.ppf(0.95)), ("subG", math.sqrt(2 * math.log(20)))):
                 acc[f"{zn} rho=0"].append(ev(z)); acc[f"{zn} robust rho_hat"].append(ev(z, r))
+            acc["cantelli rho=0"].append(ev(math.sqrt(0.95 / 0.05)))
             acc["z=0"].append(ev(0.0))
         out = {"rho_hat_mean": round(st.mean(rh), 4), "rho_hat_sd": round(st.stdev(rh), 4)}
         for m, L in acc.items():

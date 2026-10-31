@@ -19,31 +19,31 @@
    ],
    "normal indep": {
     "seeds": 100,
-    "FDP": 0.0234,
-    "FDP_sd": 0.0442,
-    "power": 0.4418,
-    "reported": 23.26
+    "FDP": 0.0231,
+    "FDP_sd": 0.0444,
+    "power": 0.4421,
+    "reported": 23.35
    },
    "normal banded": {
     "seeds": 100,
     "FDP": 0.0097,
     "FDP_sd": 0.035,
-    "power": 0.3477,
-    "reported": 17.99
+    "power": 0.3469,
+    "reported": 18.02
    },
    "subG indep": {
     "seeds": 100,
     "FDP": 0.0055,
     "FDP_sd": 0.0226,
-    "power": 0.3231,
-    "reported": 16.63
+    "power": 0.3225,
+    "reported": 16.67
    },
    "subG banded": {
     "seeds": 100,
     "FDP": 0.0021,
     "FDP_sd": 0.0159,
-    "power": 0.2118,
-    "reported": 10.81
+    "power": 0.2119,
+    "reported": 10.86
    }
   },
   "activity+spatial 0.1": {
@@ -56,31 +56,31 @@
    ],
    "normal indep": {
     "seeds": 100,
-    "FDP": 0.0395,
-    "FDP_sd": 0.0812,
-    "power": 0.1321,
-    "reported": 6.97
+    "FDP": 0.0382,
+    "FDP_sd": 0.0797,
+    "power": 0.1329,
+    "reported": 7.1
    },
    "normal banded": {
     "seeds": 100,
-    "FDP": 0.0287,
-    "FDP_sd": 0.0722,
-    "power": 0.1135,
-    "reported": 5.92
+    "FDP": 0.0273,
+    "FDP_sd": 0.0698,
+    "power": 0.1153,
+    "reported": 6.09
    },
    "subG indep": {
     "seeds": 100,
     "FDP": 0.0057,
     "FDP_sd": 0.0341,
-    "power": 0.0614,
-    "reported": 3.09
+    "power": 0.062,
+    "reported": 3.18
    },
    "subG banded": {
     "seeds": 100,
     "FDP": 0.0046,
     "FDP_sd": 0.0355,
-    "power": 0.0484,
-    "reported": 2.45
+    "power": 0.0488,
+    "reported": 2.51
    }
   },
   "activity+spatial 0.25": {
@@ -93,31 +93,31 @@
    ],
    "normal indep": {
     "seeds": 100,
-    "FDP": 0.0388,
-    "FDP_sd": 0.0949,
-    "power": 0.1721,
-    "reported": 8.91
+    "FDP": 0.0382,
+    "FDP_sd": 0.094,
+    "power": 0.1751,
+    "reported": 9.25
    },
    "normal banded": {
     "seeds": 100,
-    "FDP": 0.0302,
-    "FDP_sd": 0.1443,
-    "power": 0.124,
-    "reported": 6.32
+    "FDP": 0.0346,
+    "FDP_sd": 0.1475,
+    "power": 0.1263,
+    "reported": 6.58
    },
    "subG indep": {
     "seeds": 100,
-    "FDP": 0.014,
+    "FDP": 0.0144,
     "FDP_sd": 0.1027,
-    "power": 0.0862,
-    "reported": 4.3
+    "power": 0.0871,
+    "reported": 4.44
    },
    "subG banded": {
     "seeds": 100,
     "FDP": 0.002,
     "FDP_sd": 0.02,
-    "power": 0.0542,
-    "reported": 2.69
+    "power": 0.0559,
+    "reported": 2.83
    }
   },
   "activity+spatial 0.5": {
@@ -130,31 +130,31 @@
    ],
    "normal indep": {
     "seeds": 100,
-    "FDP": 0.0294,
-    "FDP_sd": 0.0795,
-    "power": 0.207,
-    "reported": 10.58
+    "FDP": 0.0311,
+    "FDP_sd": 0.0796,
+    "power": 0.2073,
+    "reported": 11.06
    },
    "normal banded": {
     "seeds": 100,
-    "FDP": 0.0099,
-    "FDP_sd": 0.0436,
-    "power": 0.1219,
-    "reported": 6.02
+    "FDP": 0.0112,
+    "FDP_sd": 0.046,
+    "power": 0.1251,
+    "reported": 6.47
    },
    "subG indep": {
     "seeds": 100,
-    "FDP": 0.008,
-    "FDP_sd": 0.0389,
-    "power": 0.1174,
-    "reported": 5.8
+    "FDP": 0.0083,
+    "FDP_sd": 0.0395,
+    "power": 0.1187,
+    "reported": 6.13
    },
    "subG banded": {
     "seeds": 100,
     "FDP": 0.0045,
     "FDP_sd": 0.0285,
-    "power": 0.0611,
-    "reported": 2.98
+    "power": 0.0618,
+    "reported": 3.16
    }
   }
  }

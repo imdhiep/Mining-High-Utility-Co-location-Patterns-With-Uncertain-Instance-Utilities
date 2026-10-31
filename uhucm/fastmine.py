@@ -297,7 +297,7 @@ class Problem:
                 parts_r.append(self.rank[Pm[ok]]); parts_k.append(k2)
         r = np.concatenate(parts_r); k = np.concatenate(parts_k)
         keep = (r >= 0) & (k >= 0); r, k = r[keep], k[keep]
-        if len(r) == 0: return True, 0
+        if len(r) == 0: return (0.0 < thr), (0 if 0.0 < thr else nT)   # empty candidate set: bound 0
         bestall = np.full(len(self.smu), -1); np.maximum.at(bestall, r, k)
         u = np.flatnonzero(bestall >= 0); best = bestall[u]
         mu, s2 = self.smu[u], self.ss2[u]
@@ -305,7 +305,7 @@ class Problem:
 
         def below(j):
             m = best >= j
-            if not m.any(): return True
+            if not m.any(): return 0.0 < thr
             mj, sj = mu[m], s2[m]
             msum = float(mj.sum())
             if msum < thr: return True                      # the mean bound already prunes
@@ -403,7 +403,7 @@ def mine(Pb, mu, use=(1, 1, 1, 1), kind='two', max_size=None, rule_l=None, deadl
         if max_size and len(P) >= max_size: return
         T = order[rank[P[-1]] + 1:]
         if not T: return
-        if use[3] and all(f in npf for f in list(P) + T):
+        if use[3] and mu > tol and all(f in npf for f in list(P) + T):   # the tier needs a positive threshold
             st['ps4'] += 1; return
         Lp = L[hasf[np.ix_(L, T)].any(1)]
         if len(Lp) == 0: return

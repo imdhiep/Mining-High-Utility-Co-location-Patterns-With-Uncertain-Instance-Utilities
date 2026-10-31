@@ -28,6 +28,12 @@
     "FDP_sd": 0.0,
     "power": 0.0421
    },
+   "cantelli rho=0": {
+    "seeds": 100,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "power": 0.0098
+   },
    "z=0": {
     "seeds": 100,
     "FDP": 0.2516,
@@ -62,6 +68,12 @@
     "FDP_sd": 0.0,
     "power": 0.0428
    },
+   "cantelli rho=0": {
+    "seeds": 100,
+    "FDP": 0.0,
+    "FDP_sd": 0.0,
+    "power": 0.0191
+   },
    "z=0": {
     "seeds": 100,
     "FDP": 0.2217,
@@ -95,6 +107,12 @@
     "FDP": 0.0009,
     "FDP_sd": 0.0091,
     "power": 0.0481
+   },
+   "cantelli rho=0": {
+    "seeds": 100,
+    "FDP": 0.0013,
+    "FDP_sd": 0.0125,
+    "power": 0.0398
    },
    "z=0": {
     "seeds": 100,

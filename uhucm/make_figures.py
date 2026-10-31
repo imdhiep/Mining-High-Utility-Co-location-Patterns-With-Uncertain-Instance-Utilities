@@ -302,8 +302,10 @@ def fig_eff_v2():
     first = "D1" if "D1|50|20" in T else "D4"
     vsK(axes[0], f"{first}|50|20"); vsK(axes[1], "D5|50|20"); vsk(axes[2], "D4"); vsk(axes[3], "D5")
     caps = [f"(a) {first}, $k=20$", "(b) D5, $k=20$", "(c) D4, $K=300$", "(d) D5, $K=300$"]
-    for ax, cp in zip(axes, caps):
-        ax.set_yscale("log"); ax.set_ylabel("Mining time (s)", labelpad=1); _sub(ax, cp, -0.36)
+    for i, (ax, cp) in enumerate(zip(axes, caps)):
+        if i >= 2: ax.set_yscale("log")
+        else: ax.set_ylim(bottom=0)
+        ax.set_ylabel("Mining time (s)", labelpad=1); _sub(ax, cp, -0.36)
     fig.subplots_adjust(wspace=0.45, bottom=0.36); _leg(fig, axes[0], 3, 0.03); save(fig, "fig_effw.pdf")
 
 

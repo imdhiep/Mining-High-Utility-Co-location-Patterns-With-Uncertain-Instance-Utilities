@@ -145,12 +145,12 @@
    "rho_hat_mean": 0.161,
    "normal d=0.01": {
     "seeds": 100,
-    "reported": 17.54,
+    "reported": 17.55,
     "FDP": 0.0073,
     "FDP_sd": 0.0268,
     "FDP_p90": 0.0038,
-    "power": 0.3386,
-    "power_sd": 0.128
+    "power": 0.3388,
+    "power_sd": 0.1277
    },
    "normal d=0.05": {
     "seeds": 100,
