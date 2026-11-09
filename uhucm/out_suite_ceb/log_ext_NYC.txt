@@ -1,0 +1,9 @@
+X|CEB_NYC|FL|K=100|{"J_fl_R0": 0.136, "J_fl_Rz": 0.113, "fl_inst_hucp": 0.24, "hold_fl": 0.44, "hold_R0": 0.88, "hold_Rz": 0.97}
+Traceback (most recent call last):
+  File "/home/claude/credible_hucpm/uhucm/run_ext_ceb.py", line 6, in <module>
+    ext_baselines.run_all(rows, f"CEB_{c}", "out_suite_ceb", os.path.join(paths.PSOMUCP_DIR, "HUCPM"), UB=UB, Zhat=Zh)
+    ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/credible_hucpm/uhucm/ext_baselines.py", line 37, in run_all
+    mufl = scfl[K - 1]; Rfl = {p for p, s in Rfl_all.items() if s >= mufl}
+           ~~~~^^^^^^^
+IndexError: list index out of range

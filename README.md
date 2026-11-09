@@ -1,6 +1,6 @@
 # Mining High-Utility Co-location Patterns With Uncertain Instance Utilities
 
-Source code of **UHUCM**, a sound and complete miner of high-utility co-location patterns whose instance utilities are
+Source code of **UHUCPM** (uncertain high-utility co-location pattern mining; the code keeps the earlier name `uhucm`), a sound and complete miner of high-utility co-location patterns whose instance utilities are
 posterior distributions (mean and variance) estimated from user-generated evidence, together with the **EviGen**
 synthetic generator and the scripts that produce every experiment of the paper.
 
@@ -15,7 +15,12 @@ are the summed posterior means and variances of the participating atoms (instanc
 | `uhucm/fastmine.py` | Vectorized UHUCM used in all experiments: prefix-optimal exact bound, chord bound, FUB, PCB, suffix bound located by binary search, robust (equicorrelated) bound, distance-banded non-negative covariance |
 | `uhucm/test_fastmine.py`, `uhucm/test_bands.py` | `fastmine` vs. brute force on random instances (mixed signs, variances, interactions, rho; banded covariance) |
 | `uhucm/evigen.py`, `uhucm/synth.py` | EviGen generator; E1 exactness, E2 calibration (incl. misspecification), scalability, clique stress test |
-| `uhucm/fsq_loader.py` | Foursquare TSMC2014 -> atoms (Gamma-Poisson relative-performance utility) and interaction pairs |
+| `uhucm/ceb.py` | Compound empirical Bayes posterior for counts: per-feature NPMLE prior (zero/left-truncation allowed), moment center, expected normalizer, conditional (count) bootstrap for the total variance, optimal set selection |
+| `uhucm/fsq_loader.py` | Foursquare TSMC2014 -> atoms (`model="ceb"`: compound empirical Bayes; `model="gamma"`: earlier Gamma-Poisson utility) and interaction pairs |
+| `uhucm/run_suite_ceb.py`, `uhucm/run_bands_ceb.py`, `uhucm/run_inter_ceb.py`, `uhucm/run_ext_ceb.py`, `uhucm/run_timing_ceb.py` | D4/D5 experiments with the compound EB posterior and total variance (quality and hold-out, banded covariance, interactions and bootstrap sensitivity, external baselines, repeated timing) |
+| `uhucm/real_ceb.py` | Real data: compound EB vs. Gamma-Poisson answer sets, posterior expected FDP, optimal selection |
+| `uhucm/semisyn/` | Semi-synthetic count data on the real layouts of D4, D5 and Las Vegas with known utilities (`semisyn_fsq.py`; methods `np` with `cboot`, `oracle`, `gamma`), center studies, unit tests |
+| `uhucm/make_semisyn_table.py`, `uhucm/stats_rev3.py`, `uhucm/stats_timing_ceb.py` | Semi-synthetic table, hold-out statistics and timing statistics for the compound EB runs |
 | `uhucm/yelp_full.py` | Yelp Open Dataset -> atoms (Normal-Normal rating posterior) and interaction pairs |
 | `uhucm/suite.py` | Experiment suite shared by all real datasets (quality, hold-out, filters, sensitivity, dependence, efficiency) |
 | `uhucm/run_suite_fsq.py`, `uhucm/run_fsq_d.py` | Suite on Foursquare (D4 New York, D5 Tokyo) at d = 50 m and at other distances |
@@ -27,7 +32,7 @@ are the summed posterior means and variances of the participating atoms (instanc
 | `uhucm/run_bands_fsq.py`, `uhucm/run_mc_fsq.py` | Distance-banded residual correlation and mining (E8); Monte Carlo check of the normal approximation on D4/D5 |
 | `uhucm/results_db.py`, `uhucm/stats_rev.py`, `uhucm/stats_rev2.py`, `uhucm/stats_tests.py`, `uhucm/stats_timing2.py` | Collect results; Wilson intervals, score matching, Friedman, Wilcoxon with Holm, Nemenyi, Welch tests on timings |
 | `uhucm/make_rev_tables.py`, `uhucm/make_rev3_tables.py`, `uhucm/make_figures.py`, `uhucm/figstyle.py` | Tables and figures, generated only from the result files |
-| `uhucm/out_*`, `uhucm/results_kaggle/`, `uhucm/d8/d8_results.jsonl` | Result files behind the reported numbers |
+| `uhucm/out_*`, `uhucm/results_kaggle/`, `uhucm/d8/d8_results.jsonl` | Result files behind the reported numbers (`out_semisyn`, `out_suite_ceb`, `out_ceb`, `out_timing_ceb`: compound EB version) |
 
 Yelp runs were executed in a Kaggle notebook; their outputs were copied into `uhucm/results_kaggle/`
 (`summary_transcribed.txt`, `k4_digest.txt`), and `parse_digest.py` converts and consistency-checks them.
@@ -66,6 +71,20 @@ python run_timing_k.py NYC && python run_timing_k2.py TKY 40 60 80   # repeated 
 python run_bands_fsq.py NYC && python run_mc_fsq.py NYC             # E8 banded covariance, Monte Carlo check
 (cd d8 && python rerun_d6_time.py)                                 # D6 timing, three runs
 python stats_rev2.py && python stats_timing2.py && python make_rev3_tables.py && python make_figures.py
+```
+
+Compound empirical Bayes version (Section IV-A of the paper; D4/D5 and semi-synthetic data). `D6_DIR` is the `DATA`
+folder of the PSO-MUCP clone.
+
+```bash
+python semisyn/test_ceb.py && python semisyn/test_trunc.py && python semisyn/test_boot_exact.py
+FR=1.0 KS=100,300,1000 python semisyn/semisyn_fsq.py NYC 3 lognormal np zpost cboot diag momc   # also TKY, LasVegas; gamma, mixture
+FR=1.0 KS=100,300,1000 python semisyn/semisyn_fsq.py NYC 3 lognormal oracle zpost diag momc
+FR=1.0 KS=100,300,1000 python semisyn/semisyn_fsq.py NYC 3 lognormal gamma diag                 # parametric reference, own target
+python make_semisyn_table.py
+python run_suite_ceb.py $FSQ_DIR/dataset_TSMC2014_NYC.txt NYC out_suite_ceb quality
+python run_bands_ceb.py NYC && python run_inter_ceb.py NYC && python run_ext_ceb.py NYC && python real_ceb.py NYC
+python run_timing_ceb.py NYC && python stats_rev3.py && python stats_timing_ceb.py
 ```
 
 Seeds are fixed in the scripts (EviGen calibration seeds 1000-1099, E1 seeds 0-1999, timing seeds 7-9, D6 utilities seed 2026, bootstrap/permutation and Monte Carlo seed 0).

@@ -1,0 +1,38 @@
+{
+ "tag": "CEB_TKY",
+ "n": 29774,
+ "U_all_fl": -2610.409734601726,
+ "fl": {
+  "100": {
+   "J_fl_R0": 0.316,
+   "J_fl_Rz": 0.24,
+   "fl_inst_hucp": 0.48,
+   "hold_fl": 0.33,
+   "hold_R0": 0.45,
+   "hold_Rz": 0.58
+  },
+  "300": {
+   "J_fl_R0": 0.333,
+   "J_fl_Rz": 0.284,
+   "fl_inst_hucp": 0.5,
+   "hold_fl": 0.447,
+   "hold_R0": 0.633,
+   "hold_Rz": 0.75
+  }
+ },
+ "cq": {
+  "U_all": -2610.4097346017256
+ },
+ "mem": {
+  "uhucm": {
+   "peak_mb": 73.7,
+   "seconds_traced": 8.19,
+   "evaluated": 3513
+  },
+  "noprune": {
+   "peak_mb": 44.5,
+   "seconds_traced": 9.85,
+   "evaluated": 33376
+  }
+ }
+}

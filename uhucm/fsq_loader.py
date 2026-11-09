@@ -20,7 +20,7 @@ UTM = {"NYC": 32618, "TKY": 32654}
 TRAIN_END = pd.Timestamp("2012-12-01")
 
 
-def load(path, city, nfeat=20):
+def load(path, city, nfeat=20, model="gamma", B=20, seed=1):
     df = pd.read_csv(path, sep="\t", header=None, encoding="latin-1",
                      names=["u", "v", "c", "cn", "lat", "lon", "tz", "t"])
     df["ts"] = pd.to_datetime(df.t, format="%a %b %d %H:%M:%S +0000 %Y") + pd.to_timedelta(df.tz, unit="m")
@@ -77,6 +77,13 @@ def load(path, city, nfeat=20):
     info = dict(city=city, n=len(rows), Wtr=round(Wtr, 1), Wte=round(Wte, 1), NU=NU, nweeks=nweeks,
                 phi={k: (round(v, 1) if math.isfinite(v) else "inf") for k, v in phi.items()},
                 alpha={k: round(v, 3) for k, v in alpha.items()}, beta={k: round(v, 3) for k, v in beta.items()})
+    if model == "ceb":                                     # compound empirical Bayes (Def. 4): NPMLE prior, moment center
+        from ceb import ceb_posterior, cboot
+        Fv = np.array([r["feat"] for r in rows]); xa = np.array([r["a"] for r in rows]); xt = np.array([r["a_test"] for r in rows])
+        mu, s2, ep, st = ceb_posterior(xa, Wtr, Fv, t=1)     # training venues have >= 1 check-in
+        mt, _, _, _ = ceb_posterior(xt, Wte, Fv, t=0)        # test counts are not selected given the rates
+        for i, r in enumerate(rows): r.update(mu=float(mu[i]), s2=float(s2[i]), mu_test=float(mt[i]))
+        info.update(UB=cboot(xa, Wtr, st, B=B, seed=seed), Zhat=float(ep.sum()))
     return rows, users, NU, info
 
 

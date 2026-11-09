@@ -1,0 +1,29 @@
+{
+ "city": "LasVegas",
+ "n": 18715,
+ "k": 10,
+ "t": 11,
+ "E": 1.0,
+ "post_s": 20.0,
+ "Z_new": 10999.7,
+ "Z_plugin": 10741.8,
+ "res": {
+  "100": {
+   "gamma": 0.00197,
+   "R0": 100,
+   "new_lb": 72,
+   "new_bfdr": 94,
+   "old_R0": 100,
+   "old_lb": 91,
+   "J_R0_old_new": 0.342,
+   "J_bfdr_oldlb": 0.341,
+   "J_lb_bfdr": 0.766,
+   "pEFDP_R0": 0.07,
+   "pEFDP_bfdr": 0.048,
+   "pEFDP_oldlb": 0.02,
+   "oldlb_in_R0": 0.516,
+   "size_R0": 4.25,
+   "size_bfdr": 4.18
+  }
+ }
+}

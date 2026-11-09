@@ -24,7 +24,7 @@ class Problem:
         self.n = len(feat); self.feat = np.asarray(feat); self.k = int(self.feat.max()) + 1
         self.names = feat_names or [str(f) for f in range(self.k)]
         self.z, self.rho, self.beta, self.d = z, rho, beta, d
-        xy = np.asarray(xy, float); self.xy = xy; self.bands = None
+        xy = np.asarray(xy, float); self.xy = xy; self.bands = None; self.UB = None
         self.nb = self._neighbours(xy, d)
         self.cliques = self._maximal_cliques()
         C = len(self.cliques)
@@ -137,15 +137,22 @@ class Problem:
             tot += float(s[a:a + 1024] @ (R @ s))
         return tot - rr[0] * float((s * s).sum())          # remove the diagonal (distance 0 falls in the first band)
 
+    def set_boot(self, U, Z=None):
+        """Prior-estimation uncertainty (law of total variance): U is a B x n matrix of plug-in posterior means of the
+        instance atoms under B bootstrap priors; the pattern variance gains the variance over b of their sum, which is
+        non-negative, so every bound computed without it stays valid.  Z optionally replaces the normalizer."""
+        U = np.asarray(U, float); D = U - U.mean(0)
+        self.UB = np.zeros((U.shape[0], len(self.amu))); self.UB[:, :U.shape[1]] = D / math.sqrt(max(U.shape[0] - 1, 1))
+        if Z is not None: self.Z = float(Z)
+
     def score(self, A):
         m = self.amu[A].sum(); v = self.as2[A]
-        if self.bands is not None:
-            V = v.sum() + self._banded_extra(A[A < self.n])
-            return (m - self.z * math.sqrt(max(V, 0.0))) / self.Z
         if self.rho > 0:
             V = (1 - self.rho) * v.sum() + self.rho * np.sqrt(v).sum() ** 2
         else:
             V = v.sum()
+        if self.bands is not None: V += self._banded_extra(A[A < self.n])
+        if self.UB is not None: V += float((self.UB[:, A].sum(1) ** 2).sum())
         return (m - self.z * math.sqrt(max(V, 0.0))) / self.Z
 
     def _sr(self, A, z):

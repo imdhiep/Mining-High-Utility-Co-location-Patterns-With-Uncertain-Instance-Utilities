@@ -53,12 +53,12 @@ def timed(fn, reps=1):
 
 class Suite:
     def __init__(self, name, rows, d, out, recompute=None, variants=(), users=None, NU=None, interactions=None,
-                 resid=None, log=print, deadline=900, reps=3, zmain=ZMAIN):
+                 resid=None, log=print, deadline=900, reps=3, zmain=ZMAIN, UB=None, Zhat=None):
         self.name, self.rows, self.d, self.out = name, rows, d, out
         self.recompute, self.variants = recompute, variants
         self.users, self.NU, self.interactions, self.resid = users, NU, interactions, resid
         self.log, self.deadline, self.reps = log, deadline, reps
-        self.zmain = zmain
+        self.zmain = zmain; self.UB, self.Zhat = UB, Zhat     # total variance (Def. totalvar) and expected normalizer
         self.names = sorted({r["feat"] for r in rows}); fi = {f: j for j, f in enumerate(self.names)}
         self.F = [fi[r["feat"]] for r in rows]; self.XY = [(r["x"], r["y"]) for r in rows]
         self.mu = np.array([r["mu"] for r in rows], float); self.s2 = np.array([r["s2"] for r in rows], float)
@@ -75,8 +75,11 @@ class Suite:
         self.P("R|" + self.name + "|" + tag + "|" + " ".join(f"{k}={v}" for k, v in kw.items()))
 
     def mk(self, mu=None, s2=None, z=0.0, rho=0.0, d=None, pairs=None, beta=0.0):
+        own = mu is None and s2 is None and pairs is None and self.UB is not None
         mu = self.mu if mu is None else mu; s2 = self.s2 if s2 is None else s2
-        return Problem(self.F, self.XY, mu, s2, d or self.d, z, rho, pairs, beta, self.names)
+        P = Problem(self.F, self.XY, mu, s2, d or self.d, z, rho, pairs, beta, self.names)
+        if own: P.set_boot(self.UB, self.Zhat)
+        return P
 
     # ------------------------------------------------------------------ thresholds
     @staticmethod

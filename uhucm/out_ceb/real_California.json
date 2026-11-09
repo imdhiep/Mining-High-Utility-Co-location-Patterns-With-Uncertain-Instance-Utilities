@@ -1,0 +1,29 @@
+{
+ "city": "California",
+ "n": 46429,
+ "k": 13,
+ "t": 10,
+ "E": 1.0,
+ "post_s": 73.1,
+ "Z_new": 17111.3,
+ "Z_plugin": 17109.4,
+ "res": {
+  "100": {
+   "gamma": 0.00016,
+   "R0": 100,
+   "new_lb": 94,
+   "new_bfdr": 100,
+   "old_R0": 100,
+   "old_lb": 97,
+   "J_R0_old_new": 0.923,
+   "J_bfdr_oldlb": 0.913,
+   "J_lb_bfdr": 0.94,
+   "pEFDP_R0": 0.017,
+   "pEFDP_bfdr": 0.017,
+   "pEFDP_oldlb": 0.008,
+   "oldlb_in_R0": 0.969,
+   "size_R0": 4.46,
+   "size_bfdr": 4.46
+  }
+ }
+}

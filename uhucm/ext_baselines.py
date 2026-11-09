@@ -20,8 +20,8 @@ def _csv(S, out, tag):
     return p, lab, ids
 
 
-def run_all(rows, tag, out, src_dir, d=50.0, Ks=(100, 300), log=print, do_authors=True):
-    S = Suite(tag, rows, d, out, log=lambda s: None)
+def run_all(rows, tag, out, src_dir, d=50.0, Ks=(100, 300), log=print, do_authors=True, UB=None, Zhat=None):
+    S = Suite(tag, rows, d, out, log=lambda s: None, UB=UB, Zhat=Zhat)
     P0 = S.mk(); Pz = S.mk(z=1.645); R0all, sc = S.topk(P0, max(Ks))
     has_t = ~np.isnan(S.mut); Zt = float(np.clip(S.mut[has_t], 0, None).sum())
     def te(p):

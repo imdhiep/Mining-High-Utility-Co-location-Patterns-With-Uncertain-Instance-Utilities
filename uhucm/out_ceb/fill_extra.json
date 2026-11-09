@@ -1,0 +1,12 @@
+{
+ "@@ABL@@": "Ablations on the log-normal settings of D4 and D5 (selection at $\\delta=0.05$) show which parts matter: the median of $\\hat G_f$ as center raises the FDP to 0.13 and 0.30, the plug-in normalizer to 0.094 and 0.097, and dropping the bootstrap term to 0.043 and 0.065; resampling instances instead of counts keeps the FDP (0.031 and 0.048) but lowers the efficiency to 0.82 and 0.53.",
+ "@@SPEED@@": "66",
+ "@@OLD@@": "up to 94\\%",
+ "@@OLDTKY@@": "49\\%--94\\%",
+ "@@OLDR@@": "0\\%--12\\% on D4, Las Vegas and the D5 mixture but 49\\% and 94\\% on D5 with log-normal and Gamma truth, even with $z=2.45$ and even when its Gamma prior is correctly specified: its center and normalizer are computed from shrunken posterior means, and their errors, shared by all atoms of a pattern, are not in its variance",
+ "@@EFF@@": "73\\%--135\\%",
+ "@@EFFR@@": "73\\%--135\\% (median 98\\%)",
+ "@@POINT@@": "6\\%--34\\%",
+ "@@POINTR@@": "6\\%--34\\%",
+ "@@LBR@@": "at most 0.026"
+}

@@ -1,0 +1,30 @@
+{
+ "tag": "CEB_NYC",
+ "n": 13932,
+ "U_all_fl": -2251.8248985251826,
+ "fl": {
+  "100": {
+   "J_fl_R0": 0.136,
+   "J_fl_Rz": 0.113,
+   "fl_inst_hucp": 0.24,
+   "hold_fl": 0.44,
+   "hold_R0": 0.88,
+   "hold_Rz": 0.97
+  }
+ },
+ "cq": {
+  "U_all": -2251.8248985251826
+ },
+ "mem": {
+  "uhucm": {
+   "peak_mb": 12.7,
+   "seconds_traced": 1.63,
+   "evaluated": 809
+  },
+  "noprune": {
+   "peak_mb": 12.5,
+   "seconds_traced": 1.75,
+   "evaluated": 3481
+  }
+ }
+}

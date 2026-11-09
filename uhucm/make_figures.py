@@ -5,7 +5,7 @@ import figstyle as fs
 from figstyle import plt
 import results_db
 
-OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "tkde_overleaf", "figures")
+OUT = os.environ.get("FIG_OUT", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "tkde_overleaf", "figures"))
 os.makedirs(OUT, exist_ok=True)
 db, syn, d8 = results_db.load()
 LAB = {"Phi": "D1", "New": "D2", "Tam": "D3", "FSQ_NYC": "D4", "FSQ_TKY": "D5", "Las": "D6a", "Pho": "D6b", "Tor": "D6c"}
@@ -40,9 +40,9 @@ def fig_e7():
         kept = [db[n]["quality"][K]["hold_kept"] for n in ORDER]
         rej = [db[n]["quality"][K]["hold_rej"] for n in ORDER]
         mat = [db[n]["quality"][K]["hold_matched"] for n in ORDER]
-        ax.bar(x - w, kept, w, color=fs.BLUE, label="Kept by UHUCM ($z$=1.645)")
+        ax.bar(x - w, kept, w, color=fs.BLUE, label="Kept by UHUCPM ($z$=1.645)")
         ax.bar(x, mat, w, color=fs.GRAY, label="Kept, matched on training score")
-        ax.bar(x + w, rej, w, color=fs.ORANGE, label="Accepted by $z$=0, rejected by UHUCM")
+        ax.bar(x + w, rej, w, color=fs.ORANGE, label="Accepted by $z$=0, rejected by UHUCPM")
         ax.set_xticks(x); ax.set_xticklabels([LAB[n] for n in ORDER]); ax.set_ylim(0, 1.0); ax.set_ylabel("Hold rate in test period")
     h, l = axes[0].get_legend_handles_labels(); fig.subplots_adjust(wspace=0.22)
     fs.finalize(fig, axes, ["(a) $K=300$", "(b) $K=1000$"], h, l, ncol=3, bottom=0.38, leg_y=0.17); save(fig, "fig_e7.pdf")
@@ -86,7 +86,7 @@ def fig_eff_mu():
     fig, axes = plt.subplots(1, 2, figsize=(W2, 2.5))
     for ax, nm, lab in zip(axes, ("Phi", "FSQ_TKY"), ("(a) D1 (Yelp, Philadelphia)", "(b) D5 (Foursquare, Tokyo)")):
         em = db[nm]["eff_mu"]; Ks = sorted(em)
-        series = [(lbl, [float(em[K][k]["time"]) for K in Ks]) for k, lbl in (("exact", "UHUCM"), ("mean", "Mean bound"), ("noprune", "NoPrune"))]
+        series = [(lbl, [float(em[K][k]["time"]) for K in Ks]) for k, lbl in (("exact", "UHUCPM"), ("mean", "Mean bound"), ("noprune", "NoPrune"))]
         fs.bar_with_table(ax, [f"K={K}" for K in Ks], series, log2=True, ylabel="Run time (s)", fmt="{:.2f}")
         ax.set_title(lab, y=-0.62, fontsize=8)
     fig.subplots_adjust(wspace=0.45, bottom=0.30); save(fig, "fig_eff_mu.pdf")
@@ -96,7 +96,7 @@ def fig_eff_nodes():
     fig, axes = plt.subplots(1, 2, figsize=(W2, 2.5))
     for ax, nm, lab in zip(axes, ("Phi", "FSQ_TKY"), ("(a) D1 (Yelp, Philadelphia)", "(b) D5 (Foursquare, Tokyo)")):
         em = db[nm]["eff_mu"]; Ks = sorted(em)
-        series = [(lbl, [float(em[K][k]["evaluated"]) for K in Ks]) for k, lbl in (("exact", "UHUCM"), ("mean", "Mean bound"), ("noprune", "NoPrune"))]
+        series = [(lbl, [float(em[K][k]["evaluated"]) for K in Ks]) for k, lbl in (("exact", "UHUCPM"), ("mean", "Mean bound"), ("noprune", "NoPrune"))]
         fs.bar_with_table(ax, [f"K={K}" for K in Ks], series, log2=True, ylabel="Evaluated nodes", fmt="{:.0f}")
         ax.set_title(lab, y=-0.62, fontsize=8)
     fig.subplots_adjust(wspace=0.45, bottom=0.30); save(fig, "fig_eff_nodes.pdf")
@@ -108,7 +108,7 @@ def fig_scale():
     sk = syn["scale_k"]; sn = syn["scale_n"]
     for ax, S, key, lab in ((axes[0], sk, "k", "(a) Number of features ($n=10^4$)"), (axes[1], sn, "n", "(b) Number of instances ($k=10$)")):
         cats = [(f"{r[key] // 1000}k" if key == "n" else str(r[key])) for r in S]
-        series = [("UHUCM", [r["uhucm"]["time"] for r in S]), ("NoPrune", [r["noprune"]["time"] for r in S]),
+        series = [("UHUCPM", [r["uhucm"]["time"] for r in S]), ("NoPrune", [r["noprune"]["time"] for r in S]),
                   ("Build (nbr.+cliques)", [r["build_s"] for r in S])]
         fs.bar_with_table(ax, cats, series, log2=True, ylabel="Run time (s)", fmt="{:.2f}")
         ax.set_title(lab, y=-0.62, fontsize=8)
@@ -120,7 +120,7 @@ def fig_eff_d():
     fig, axes = plt.subplots(1, 2, figsize=(W2, 2.1))
     for ax, nm, lab in zip(axes, ("Phi", "FSQ_TKY"), ("(a) D1", "(b) D5")):
         ed = db[nm]["eff_d"]; ds = sorted(ed)
-        fs.line(ax, ds, [("UHUCM", [ed[d]["exact"]["time"] for d in ds]), ("NoPrune", [ed[d]["noprune"]["time"] for d in ds])],
+        fs.line(ax, ds, [("UHUCPM", [ed[d]["exact"]["time"] for d in ds]), ("NoPrune", [ed[d]["noprune"]["time"] for d in ds])],
                 fmt="{:.2f}", xlabel="Distance threshold $d$ (m)", ylabel="Run time (s)", logy=True)
         ax2 = ax.twinx(); ax2.plot(ds, [ed[d]["cliques"] for d in ds], color=fs.GRAY, linestyle=":", marker="^", label="Maximal cliques $C$")
         ax2.set_yscale("log"); ax2.set_ylabel("$C$"); ax2.grid(False)
@@ -200,7 +200,7 @@ def fig_e2_1c():
 
 def fig_eff_1c():
     fig, axes = plt.subplots(1, 2, figsize=(W1, 1.85))
-    meth = (("exact", "UHUCM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
+    meth = (("exact", "UHUCPM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
     for nm, ls in (("Phi", "-"), ("FSQ_TKY", "--")):
         em = db[nm]["eff_mu"]; Ks = sorted(em)
         for k, lbl, c, m in meth:
@@ -227,7 +227,7 @@ def fig_scale_1c():
     def med(r, key): v = sorted(x[key] for x in r["reps"]); return v[1], v[0], v[2]
     fig, axes = plt.subplots(1, 2, figsize=(W1, 1.85))
     for ax, key, fixed, t in ((axes[0], "k", lambda r: r["n"] == 10000, "(a) $k$ ($n=10^4$)"), (axes[1], "n", lambda r: r["k"] == 10, "(b) $n$ ($k=10$)")):
-        for meth, lbl, c, m in (("uhucm", "UHUCM", fs.BLUE, "o"), ("noprune", "NoPrune", fs.GRAY, "^")):
+        for meth, lbl, c, m in (("uhucm", "UHUCPM", fs.BLUE, "o"), ("noprune", "NoPrune", fs.GRAY, "^")):
             rs = sorted([r for r in SM if r["method"] == meth and fixed(r)], key=lambda r: r[key])
             xs = [r[key] for r in rs]; ms = [med(r, "mine_s") for r in rs]
             ax.errorbar(xs, [a for a, _, _ in ms], yerr=[[a - lo for a, lo, _ in ms], [hi - a for a, _, hi in ms]], color=c, marker=m, label=lbl, capsize=1.5, elinewidth=0.6)
@@ -264,7 +264,7 @@ def fig_e2_2c():
 
 def fig_eff_2c():
     from matplotlib.lines import Line2D
-    meth = (("exact", "UHUCM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
+    meth = (("exact", "UHUCPM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
     fig, axes = plt.subplots(1, 4, figsize=(W2, 1.9))
     caps = ["(a) D1, nodes", "(b) D1, time", "(c) D5, nodes", "(d) D5, time"]
     for j, nm in enumerate(("Phi", "FSQ_TKY")):
@@ -285,8 +285,8 @@ def fig_eff_2c():
 def fig_eff_v2():
     """Mining time (mean and SD of 10 runs, binary-search suffix bound) of UHUCM, the mean bound and NoPrune:
     (a), (b) against the rank threshold K on D1 and D5 (k = 20); (c), (d) against the number of features k at K = 300."""
-    T = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out_synth", "stats_timing2.json")))
-    meth = (("exact", "UHUCM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
+    T = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out_synth", os.environ.get("STATS_TIMING", "stats_timing2.json"))))
+    meth = (("exact", "UHUCPM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
     fig, axes = plt.subplots(1, 4, figsize=(W2, 1.9))
     def vsK(ax, key):
         R = T[key]["rows"]; Ks = sorted(R, key=int)
@@ -318,7 +318,7 @@ def fig_scale_2c():
              (axes[2], "n", lambda r: r["k"] == 10, "mine_s", "Time (s)", "(c) Time vs. $n$ ($k=10$)"),
              (axes[3], "n", lambda r: r["k"] == 10, "evaluated", "Evaluated nodes", "(d) Nodes vs. $n$"))
     for ax, key, fixed, val, yl, cap in specs:
-        for meth, lbl, c, m in (("uhucm", "UHUCM", fs.BLUE, "o"), ("noprune", "NoPrune", fs.GRAY, "^")):
+        for meth, lbl, c, m in (("uhucm", "UHUCPM", fs.BLUE, "o"), ("noprune", "NoPrune", fs.GRAY, "^")):
             rs = sorted([r for r in SM if r["method"] == meth and fixed(r)], key=lambda r: r[key])
             ms = [med(r, val) for r in rs]
             ax.errorbar([r[key] for r in rs], [a for a, _, _ in ms], yerr=[[a - lo for a, lo, _ in ms], [hi - a for a, _, hi in ms]],
@@ -336,9 +336,9 @@ def fig_e7_2c():
     fig, axes = plt.subplots(1, 2, figsize=(W2, 1.9))
     for ax, K, lab in zip(axes, (300, 1000), ("(a) $K=300$", "(b) $K=1000$")):
         x = np.arange(len(ORDER)); w = 0.27
-        ax.bar(x - w, [db[n]["quality"][K]["hold_kept"] for n in ORDER], w, color=fs.BLUE, label="Kept by UHUCM ($z$=1.645)")
+        ax.bar(x - w, [db[n]["quality"][K]["hold_kept"] for n in ORDER], w, color=fs.BLUE, label="Kept by UHUCPM ($z$=1.645)")
         ax.bar(x, [db[n]["quality"][K]["hold_matched"] for n in ORDER], w, color=fs.GRAY, label="Kept, matched on training score")
-        ax.bar(x + w, [db[n]["quality"][K]["hold_rej"] for n in ORDER], w, color=fs.ORANGE, label="Accepted by $z$=0, rejected by UHUCM")
+        ax.bar(x + w, [db[n]["quality"][K]["hold_rej"] for n in ORDER], w, color=fs.ORANGE, label="Accepted by $z$=0, rejected by UHUCPM")
         ax.set_xticks(x); ax.set_xticklabels([LAB[n] for n in ORDER]); ax.set_ylim(0, 1.0); ax.set_ylabel("Hold rate"); _sub(ax, lab, -0.22)
     fig.subplots_adjust(wspace=0.18, bottom=0.30); _leg(fig, axes[0], 3, 0.03); save(fig, "fig_e7w.pdf")
 
@@ -352,6 +352,48 @@ def fig_e3_1c():
     ax.set_xticks(x); ax.set_xticklabels(bins); ax.set_xlabel(r"Number of atoms $|A(P)|$"); ax.set_ylabel("FE miss rate"); ax.set_ylim(0, 1.05)
     fig.subplots_adjust(bottom=0.36); _leg(fig, ax, 5, 0.02); save(fig, "fig_e3.pdf")
 
+
+
+def fig_case_ceb():
+    """Case study on D4 with the compound EB posteriors, total variance and expected normalizer (z = 1.645, K = 300)."""
+    import fsq_loader, paths
+    from fastmine import Problem, mine, pattern_atoms
+    rows, users, NU, info = fsq_loader.load(paths.fsq("NYC"), "NYC", model="ceb"); UB, Zh = info.pop("UB"), info.pop("Zhat")
+    names = sorted({r["feat"] for r in rows}); fi = {f: j for j, f in enumerate(names)}
+    F = [fi[r["feat"]] for r in rows]; XY = np.array([(r["x"], r["y"]) for r in rows])
+    mu = np.array([r["mu"] for r in rows]); s2 = np.array([r["s2"] for r in rows])
+    P0 = Problem(F, XY, mu, s2, 50.0, 0.0, feat_names=names); P0.set_boot(UB, Zh)
+    P1 = Problem(F, XY, mu, s2, 50.0, 1.645, feat_names=names); P1.set_boot(UB, Zh)
+    muK = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out_suite_ceb", "suite_CEB_NYC.json")))
+    muK = [x for x in muK["quality"] if x["K"] == 300][0]["mu"]
+    R0 = mine(P0, muK)[0]; R1 = mine(P1, muK)[0]
+    rej = sorted(set(R0) - set(R1), key=lambda p: -R0[p]); kept = sorted(set(R1), key=lambda p: -R1[p])
+    pr, pk = rej[0], kept[0]
+    Ar = pattern_atoms(P0, pr); Ak = pattern_atoms(P0, pk)
+    fig, axes = plt.subplots(1, 2, figsize=(W1, 1.98)); caps = []
+    for ax, A, p, lab in ((axes[0], Ak, pk, "(a) Kept"), (axes[1], Ar, pr, "(b) Rejected")):
+        ax.scatter(XY[:, 0] / 1000, XY[:, 1] / 1000, s=0.3, color="#D9D9D9", linewidths=0, rasterized=True)
+        a = A[A < P0.n]; sig = np.sqrt(s2[a]); col = np.where(mu[a] >= 0, fs.BLUE, fs.ORANGE)
+        alpha = np.clip(1 - sig / (sig.max() + 1e-12), 0.25, 1)
+        for i, j in enumerate(a):
+            ax.scatter(XY[j, 0] / 1000, XY[j, 1] / 1000, s=3, color=col[i], alpha=float(alpha[i]), linewidths=0)
+        cx, cy = XY[a, 0].mean() / 1000, XY[a, 1].mean() / 1000; span = max(np.ptp(XY[a, 0]), np.ptp(XY[a, 1])) / 1000 / 2 + 1.0
+        ax.set_xlim(cx - span, cx + span); ax.set_ylim(cy - span, cy + span); ax.set_aspect("equal")
+        ax.set_xlabel("x (km, UTM 18N)", fontsize=7, labelpad=1); ax.set_ylabel("y (km)", fontsize=7, labelpad=1); ax.tick_params(labelsize=6); ax.grid(False)
+        lbl = " + ".join(s.replace("___", " / ").replace("_and_", " & ").replace("_", " ") for s in p)
+        caps.append(f"{lab}: {{{lbl}}}")
+        ax.text(0.02, 0.98, f"$|A(P)|$={len(A)}, median $c$={np.median(np.array([rows[j]['a'] for j in a])):.0f}", transform=ax.transAxes, va="top", fontsize=5.5)
+    from matplotlib.lines import Line2D
+    h = [Line2D([], [], marker="o", color="w", markerfacecolor=fs.BLUE, label=r"$\mu_a\geq 0$"), Line2D([], [], marker="o", color="w", markerfacecolor=fs.ORANGE, label=r"$\mu_a<0$"),
+         Line2D([], [], marker="o", color="w", markerfacecolor="#D9D9D9", label="Other venues")]
+    fig.subplots_adjust(wspace=0.38, left=0.12, right=0.99, top=0.99)
+    fs.finalize(fig, axes, caps, h, [x.get_label() for x in h], ncol=3, bottom=0.345, leg_y=0.175, lab_y=0.01, fontsize=6.5); save(fig, "fig_case.pdf")
+    Vk = float(s2[Ak[Ak < P0.n]].sum()); Vr = float(s2[Ar[Ar < P0.n]].sum())
+    json.dump(dict(kept=list(pk), kept_score=R1[pk], kept_s0=float(P0.score(Ak)), kept_atoms=int(len(Ak)), rejected=list(pr), rejected_s0=R0[pr],
+                   rejected_lb=float(P1.score(Ar)), rejected_atoms=int(len(Ar)), muK=muK, Vpost_kept=Vk, Vpost_rej=Vr,
+                   VT_kept=float(Vk + (P0.UB[:, Ak].sum(1) ** 2).sum()), VT_rej=float(Vr + (P0.UB[:, Ar].sum(1) ** 2).sum()),
+                   med_c_kept=float(np.median([rows[j]["a"] for j in Ak[Ak < P0.n]])), med_c_rej=float(np.median([rows[j]["a"] for j in Ar[Ar < P0.n]]))),
+              open(os.path.join(OUT, "fig_case.json"), "w"), indent=1)
 
 if __name__ == "__main__":
     import sys
