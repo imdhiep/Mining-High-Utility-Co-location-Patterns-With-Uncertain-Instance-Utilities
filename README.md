@@ -4,8 +4,10 @@ Source code of **UHUCPM** (uncertain high-utility co-location pattern mining; th
 posterior distributions (mean and variance) estimated from user-generated evidence, together with the **EviGen**
 synthetic generator and the scripts that produce every experiment of the paper.
 
-A pattern `P` is reported when its lower-bound score `(M(P) - z*sqrt(V(P))) / Z` reaches the threshold, where `M` and `V`
-are the summed posterior means and variances of the participating atoms (instances and neighboring pairs).
+A pattern `P` is reported when its lower-bound score `(M(P) - z*sqrt(V(P))) / Z` reaches the threshold, where `M` is the
+summed posterior mean of the participating instances and `V` the posterior variance of their total (independent part plus
+the error of the estimated prior and center, shared by the instances of a feature). Pair utilities from visit logs are
+supported by the code but are not used in the paper.
 
 ## Layout
 
@@ -36,6 +38,28 @@ are the summed posterior means and variances of the participating atoms (instanc
 
 Yelp runs were executed in a Kaggle notebook; their outputs were copied into `uhucm/results_kaggle/`
 (`summary_transcribed.txt`, `k4_digest.txt`), and `parse_digest.py` converts and consistency-checks them.
+
+## Paper tables and figures
+
+Run from `uhucm/`. Every number in the paper is read from the result files listed here.
+
+| Item in the paper | Script | Result files |
+|---|---|---|
+| Running example, Tables I-III, scan and suffix bounds of Sections III-V | `running_example.py` | printed |
+| Table IV (datasets) | `run_suite_ceb.py` (D4, D5), `kexp4.py` (D1-D3, Kaggle) | `out_suite_ceb/suite_CEB_*.json` (`stats`), `results_kaggle/` |
+| Table V (calibration on semi-synthetic counts) | `semisyn/semisyn_fsq.py` (seeds 0-2), `semisyn/run_seeds.sh` (seeds 3-9), `make_semisyn_table2.py` | `out_semisyn/`, `out_semisyn_s3_9/`, `out_ceb/semisyn_table2.*` |
+| Section VI-B, ablation of the posterior (median center, plug-in normalizer, no bootstrap, venue resampling) | `semisyn/semisyn_fsq.py` with the flags in `out_semisyn/abl_*` | `out_semisyn/abl_*.txt`, `out_semisyn/log_*_np_boot.txt` |
+| Section VI-B, spatially correlated rates | `SPF=100,0.3 semisyn/semisyn_fsq.py NYC 3 lognormal np zpost cboot diag momc` (also TKY) | `out_semisyn_spatial/` |
+| Section VI-B, EviGen calibration | `synth.py e2`, `synth.py e2b`, `synth_vt.py` | `out_synth/e2*.json` |
+| Table VI (patterns rejected), PLB miss, filters, sensitivity | `run_suite_ceb.py`, `run_fsq_d.py`, `run_bands_ceb.py`, `kexp4.py` | `out_suite_ceb/`, `results_kaggle/` |
+| Table VII (hold rates, 13 datasets) | `stats_rev3.py`, `make_hold_table.py` | `out_synth/stats_rev3.json`, `out_synth/hold_all_K300.tex` |
+| Fig. 2 (case study) | `make_figures.py case_ceb` | `fig_case.json` next to the figure |
+| Fig. 3 and Table VIII upper block (timing, ablation at k = 20) | `run_timing_ceb.py`, `stats_timing_ceb.py`, `make_figures.py eff_v2` (`STATS_TIMING=stats_timing_ceb.json`) | `out_timing_ceb/`, `out_synth/stats_timing_ceb.json` |
+| Table VIII lower block, exact vs. mean bound for z = 1.645-4.36 | `run_zsweep.py NYC 20 60`, `run_zsweep.py TKY 20 60` | `out_zsweep/` |
+| Section VI-D, exactness against brute force | `test_fastmine.py`, `synth.py e1` | `out_synth/e1.json` |
+| Section VI-D, Strategy 4 on real data and on the PSO-MUCP data | `suite.py` (`Lsum_miss_*`, `Lglobal_miss_*`), `d8/run_d8_all.py` | `out_suite_ceb/suite_CEB_*.json`, `d8/d8_results.jsonl` |
+| Section VI-D, Strategy 4 counterexample with feature-level utilities | authors' PSO-MUCP code on `d8/strategy4_counterexample.csv` with v(A) = 10, v(B) = -10, v(C) = -1, d = 10, minutil = 0.5 | expected output: only {A, C}, while {A, B, C} scores 0.593 |
+| Section VI-D, scalability on EviGen and timing on the PSO-MUCP data | `scale_mem.py`, `synth.py stress`, `d8/rerun_d6_time.py` | `out_synth/`, `d8/d6_retime.json` |
 
 ## Requirements
 
