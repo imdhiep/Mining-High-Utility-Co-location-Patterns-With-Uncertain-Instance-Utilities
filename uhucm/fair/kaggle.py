@@ -52,7 +52,9 @@ def sh(cmd, **kw):
 phase = sys.argv[1]; pattern = sys.argv[2] if len(sys.argv) > 2 else ""
 env = dict(os.environ, FAIR_RUNS=f"{W}/fair_runs")
 env["FSQ_DIR"] = fsq_dir()
-env["YELP_DIR"] = find("yelp_academic_dataset_business.json") or sys.exit("Yelp JSON files not attached")
+env["YELP_DIR"] = find("yelp_academic_dataset_business.json") or ""
+if phase == "shared" and not env["YELP_DIR"] and (not pattern or pattern.startswith("yelp")):
+    sys.exit("Yelp JSON files not attached")
 pso = f"{W}/PSO-MUCP"
 if not os.path.isdir(pso):
     sh(["git", "clone", "--depth", "1", "https://github.com/yuanshuaikang/PSO-MUCP", pso])
@@ -61,8 +63,10 @@ try:
     import pyproj  # noqa: F401
 except ImportError:
     sh([sys.executable, "-m", "pip", "install", "-q", "pyproj"])
-if os.environ.get("FAIR_PREV") and not os.path.isdir(env["FAIR_RUNS"]):
-    shutil.copytree(os.environ["FAIR_PREV"], env["FAIR_RUNS"])
+prev = os.environ.get("FAIR_PREV") or next(iter(sorted(glob.glob("/kaggle/input/**/fair_runs", recursive=True), key=len)), None)
+if prev and not os.path.isdir(env["FAIR_RUNS"]):                # earlier output attached as input: keep its finished jobs
+    print("copying earlier results from", prev, flush=True)
+    shutil.copytree(prev, env["FAIR_RUNS"])
 print({k: env[k] for k in ("FSQ_DIR", "YELP_DIR", "PSOMUCP_DIR", "FAIR_RUNS")}, "cpus", os.cpu_count(), flush=True)
 run = [sys.executable, os.path.join(H, "fair", "run.py")]
 if phase == "shared":

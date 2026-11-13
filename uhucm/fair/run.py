@@ -50,6 +50,13 @@ def local_deps(script):
     return sorted(seen)
 
 
+def cpu_model():
+    try:
+        return next(l.split(":", 1)[1].strip() for l in open("/proc/cpuinfo") if l.startswith("model name"))
+    except Exception:
+        return platform.processor()
+
+
 def versions():
     import numpy, scipy
     return dict(python=platform.python_version(), numpy=numpy.__version__, scipy=scipy.__version__)
@@ -130,7 +137,7 @@ def finish(r):
             p = os.path.join(root, f); outs[os.path.relpath(p, d)] = hashlib.sha256(open(p, "rb").read()).hexdigest()[:16]
     json.dump(dict(name=j["name"], fingerprint=fp, exit=r["proc"].returncode, start=r["t0"], seconds=round(time.time() - r["t0"], 1),
                    exclusive=j["exclusive"], load_samples=r["load"], deps=deps, inputs=ids, cmd=[os.path.relpath(j["script"], H)] + j["args"],
-                   env=j["env"], versions=versions(), host=dict(node=platform.node(), cpus=os.cpu_count(), session=SESSION),
+                   env=j["env"], versions=versions(), host=dict(node=platform.node(), cpus=os.cpu_count(), session=SESSION, cpu_model=cpu_model()),
                    outputs=outs), open(stamp_path(j["name"]), "w"), indent=1)
     os.remove(os.path.join(d, "RUNNING"))
     print(f"{time.strftime('%H:%M')} {'ok ' if r['proc'].returncode == 0 else 'ERR'} {j['name']} ({time.time() - r['t0']:.0f}s)", flush=True)
@@ -142,7 +149,7 @@ def run(pattern, nj, budget, mode):
         if os.path.exists(os.path.join(ROOT, j["name"], "RUNNING")): os.remove(os.path.join(ROOT, j["name"], "RUNNING"))
     todo = [j for j in select(pattern) if state(j) in ("missing", "stale", "failed")
             and (mode != "exclusive" or j["exclusive"]) and (mode != "shared" or not j["exclusive"])]
-    print(f"{len(todo)} jobs to run, session {SESSION}, versions {versions()}", flush=True)
+    print(f"{len(todo)} jobs to run, session {SESSION}, versions {versions()}, cpu {cpu_model()}", flush=True)
     t_end = time.time() + 60 * budget; running = []
     while todo or running:
         for r in [r for r in running if r["proc"].poll() is not None]:
