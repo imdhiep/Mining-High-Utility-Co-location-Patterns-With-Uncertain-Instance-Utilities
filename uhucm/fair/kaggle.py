@@ -14,10 +14,34 @@ H = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W = "/kaggle/working"
 
 
-def find(name):
-    hits = glob.glob(f"/kaggle/input/**/{name}", recursive=True)
-    if not hits: sys.exit(f"input not found: {name}")
-    return os.path.dirname(sorted(hits, key=len)[0])
+FSQ_SHA = {"dataset_TSMC2014_NYC.txt": "2f39ce698e5bff6683c74bec30c436cc022c160b0f3d73c5268b55491b2445f9",
+           "dataset_TSMC2014_TKY.txt": "85542c605ce708d8584637756590383a84e9bbdb71342d0d8e78858ba2a0e5c8"}
+FSQ_GDRIVE = "1VE67jfSN-GV6fkCfuyBEQJzk_qy-SfOk"     # dataset_tsmc2014.zip, linked from the authors' page (D. Yang)
+
+
+def find(name, roots=("/kaggle/input", W)):
+    hits = [h for r in roots for h in glob.glob(f"{r}/**/{name}", recursive=True) if "fair_runs" not in h]
+    return os.path.dirname(sorted(hits, key=len)[0]) if hits else None
+
+
+def sha(path):
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for b in iter(lambda: f.read(1 << 24), b""): h.update(b)
+    return h.hexdigest()
+
+
+def fsq_dir():
+    d = find("dataset_TSMC2014_NYC.txt")
+    if d is None:                                        # not attached: fetch the original archive
+        sh([sys.executable, "-m", "pip", "install", "-q", "gdown"])
+        sh([sys.executable, "-m", "gdown", FSQ_GDRIVE, "-O", f"{W}/dataset_tsmc2014.zip"])
+        shutil.unpack_archive(f"{W}/dataset_tsmc2014.zip", f"{W}/fsq")
+        d = find("dataset_TSMC2014_NYC.txt")
+    for f, h in FSQ_SHA.items():                          # the same bytes as the files behind the paper
+        if sha(os.path.join(d, f)) != h: sys.exit(f"{f}: checksum differs from the reference file")
+    return d
 
 
 def sh(cmd, **kw):
@@ -26,8 +50,8 @@ def sh(cmd, **kw):
 
 phase = sys.argv[1]
 env = dict(os.environ, FAIR_RUNS=f"{W}/fair_runs")
-env["FSQ_DIR"] = find("dataset_TSMC2014_NYC.txt")
-env["YELP_DIR"] = find("yelp_academic_dataset_business.json")
+env["FSQ_DIR"] = fsq_dir()
+env["YELP_DIR"] = find("yelp_academic_dataset_business.json") or sys.exit("Yelp JSON files not attached")
 pso = f"{W}/PSO-MUCP"
 if not os.path.isdir(pso):
     sh(["git", "clone", "--depth", "1", "https://github.com/yuanshuaikang/PSO-MUCP", pso])
