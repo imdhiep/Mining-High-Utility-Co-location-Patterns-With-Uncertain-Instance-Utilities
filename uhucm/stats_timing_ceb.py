@@ -11,14 +11,14 @@ H = os.path.dirname(os.path.abspath(__file__))
 
 def load():
     T = {}
-    for f in sorted(glob.glob(os.path.join(H, "out_timing_ceb", "suite_CEB_*.json"))):
+    for f in sorted(glob.glob(os.environ.get("TIMING_GLOB", os.path.join(H, os.environ.get("TIMING_DIR", "out_timing_ceb"), "suite_*.json")))):
         r = json.load(open(f)); nm = r["name"]                     # FSQ_NYC_k40 or FSQ_NYC_k20_d70
         city = "D4" if "_NYC_" in nm else "D5"; k = int(nm.split("_k")[1].split("_")[0])
         for d, res in r["timing"].items():
             key = f"{city}|{int(float(d))}|{k}"
             for K, rec in res.items():
                 if K == "cliques": continue
-                T.setdefault(key, {"cliques": res["cliques"]})[int(K)] = {v: dict(mean=float(np.mean(x["times"])), sd=float(np.std(x["times"], ddof=1)),
+                T.setdefault(key, {"cliques": res["cliques"]})[int(K)] = {v: dict(mean=float(np.mean(x["times"])), sd=float(np.std(x["times"], ddof=1)), times=list(x["times"]), cpu=list(x.get("cpu", [])), cpu_mean=float(np.mean(x["cpu"])) if x.get("cpu") else None,
                                                                               n=len(x["times"]), evaluated=x["evaluated"]) for v, x in rec.items()}
     p = os.path.join(H, "results_kaggle", "_none_")
     if os.path.exists(p):
@@ -57,7 +57,7 @@ def main():
         for K in Ks:
             res["rows"][K]["table"] = {v: (round(x["mean"], 3), round(x["sd"], 3), x["evaluated"]) for v, x in byK[K].items()}
         out[key] = res
-    json.dump(out, open(os.path.join(H, "out_synth", "stats_timing_ceb.json"), "w"), indent=1)
+    json.dump(out, open(os.path.join(H, "out_synth", os.environ.get("TIMING_OUT", "stats_timing_ceb.json")), "w"), indent=1)
     return out
 
 

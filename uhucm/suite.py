@@ -14,6 +14,7 @@ Experiments (numbering of Section VI):
   EFF    efficiency vs threshold, vs z, vs distance; ablation of bounds and pruning strategies
   CASE   patterns accepted by z=0 and rejected by z=1.645
 """
+import gc
 import json, time, math, statistics as st, os
 import numpy as np
 from fastmine import Problem, mine, pattern_atoms, Timeout
@@ -241,9 +242,11 @@ class Suite:
         muK = self.sc[K - 1]
         base = set(mine(self.mk(z=self.zmain), muK)[0]); out = {}
         for name, kw in self.variants:
-            mu, s2 = self.recompute(**kw)
+            res = self.recompute(**kw); mu, s2 = res[0], res[1]
             Pb = self.mk(mu=np.array(mu), s2=np.array(s2), z=self.zmain)
             P0v = self.mk(mu=np.array(mu), s2=np.array(s2))
+            if len(res) == 4:                    # total variance and expected normalizer recomputed under the variant
+                Pb.set_boot(res[2], res[3]); P0v.set_boot(res[2], res[3])
             # same rank-based threshold: the K-th z=0 score of the variant
             _, scv = self.topk(P0v, K)
             Rv = set(mine(Pb, scv[K - 1])[0])
@@ -342,11 +345,17 @@ class Suite:
                 if K > len(scd): continue
                 m = scd[K - 1]; VV = V + (A if (K == abl_K and d == self.d) else [])
                 if np_once and res.get("_np"): VV = [v for v in VV if v[0] != "noprune"]
-                rec = {n: dict(times=[]) for n, _, _ in VV}
-                for it in range(reps):
-                    for n, use, kind in VV:
+                rec = {n: dict(times=[], cpu=[]) for n, _, _ in VV}
+                for it in range(-1, reps):                    # it = -1: one untimed warm-up run of every variant
+                    sh = it % len(VV) if it >= 0 else 0       # rotate the order so that no variant always runs first
+                    for n, use, kind in VV[sh:] + VV[:sh]:
                         if n == "noprune" and np_reps is not None and it >= np_reps: continue   # NoPrune: fewer repetitions (node count is deterministic)
-                        t = time.time(); R, stt, _ = mine(Pzd, m, use, kind, search=(n != "nosearch"), adaptive=(n == "adaptive")); rec[n]["times"].append(round(time.time() - t, 4))
+                        gc.collect(); gc.disable()
+                        t, c = time.perf_counter(), time.process_time()
+                        R, stt, _ = mine(Pzd, m, use, kind, search=(n != "nosearch"), adaptive=(n == "adaptive"))
+                        t, c = time.perf_counter() - t, time.process_time() - c
+                        gc.enable()
+                        if it >= 0: rec[n]["times"].append(round(t, 4)); rec[n]["cpu"].append(round(c, 4))
                         rec[n]["evaluated"], rec[n]["R"] = stt["evaluated"], len(R)
                 if np_once:
                     if "noprune" in rec: res["_np"] = rec["noprune"]

@@ -69,7 +69,7 @@ def evigen2(n, k, seed, d=1.0, cluster=True, tau=1.0, sig=3.0, neg_frac=0.35, vo
             tau_i[idx] = math.sqrt(max(0.05, float(s[idx].var(ddof=1)) - sg ** 2 * float((1.0 / vol[idx]).mean())))
     prec = 1 / tau_i ** 2 + vol / sg ** 2
     pm = (m0 / tau_i ** 2 + vol * s / sg ** 2) / prec; pv = 1 / prec
-    return dict(feat=feat, xy=xy, q=q, s=s, pm=pm, pv=pv, vol=vol, k=k, d=d, m0=m0)
+    return dict(feat=feat, xy=xy, q=q, s=s, pm=pm, pv=pv, vol=vol, k=k, d=d, m0=m0, sg=sg, sv=(sv if estimate else None))
 
 
 def problem(G, mu, s2, z):
@@ -81,8 +81,9 @@ def e1(nrep=2000):
     """Random small instances; UHUCM (every bound kind x 5 pruning combinations) vs reference brute force."""
     combos = [(1, 1, 1, 1), (0, 0, 0, 0), (1, 0, 1, 0), (0, 1, 0, 1), (1, 1, 0, 1)]
     kinds = ("two", "exact", "chord", "mean")
-    runs = mism = nonempty = 0; t0 = time.time()
-    for seed in range(nrep):
+    runs = mism = nonempty = valid = 0; t0 = time.time(); seed = -1
+    while valid < nrep:                      # draw seeds until nrep instances with a positive normalizer are tested
+        seed += 1
         rnd = random.Random(seed)
         n, k = rnd.randint(8, 30), rnd.randint(4, 6)
         G = evigen2(n, k, seed, d=1.0, density=rnd.choice([0.5, 1.0, 2.0]))
@@ -100,6 +101,7 @@ def e1(nrep=2000):
                         iota[frozenset((ids[i], j))] = v; ivar[frozenset((ids[i], j))] = w; pairs[(i, jj)] = (v, w)
         D = uhucm.CData(inst, dict(zip(ids, G["pm"])), dict(zip(ids, G["pv"])), iota, ivar, 1.0, beta, z, rho)
         if D.Z <= 0: continue
+        valid += 1
         mu = rnd.choice([0.0, 0.02, 0.05, 0.1, 0.2])
         bf, allv = uhucm.brute_force(D, mu); want = {tuple(sorted(P)) for P in bf}
         names = sorted({f for _, f, _, _ in inst})
@@ -109,7 +111,7 @@ def e1(nrep=2000):
                 r = fastmine.mine(Pb, mu, use, kind)[0]; runs += 1
                 mism += {tuple(sorted(P)) for P in r} != want
         nonempty += bool(want)
-    res = dict(instances=nrep, runs=runs, mismatches=mism, nonempty=nonempty, seconds=round(time.time() - t0, 1))
+    res = dict(instances=nrep, seeds_drawn=seed + 1, runs=runs, mismatches=mism, nonempty=nonempty, seconds=round(time.time() - t0, 1))
     print("E1", res); json.dump(res, open(f"{OUT}/e1.json", "w"))
 
 

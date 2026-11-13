@@ -37,7 +37,7 @@ def authors(path, util, D, mu, nos4=False, timeout=1800):
 
 if __name__ == "__main__":
     ds, D, mu, util = sys.argv[1], float(sys.argv[2]), float(sys.argv[3]), ast.literal_eval(sys.argv[4])
-    path = os.path.join(SRC, "DATA", ds)
+    path = ds if os.path.isfile(ds) else os.path.join(SRC, "DATA", ds)
     rec = dict(dataset=ds, D=D, minutil=mu, util=util, uhucm=uhucm_run(path, util, D, mu))
     if "--authors" in sys.argv:
         rec["orig"] = authors(path, util, D, mu); rec["nos4"] = authors(path, util, D, mu, True)
@@ -48,5 +48,5 @@ if __name__ == "__main__":
             rec["nos4_equal_uhucm"] = set(rec["nos4"]["patterns"]) == u
     short = {k: (v if k not in ("uhucm", "orig", "nos4") else {a: b for a, b in v.items() if a != "patterns"} if isinstance(v, dict) else v) for k, v in rec.items()}
     print(json.dumps(short), flush=True)
-    with open(os.path.join(HERE, "d8_results.jsonl"), "a") as f:
+    with open("d8_results.jsonl", "a") as f:                      # in the working directory of the run
         f.write(json.dumps(rec) + "\n")

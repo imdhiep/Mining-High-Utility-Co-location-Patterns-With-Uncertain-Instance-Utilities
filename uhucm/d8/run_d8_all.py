@@ -17,12 +17,7 @@ for kneg in (1, 2, 3, 4):
         for mu in (0.05, 0.1):
             confs.append((f"neg{kneg}x{mag}", u, mu))
 import os
-done = set()
-if os.path.exists("d8_results.jsonl"):
-    for l in open("d8_results.jsonl"):
-        r = json.loads(l)
-        if "orig" in r: done.add((r["dataset"], r["minutil"], json.dumps(r["util"], sort_keys=True)))
+HERE = os.path.dirname(os.path.abspath(__file__))
 for tag, u, mu in confs:
-    if (name, mu, json.dumps(u, sort_keys=True)) in done: continue
-    out = subprocess.run([sys.executable, "compare_d8.py", name, str(D), str(mu), repr(u), "--authors"], capture_output=True, text=True).stdout
+    out = subprocess.run([sys.executable, os.path.join(HERE, "compare_d8.py"), name, str(D), str(mu), repr(u), "--authors"], capture_output=True, text=True).stdout
     print(tag, out.strip()[:600], flush=True)

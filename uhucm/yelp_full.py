@@ -13,6 +13,7 @@ Interaction evidence (Def. 5 proxy): U(o) = set of training reviewers of o; for 
   cv = |U(o) & U(o')|, e = |U(o)| |U(o')| / N_U, iota = (cv-e)/(cv+e+kappa_i), Var(iota) = cv [(2e+kappa_i)/(cv+e+kappa_i)^2]^2.
 """
 import json, math, collections, csv, os, time
+import numpy as np
 
 FEATURES = [
     ("Coffee & Tea", "Coffee"), ("Fast Food", "FastFood"), ("Pizza", "Pizza"), ("Mexican", "Mexican"),
@@ -34,7 +35,21 @@ def feature_of(cats):
     return None
 
 
-def build(root, cities, split="2017-01-01", test_end="9999-12-31", s0=3.0, tau2_floor=0.05, log=print):
+def reviews(root, cities, review_dir=None):
+    """Review records (business_id, stars, date, user_id): from review.json, or from the per-city CSV files written by
+    prep_yelp_reviews.py (reviews_<City>.csv with review_id, user_id, business_id, stars, date) when review_dir is set."""
+    if review_dir is None:
+        with open(os.path.join(root, "yelp_academic_dataset_review.json")) as f:
+            for l in f:
+                r = json.loads(l); yield r["business_id"], float(r["stars"]), r["date"][:10], r["user_id"]
+        return
+    for c in cities:
+        with open(os.path.join(review_dir, f"reviews_{c.replace(' ', '_')}.csv"), newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                yield r["business_id"], float(r["stars"]), r["date"][:10], r["user_id"]
+
+
+def build(root, cities, split="2017-01-01", test_end="9999-12-31", s0=3.0, tau2_floor=0.05, log=print, review_dir=None):
     import pyproj
     t0 = time.time()
     biz = {}
@@ -64,17 +79,14 @@ def build(root, cities, split="2017-01-01", test_end="9999-12-31", s0=3.0, tau2_
                 ck[r["business_id"]] += sum(r.get("time", {}).values())
     tr = collections.defaultdict(list); te = collections.defaultdict(list); users = collections.defaultdict(set)
     dmin, dmax, nrev = "9999", "0000", 0
-    with open(os.path.join(root, "yelp_academic_dataset_review.json")) as f:
-        for l in f:
-            r = json.loads(l)
-            b = r["business_id"]
-            if b not in biz:
-                continue
-            nrev += 1; dt = r["date"][:10]; dmin = min(dmin, dt); dmax = max(dmax, dt)
-            if dt < split:
-                tr[b].append(float(r["stars"])); users[b].add(r["user_id"])
-            elif dt < test_end:
-                te[b].append(float(r["stars"]))
+    for b, stars, dt, uid in reviews(root, cities, review_dir):
+        if b not in biz:
+            continue
+        nrev += 1; dmin = min(dmin, dt); dmax = max(dmax, dt)
+        if dt < split:
+            tr[b].append(stars); users[b].add(uid)
+        elif dt < test_end:
+            te[b].append(stars)
     log(f"[yelp] businesses={len(biz)} reviews kept={nrev} dates {dmin}..{dmax} split={split} test_end={test_end} dated_checkins={dated} ({time.time()-t0:.0f}s)")
     out = {}
     for city in cities:
@@ -110,6 +122,7 @@ def build(root, cities, split="2017-01-01", test_end="9999-12-31", s0=3.0, tau2_
             x, y = tf.transform(biz[b]["lon"], biz[b]["lat"])
             nt = len(te[b])
             rows.append(dict(id=b, feat=ft, x=x, y=y, a=ck[b], a_test=(ck_te[b] if dated else -1), n_r=n, S=S, n_test=nt,
+                             SS=sum(v * v for v in tr[b]),
                              mu=g * (th - s0) / 2, s2=g * g * vth / 4,
                              raw=(g * (S / n - s0) / 2) if n else 0.0,
                              mu_test=(gt * (sum(te[b]) / nt - s0) / 2) if nt else float("nan"),
@@ -138,6 +151,43 @@ def interactions(rows, users, NU, nb, kappa_i=5.0):
 def save(rows, path):
     with open(path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys())); w.writeheader(); w.writerows(rows)
+
+
+def expected_pos(mu, s2):
+    """sum over instances of E[u+] under N(mu, s2): the expected normalizer of Definition (eq. zhat) for ratings"""
+    from scipy.stats import norm
+    mu = np.asarray(mu, float); sd = np.sqrt(np.maximum(np.asarray(s2, float), 1e-300))
+    return float((mu * norm.cdf(mu / sd) + sd * norm.pdf(mu / sd)).sum())
+
+
+def vt_boot(rows, B=20, seed=0, kappa_mult=1.0, sigma_mult=1.0, g_kind="log", s0=3.0, tau2_floor=0.05):
+    """Bootstrap of the estimated hyperparameters (law of total variance, V_T): the venues are kept, each training mean
+    rating is redrawn from N(mean, sigma_s^2/n_o) and each within-venue variance from sigma_s^2 chi2_{n_o-1}/(n_o-1);
+    sigma_s^2, mu_f and tau_f^2 are re-estimated by the same moments as build(), and the posterior means of the observed
+    ratings are recomputed. Returns the B x n matrix of posterior means (instance order of rows)."""
+    rng = np.random.default_rng(seed)
+    n = np.array([r["n_r"] for r in rows], float); S = np.array([r["S"] for r in rows], float)
+    SS = np.array([r["SS"] for r in rows], float); has = n > 0
+    sbar = np.where(has, S / np.maximum(n, 1), 0.0)
+    wv = np.where(n >= 2, (SS - n * sbar ** 2) / np.maximum(n - 1, 1), 0.0)
+    df = np.maximum(n - 1, 0); s2s = float((df * wv).sum() / df.sum())
+    feats = sorted({r["feat"] for r in rows}); F = np.array([feats.index(r["feat"]) for r in rows])
+    g = np.array([math.log1p(r["a"]) if g_kind == "log" else 1.0 for r in rows])
+    U = np.zeros((B, len(rows)))
+    for b in range(B):
+        sb = np.where(has, sbar + np.sqrt(s2s / np.maximum(n, 1)) * rng.normal(size=len(rows)), 0.0)
+        wb = np.where(n >= 2, s2s * rng.chisquare(np.maximum(df, 1)) / np.maximum(df, 1), 0.0)
+        s2b = float((df * wb).sum() / df.sum()) * sigma_mult ** 2
+        th = np.zeros(len(rows))
+        for j in range(len(feats)):
+            idx = (F == j); L = idx & has
+            m = float((n[L] * sb[L]).sum() / n[L].sum()) if L.any() else s0
+            v = float(sb[L].var(ddof=1)) if L.sum() > 1 else 0.0
+            tau2 = max(tau2_floor, v - s2b / sigma_mult ** 2 * float((1.0 / n[L]).mean()) if L.any() else tau2_floor)
+            kap = s2b / sigma_mult ** 2 / tau2 * kappa_mult * sigma_mult ** 2
+            th[idx] = (S[idx] + kap * m) / (n[idx] + kap)
+        U[b] = g * (th - s0) / 2
+    return U
 
 
 def recompute(rows, hyper, sigma_s2, kappa_mult=1.0, sigma_mult=1.0, g_kind="log", s0=3.0):

@@ -1,7 +1,8 @@
 """Pilot: semi-synthetic ground truth on a real layout.  Venues, categories and neighbourhoods are those of the city;
 true log-rates are drawn per category from a normal fitted to the full-data posterior means (so the Gamma prior of
-Def. 4 is misspecified); counts ~ Poisson(lambda * W * f).  True utility u* = log-rate - true category median; a true
-HUCP has true normalized score >= gamma (gamma = K-th largest estimated point score).  Reported: FDP and detection of
+Def. 4 is misspecified); counts ~ Poisson(lambda * W * f).  True utility u* = log-rate - true category center (moment
+center when TRUTHC=momc, the setting of the paper); with TRUTHK=1 the threshold gamma is the K-th largest TRUE score and
+the true HUCPs are the patterns whose true normalized score reaches it, the same set for every method.  Reported: FDP and detection of
 point-utility mining (z = 0), the lower bound (z = 1.645, 2.45), Bayesian set selection (largest top-P set with
 mean(1-P) <= delta), and equal-size precision of point vs posterior ranking."""
 import sys, os, json
@@ -201,6 +202,8 @@ def boot_np(cnt, Wexp, B=20, J=300, iters=40, seed=0):
             U[b, idx] = post @ th - (momc(xb, Wexp) if MOMC else float(np.log(xb.sum() / (len(xb) * Wexp))) if MEANC else th[np.searchsorted(np.cumsum(w), 0.5)])
     return U
 TRUTH = sys.argv[3] if len(sys.argv) > 3 else "lognormal"
+TRUTHK = os.environ.get("TRUTHK") == "1"   # threshold = K-th largest TRUE score (same truth set for every method)
+TRUTHC = os.environ.get("TRUTHC", "momc" if TRUTHK else "")   # truth center fixed by the problem (moment center), not by the estimator
 SPF = os.environ.get("SPF")            # spatial field for review item A2: "range_m,share" (Gaussian kernel, share of log-rate variance)
 XYa = np.asarray(XY, float)
 def spatial_field(rng, rng_m, M=500):
@@ -261,7 +264,7 @@ for f in FR:
     for seed in SEEDS:
         rng = np.random.default_rng(1000 + seed)
         lt = draw_truth(rng)
-        ut = lt - np.array([(momc_true(np.exp(lt[F == j])) if MOMC else np.log(np.exp(lt[F == j]).mean()) if MEANC else np.median(lt[F == j])) for j in range(len(fs))])[F]
+        ut = lt - np.array([(momc_true(np.exp(lt[F == j])) if (MOMC or TRUTHC == 'momc') else np.log(np.exp(lt[F == j]).mean()) if MEANC else np.median(lt[F == j])) for j in range(len(fs))])[F]
         cnt = rng.poisson(np.exp(lt) * W * f).astype(float)
         LT = lt; mu, s2 = {'oracle': posterior_oracle, 'np': posterior_np, 'cf': posterior_cf, 'pool': posterior_pool, 'pool2': posterior_pool}.get(METHOD, posterior)(cnt, W * f)
         P0 = with_values(mu, s2, 0.0)
@@ -272,6 +275,9 @@ for f in FR:
         if BOOT: UB = (boot_pool if METHOD in ('pool', 'pool2') else boot_np)(cnt, W * f, seed=seed)
         if CAL: ZC, DC = calibrate(cnt, W * f, (100, 300, 1000), seed=seed); print("cal", f, seed, ZC, DC, flush=True)
         Pt = with_values(ut, np.zeros(n), 0.0); Zt = Pt.Z
+        if TRUTHK:
+            Rt, sct = topk(Pt, max(KS)); GS = {K: sct[K - 1] for K in KS if len(sct) >= K}
+            if GS: R0all = mine(P0, min(GS.values()))[0]
         if SPF:
             from scipy.spatial import cKDTree
             EDGES = [0, 50, 100, 200, 400, 800, 1600]; rr = mu - mu.mean(); TT = cKDTree(XYa); RHO = []
@@ -280,8 +286,12 @@ for f in FR:
                 aa, bb = rr[PP[:, 0]], rr[PP[:, 1]]; RHO.append(round(float(np.corrcoef(np.r_[aa, bb], np.r_[bb, aa])[0, 1]), 4))
             P0b = with_values(mu, s2, 0.0); P0b.bands = None; P0b.rho = 0.0; P0b.set_bands(EDGES, [max(0.0, x) for x in RHO])
         for K in KS:
-            if len(sc) < K: out[f"{f}|{seed}|{K}"] = None; continue
-            g = sc[K - 1]; T = set(mine(Pt, g)[0])                 # true HUCPs at the same normalized threshold
+            if TRUTHK:
+                if K not in GS: out[f"{f}|{seed}|{K}"] = None; continue
+                g = GS[K]; T = {p for p, v in Rt.items() if v >= g}   # the K highest true scores
+            else:
+                if len(sc) < K: out[f"{f}|{seed}|{K}"] = None; continue
+                g = sc[K - 1]; T = set(mine(Pt, g)[0])             # true HUCPs at the same normalized threshold
             pool = [p for p, v in R0all.items() if v >= g]
             As = [pattern_atoms(P0, p) for p in pool]
             M = np.array([mu[x].sum() for x in As]); V = np.array([s2[x].sum() for x in As])
@@ -318,4 +328,4 @@ for f in FR:
                 m = max(1, int(round(fm * len(pool))))
                 res[f"eq{fm}"] = [round(float(tr[np.argsort(-M, kind="stable")[:m]].mean()), 3), round(float(tr[o[:m]].mean()), 3)]
             out[f"{f}|{seed}|{K}"] = res; print(city, f, seed, K, json.dumps(res), flush=True)
-json.dump(out, open(f"semisyn/{os.environ.get('OUTD', 'main')}/semisyn_{city}_{TRUTH}_{METHOD}{'_zpost' if ZPOST else ''}{'_cboot' if CBOOT else '_boot' if BOOT else ''}{'_mcc' if MCC else ''}{'_cal' if CAL else ''}{'_bbm' if BBM else ''}{'_meanc' if MEANC else ''}{'_momc' if MOMC else ''}{'_bcc' if BCC else ''}{'_spf' if SPF else ''}.json", "w"), indent=1)
+json.dump(out, open(f"pilot/{os.environ.get('OUTD', 'main')}/semisyn_{city}_{TRUTH}_{METHOD}{'_zpost' if ZPOST else ''}{'_cboot' if CBOOT else '_boot' if BOOT else ''}{'_mcc' if MCC else ''}{'_cal' if CAL else ''}{'_bbm' if BBM else ''}{'_meanc' if MEANC else ''}{'_momc' if MOMC else ''}{'_bcc' if BCC else ''}{'_spf' if SPF else ''}.json", "w"), indent=1)

@@ -49,7 +49,28 @@ def load():
                 pair=None if v[7] == "na" else dict(both=int(v[7]), only_z=int(v[8]), only_f=int(v[9]), neither=int(v[10])))
         d["q"][K] = q
     for lab, c in (("D4", "NYC"), ("D5", "TKY")):
-        r = json.load(open(os.path.join(H, "out_suite_ceb", f"suite_CEB_{c}.json")))
+        from_suite(D, lab, os.path.join(H, "out_suite_ceb", f"suite_CEB_{c}.json"))
+    return D
+
+
+FAIR = {"D1": "Philadelphia", "D2": "New_Orleans", "D3": "Tampa", "Y1": "Tucson", "Y2": "Indianapolis", "Y3": "Nashville",
+        "Y4": "Reno", "Y5": "Saint_Louis", "Y6": "Edmonton", "Y7": "Santa_Barbara", "Y8": "Boise"}
+
+
+def load_fair():
+    """All 13 datasets from the runs of fair/jobs.py (same machine, same pipeline: total variance and expected
+    normalizer for ratings and for counts)."""
+    R = os.path.join(H, "fair_runs"); D = {}
+    for lab, c in FAIR.items():
+        from_suite(D, lab, os.path.join(R, f"yelp_{c}_quality", "out_yelp", f"suite_YELP_{c}.json"))
+    for lab, c in (("D4", "NYC"), ("D5", "TKY")):
+        from_suite(D, lab, os.path.join(R, f"fsq_{c}_quality", "out_suite_ceb", f"suite_CEB_{c}.json"))
+    return D
+
+
+def from_suite(D, lab, path):
+    if True:
+        r = json.load(open(path))
         d = D[lab] = {"z": 1.645, "q": {}, "stats": r["stats"]}
         for x in r["quality"]:
             p = x.get("pair2x2", {})
@@ -66,7 +87,6 @@ def load():
                                            hits_only_z=v["hits_only_z"], train_only_f=v["train_only_f"], train_only_z=v["train_only_z"],
                                            pair=None if not b else dict(both=b["both"], only_z=b["only_z"], only_f=b["only_f"], neither=b["neither"]))
             d["q"][x["K"]] = q
-    return D
 
 
 def boot_diff(tables, plus, minus, B=10000, seed=0):
@@ -104,7 +124,7 @@ def nemenyi_cd(k, n, a=0.05):
 
 
 def main():
-    D = load(); out = {"datasets": sorted(D), "per": {}, "pooled": {}, "friedman": {}, "filters": {}, "holm": []}
+    D = load_fair() if os.environ.get("FAIR") == "1" else load(); out = {"datasets": sorted(D), "per": {}, "pooled": {}, "friedman": {}, "filters": {}, "holm": []}
     for lab in sorted(D):
         for K, q in D[lab]["q"].items():
             r = {g: dict(rate=round(q[f"hits_{g}"] / q[f"n_{g}"], 3), n=q[f"n_{g}"], ci=wilson(q[f"hits_{g}"], q[f"n_{g}"]))
