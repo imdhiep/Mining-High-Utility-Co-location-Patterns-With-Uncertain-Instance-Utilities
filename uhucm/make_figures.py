@@ -368,7 +368,9 @@ def fig_case_ceb():
     muK = [x for x in muK["quality"] if x["K"] == 300][0]["mu"]
     R0 = mine(P0, muK)[0]; R1 = mine(P1, muK)[0]
     rej = sorted(set(R0) - set(R1), key=lambda p: -R0[p]); kept = sorted(set(R1), key=lambda p: -R1[p])
-    pr, pk = rej[0], kept[0]
+    pr = rej[0]
+    # kept pattern whose point score is closest to that of the rejected pattern (same comparison as the score matching)
+    pk = min(kept, key=lambda p: abs(R0[p] - R0[pr]))
     Ar = pattern_atoms(P0, pr); Ak = pattern_atoms(P0, pk)
     fig, axes = plt.subplots(1, 2, figsize=(W1, 1.98)); caps = []
     for ax, A, p, lab in ((axes[0], Ak, pk, "(a) Kept"), (axes[1], Ar, pr, "(b) Rejected")):
@@ -381,10 +383,10 @@ def fig_case_ceb():
         ax.set_xlim(cx - span, cx + span); ax.set_ylim(cy - span, cy + span); ax.set_aspect("equal")
         ax.set_xlabel("x (km, UTM 18N)", fontsize=7, labelpad=1); ax.set_ylabel("y (km)", fontsize=7, labelpad=1); ax.tick_params(labelsize=6); ax.grid(False)
         lbl = " + ".join(s.replace("___", " / ").replace("_and_", " & ").replace("_", " ") for s in p)
-        caps.append(f"{lab}: {{{lbl}}}")
-        ax.text(0.02, 0.98, f"$|A(P)|$={len(A)}, median $c$={np.median(np.array([rows[j]['a'] for j in a])):.0f}", transform=ax.transAxes, va="top", fontsize=5.5)
+        caps.append(lab)
+        ax.text(0.02, 0.98, f"$|PI(P)|$={len(A)}, median $a$={np.median(np.array([rows[j]['a'] for j in a])):g}", transform=ax.transAxes, va="top", fontsize=5.5)
     from matplotlib.lines import Line2D
-    h = [Line2D([], [], marker="o", color="w", markerfacecolor=fs.BLUE, label=r"$\mu_a\geq 0$"), Line2D([], [], marker="o", color="w", markerfacecolor=fs.ORANGE, label=r"$\mu_a<0$"),
+    h = [Line2D([], [], marker="o", color="w", markerfacecolor=fs.BLUE, label=r"$\mu_o\geq 0$"), Line2D([], [], marker="o", color="w", markerfacecolor=fs.ORANGE, label=r"$\mu_o<0$"),
          Line2D([], [], marker="o", color="w", markerfacecolor="#D9D9D9", label="Other venues")]
     fig.subplots_adjust(wspace=0.38, left=0.12, right=0.99, top=0.99)
     fs.finalize(fig, axes, caps, h, [x.get_label() for x in h], ncol=3, bottom=0.345, leg_y=0.175, lab_y=0.01, fontsize=6.5); save(fig, "fig_case.pdf")

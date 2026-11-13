@@ -1,0 +1,34 @@
+/usr/local/lib/python3.13/site-packages/numpy/_core/_methods.py:219: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/usr/local/lib/python3.13/site-packages/numpy/_core/_methods.py:211: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+R|Z_NYC_k20_z1.645|TIME|d=50.0 K=300 exact=0.0995+-0.0034/1328 mean=0.0965+-0.0094/1463 noprune=0.0874+-nan/3481
+R|Z_NYC_k20_z2.326|TIME|d=50.0 K=300 exact=0.0948+-0.0005/1282 mean=0.0917+-0.0009/1463 noprune=0.0881+-nan/3481
+R|Z_NYC_k20_z3.09|TIME|d=50.0 K=300 exact=0.0929+-0.0006/1241 mean=0.0917+-0.0006/1463 noprune=0.0870+-nan/3481
+R|Z_NYC_k20_z4.36|TIME|d=50.0 K=300 exact=0.0904+-0.0002/1184 mean=0.0921+-0.0006/1463 noprune=0.0893+-nan/3481
+/usr/local/lib/python3.13/site-packages/numpy/_core/_methods.py:219: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/usr/local/lib/python3.13/site-packages/numpy/_core/_methods.py:211: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+R|Z_NYC_k60_z1.645|TIME|d=50.0 K=300 exact=0.6851+-0.0476/7184 mean=0.6923+-0.0419/8058 noprune=2.5096+-nan/74068
+R|Z_NYC_k60_z2.326|TIME|d=50.0 K=300 exact=0.5944+-0.0035/6870 mean=0.6358+-0.0067/8058 noprune=2.4336+-nan/74068
+R|Z_NYC_k60_z3.09|TIME|d=50.0 K=300 exact=0.5802+-0.0105/6585 mean=0.6474+-0.0139/8058 noprune=2.3751+-nan/74068
+R|Z_NYC_k60_z4.36|TIME|d=50.0 K=300 exact=0.5428+-0.0055/6113 mean=0.6290+-0.0025/8058 noprune=2.3946+-nan/74068
+DONE
+/usr/local/lib/python3.13/site-packages/numpy/_core/_methods.py:219: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/usr/local/lib/python3.13/site-packages/numpy/_core/_methods.py:211: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+R|Z_TKY_k20_z1.645|TIME|d=50.0 K=300 exact=1.4762+-0.1367/3513 mean=1.4307+-0.1039/3874 noprune=1.8638+-nan/33376
+R|Z_TKY_k20_z2.326|TIME|d=50.0 K=300 exact=1.5487+-0.1538/3380 mean=1.5962+-0.1625/3874 noprune=1.6634+-nan/33376
+R|Z_TKY_k20_z3.09|TIME|d=50.0 K=300 exact=1.3733+-0.0961/3257 mean=1.4132+-0.0613/3874 noprune=1.5200+-nan/33376
+R|Z_TKY_k20_z4.36|TIME|d=50.0 K=300 exact=1.4397+-0.1297/3077 mean=1.5428+-0.1317/3874 noprune=1.5037+-nan/33376
+/usr/local/lib/python3.13/site-packages/numpy/_core/_methods.py:219: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/usr/local/lib/python3.13/site-packages/numpy/_core/_methods.py:211: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+R|Z_TKY_k60_z1.645|TIME|d=50.0 K=300 exact=19.7831+-1.1176/27626 mean=20.5780+-1.3083/31192 noprune=132.3786+-nan/1626254
+R|Z_TKY_k60_z2.326|TIME|d=50.0 K=300 exact=18.2783+-1.3554/26420 mean=20.8089+-1.2216/31192 noprune=132.3545+-nan/1626254
+R|Z_TKY_k60_z3.09|TIME|d=50.0 K=300 exact=16.6387+-0.4176/25201 mean=19.7796+-1.4206/31192 noprune=129.1790+-nan/1626254
+R|Z_TKY_k60_z4.36|TIME|d=50.0 K=300 exact=16.9055+-0.9751/23450 mean=19.5486+-0.7656/31192 noprune=130.6888+-nan/1626254
+DONE

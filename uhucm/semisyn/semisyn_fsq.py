@@ -11,7 +11,7 @@ from scipy.stats import norm
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import fsq_loader, paths
 from fastmine import Problem, mine, pattern_atoms
-city = sys.argv[1]; FR = tuple(float(x) for x in os.environ.get('FR', '0.25,1.0').split(',')); METHOD = sys.argv[4] if len(sys.argv) > 4 else 'gamma'; ZPOST = 'zpost' in sys.argv[5:]; DIAG = 'diag' in sys.argv[5:]; MCC = 'mcc' in sys.argv[5:]; CAL = 'cal' in sys.argv[5:]; BBM = 'bbm' in sys.argv[5:]; MEANC = 'meanc' in sys.argv[5:]; MOMC = 'momc' in sys.argv[5:]; BCC = 'bcc' in sys.argv[5:]; KS = tuple(int(x) for x in os.environ.get('KS', '100,300,1000').split(',')); BOOT = 'boot' in sys.argv[5:] or 'cboot' in sys.argv[5:]; CBOOT = 'cboot' in sys.argv[5:]; SEEDS = range(int(sys.argv[2]) if len(sys.argv) > 2 else 3)
+city = sys.argv[1]; FR = tuple(float(x) for x in os.environ.get('FR', '0.25,1.0').split(',')); METHOD = sys.argv[4] if len(sys.argv) > 4 else 'gamma'; ZPOST = 'zpost' in sys.argv[5:]; DIAG = 'diag' in sys.argv[5:]; MCC = 'mcc' in sys.argv[5:]; CAL = 'cal' in sys.argv[5:]; BBM = 'bbm' in sys.argv[5:]; MEANC = 'meanc' in sys.argv[5:]; MOMC = 'momc' in sys.argv[5:]; BCC = 'bcc' in sys.argv[5:]; KS = tuple(int(x) for x in os.environ.get('KS', '100,300,1000').split(',')); BOOT = 'boot' in sys.argv[5:] or 'cboot' in sys.argv[5:]; CBOOT = 'cboot' in sys.argv[5:]; SEEDS = range(int(os.environ.get('SEED0', '0')), int(sys.argv[2]) if len(sys.argv) > 2 else 3)
 CSV = {"LasVegas": ("LasVegas_POI 10f.csv", 100.0), "California": ("California_POI 13f.csv", 1300.0), "Toronto": ("Toronto_POI 16f.csv", 100.0)}
 if city in CSV:                                                # D6 layouts: total check-ins per POI, exposure 1
     import pandas as pd
@@ -201,7 +201,16 @@ def boot_np(cnt, Wexp, B=20, J=300, iters=40, seed=0):
             U[b, idx] = post @ th - (momc(xb, Wexp) if MOMC else float(np.log(xb.sum() / (len(xb) * Wexp))) if MEANC else th[np.searchsorted(np.cumsum(w), 0.5)])
     return U
 TRUTH = sys.argv[3] if len(sys.argv) > 3 else "lognormal"
+SPF = os.environ.get("SPF")            # spatial field for review item A2: "range_m,share" (Gaussian kernel, share of log-rate variance)
+XYa = np.asarray(XY, float)
+def spatial_field(rng, rng_m, M=500):
+    """Gaussian random field with kernel exp(-h^2 / (2 range^2)) at the venue locations, unit variance (random Fourier features)."""
+    Wf = rng.normal(0.0, 1.0 / rng_m, size=(2, M)); bf = rng.uniform(0, 2 * np.pi, M)
+    g = np.sqrt(2.0 / M) * np.cos((XYa - XYa.mean(0)) @ Wf + bf).sum(1); return g / g.std()
 def draw_truth(rng):
+    if TRUTH == "lognormal" and SPF:
+        rm, sh = (float(x) for x in SPF.split(","))
+        return loc[F] + scl[F] * (np.sqrt(1 - sh) * rng.normal(size=n) + np.sqrt(sh) * spatial_field(rng, rm))
     if TRUTH == "lognormal": return rng.normal(loc[F], scl[F])
     if TRUTH == "gamma":                                           # log of a Gamma rate with the same log-mean and log-sd
         k = 1.0 / np.maximum(scl[F] ** 2, 1e-3); lam = rng.gamma(k, 1.0, size=n); return np.log(lam) - digamma(k) + loc[F]
@@ -263,6 +272,13 @@ for f in FR:
         if BOOT: UB = (boot_pool if METHOD in ('pool', 'pool2') else boot_np)(cnt, W * f, seed=seed)
         if CAL: ZC, DC = calibrate(cnt, W * f, (100, 300, 1000), seed=seed); print("cal", f, seed, ZC, DC, flush=True)
         Pt = with_values(ut, np.zeros(n), 0.0); Zt = Pt.Z
+        if SPF:
+            from scipy.spatial import cKDTree
+            EDGES = [0, 50, 100, 200, 400, 800, 1600]; rr = mu - mu.mean(); TT = cKDTree(XYa); RHO = []
+            for lo, hi in zip(EDGES[:-1], EDGES[1:]):
+                PP = TT.query_pairs(hi, output_type="ndarray"); dd = np.linalg.norm(XYa[PP[:, 0]] - XYa[PP[:, 1]], axis=1); PP = PP[dd > lo]
+                aa, bb = rr[PP[:, 0]], rr[PP[:, 1]]; RHO.append(round(float(np.corrcoef(np.r_[aa, bb], np.r_[bb, aa])[0, 1]), 4))
+            P0b = with_values(mu, s2, 0.0); P0b.bands = None; P0b.rho = 0.0; P0b.set_bands(EDGES, [max(0.0, x) for x in RHO])
         for K in KS:
             if len(sc) < K: out[f"{f}|{seed}|{K}"] = None; continue
             g = sc[K - 1]; T = set(mine(Pt, g)[0])                 # true HUCPs at the same normalized threshold
@@ -283,8 +299,12 @@ for f in FR:
                 ev = np.array([(lt[x] - th_hat[x]).sum() for x in As]); ec = np.array([(CEN[F][x] - cT[F][x]).sum() for x in As])
                 en = (Mt * Z / Zt - Mt)
                 res["vshare_top"] = [round(float((V[top] - np.array([s2[x].sum() for x in [As[i] for i in top]])).mean() / V[top].mean()), 3), round(float(np.mean([len(As[i]) for i in top])), 1)]; res["diag_top"] = [round(float((ev[top] / np.sqrt(V[top])).mean()), 2), round(float((ec[top] / np.sqrt(V[top])).mean()), 2), round(float((en[top] / np.sqrt(V[top])).mean()), 2)]
+            if SPF:                                                   # distance-banded variance estimated from the posterior means
+                Vb = V + np.array([P0b._banded_extra(x[x < n]) for x in As]); res["lb_band"] = None
+                res["rho_band"] = RHO
             def fd(sel): sel = np.asarray(sel, bool); k = int(sel.sum()); return [k, round(float(1 - tr[sel].mean()) if k else 0.0, 3), round(float(tr[sel].sum() / max(1, len(T))), 3)]
             res["point"] = fd(np.ones(len(pool)))
+            if SPF: res["lb_band"] = fd(M - 1.645 * np.sqrt(Vb) >= g * Z)
             for z in (1.645, 2.45): res[f"lb{z}"] = fd(M - z * np.sqrt(V) >= g * Z)
             o = np.argsort(-prob, kind="stable"); cm = np.cumsum(1 - prob[o]) / np.arange(1, len(o) + 1)
             if CAL:
@@ -298,4 +318,4 @@ for f in FR:
                 m = max(1, int(round(fm * len(pool))))
                 res[f"eq{fm}"] = [round(float(tr[np.argsort(-M, kind="stable")[:m]].mean()), 3), round(float(tr[o[:m]].mean()), 3)]
             out[f"{f}|{seed}|{K}"] = res; print(city, f, seed, K, json.dumps(res), flush=True)
-json.dump(out, open(f"{os.environ.get('OUTD', 'out_semisyn')}/semisyn_{city}_{TRUTH}_{METHOD}{'_zpost' if ZPOST else ''}{'_cboot' if CBOOT else '_boot' if BOOT else ''}{'_mcc' if MCC else ''}{'_cal' if CAL else ''}{'_bbm' if BBM else ''}{'_meanc' if MEANC else ''}{'_momc' if MOMC else ''}{'_bcc' if BCC else ''}.json", "w"), indent=1)
+json.dump(out, open(f"semisyn/{os.environ.get('OUTD', 'main')}/semisyn_{city}_{TRUTH}_{METHOD}{'_zpost' if ZPOST else ''}{'_cboot' if CBOOT else '_boot' if BOOT else ''}{'_mcc' if MCC else ''}{'_cal' if CAL else ''}{'_bbm' if BBM else ''}{'_meanc' if MEANC else ''}{'_momc' if MOMC else ''}{'_bcc' if BCC else ''}{'_spf' if SPF else ''}.json", "w"), indent=1)

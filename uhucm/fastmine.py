@@ -353,13 +353,17 @@ class Timeout(Exception):
     pass
 
 
-def mine(Pb, mu, use=(1, 1, 1, 1), kind='two', max_size=None, rule_l=None, deadline=None, search=True):
+def mine(Pb, mu, use=(1, 1, 1, 1), kind='two', max_size=None, rule_l=None, deadline=None, search=True, min_T=1, adaptive=False, warm=30):
     """Returns (results {tuple(sorted feature names): score}, counters, info).
     rule_l: None | 'global' | 'sum'  -- the local pruning Rule L of Section III (for the audit E4 only; unsafe).
       'global': prune P+{g} if L(P) < mu and every atom of feature g (all its instances and pairs) has mean <= 0.
       'sum'   : prune P+{g} if L(P) < mu and the summed mean of g's atoms in the cliques hosting P+{g} is <= 0
                 (feature-sign heuristic in the spirit of Strategy 4 of PSO-MUCP).
-    deadline: wall-clock seconds; raises Timeout when exceeded."""
+    deadline: wall-clock seconds; raises Timeout when exceeded.
+    min_T: subtree and suffix bounds are evaluated only at nodes with at least min_T candidate features (skipping a
+      bound never changes the result).
+    adaptive: cost-aware bounding; after `warm` bound evaluations, bounds are switched off for the rest of the run if the
+      time they cost exceeds the estimated time of the child subtrees they removed (decided once; skipping bounds is exact)."""
     import time as _t
     t_end = None if deadline is None else _t.time() + deadline
     st = collections.Counter(); tol = 1e-12
@@ -399,13 +403,17 @@ def mine(Pb, mu, use=(1, 1, 1, 1), kind='two', max_size=None, rule_l=None, deadl
                 ok = bool((Pb.amu[pa] <= 0).all()) if len(pa) else True
             gneg[f] = ok
 
+    _pc = _t.perf_counter
+    ab = dict(on=True, tb=0.0, tn=0.0, nn=0, cut=0, calls=0, t0=_pc())
+
     def visit(P, L):
         st['visited'] += 1
         if t_end is not None and st['visited'] % 64 == 0 and _t.time() > t_end:
             raise Timeout()
         v = None
         if len(P) >= 2:
-            v = Pb.score(Pb.atoms(L, P)); st['evaluated'] += 1
+            t0_ = _pc(); v = Pb.score(Pb.atoms(L, P)); st['evaluated'] += 1
+            if adaptive: ab['tn'] += _pc() - t0_; ab['nn'] += 1
             if v >= mu - tol: res[tuple(sorted(Pb.names[f] for f in P))] = v
         if max_size and len(P) >= max_size: return
         T = order[rank[P[-1]] + 1:]
@@ -416,9 +424,17 @@ def mine(Pb, mu, use=(1, 1, 1, 1), kind='two', max_size=None, rule_l=None, deadl
         if len(Lp) == 0: return
         thr = (mu - tol) * Pb.Z
         brk = len(T)
-        if (use[1] or use[2]) and search:
-            pcb, brk_ = Pb.suffix_search(Lp, P, T, kind, st, thr, need_sb=bool(use[2]))
+        if len(T) < min_T or not ab['on']: pass
+        elif (use[1] or use[2]) and search:
+            t0_ = _pc(); pcb, brk_ = Pb.suffix_search(Lp, P, T, kind, st, thr, need_sb=bool(use[2]))
             st['bound'] += 1
+            if adaptive and ab['calls'] < warm:            # decide once, after the first `warm` bound evaluations
+                ab['tb'] += _pc() - t0_; ab['calls'] += 1
+                lo = 0 if pcb else (brk_ if use[2] else len(T))
+                if lo < len(T): ab['cut'] += int(hasf[np.ix_(Lp, T[lo:])].any(0).sum())
+                el = _pc() - ab['t0']
+                if ab['calls'] == warm and ab['cut'] * (el - ab['tb']) / st['visited'] < ab['tb']:
+                    ab['on'] = False; st['bounds_off_at'] = st['visited']
             if pcb:
                 if use[1]:
                     st['ps2'] += 1; return
