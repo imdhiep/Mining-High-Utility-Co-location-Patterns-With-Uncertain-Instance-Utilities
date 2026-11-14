@@ -1,0 +1,39 @@
+{
+ "name": "running_example",
+ "fingerprint": "1fd1b395f5b436a5",
+ "exit": 0,
+ "start": 1794576151.9011676,
+ "seconds": 3.3,
+ "exclusive": false,
+ "load_samples": [
+  4.51
+ ],
+ "deps": [
+  "running_example.py"
+ ],
+ "inputs": [],
+ "cmd": [
+  "running_example.py"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "8ead24bdab9e",
+  "cpus": 4,
+  "session": "8ead24bdab9e-1794561946"
+ },
+ "outputs": {
+  "stdout.txt": "1e9f9cff9d90c6e6"
+ }
+}

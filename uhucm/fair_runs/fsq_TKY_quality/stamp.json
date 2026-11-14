@@ -1,0 +1,50 @@
+{
+ "name": "fsq_TKY_quality",
+ "fingerprint": "10f336277ea883fc",
+ "exit": 0,
+ "start": 1794576467.7591665,
+ "seconds": 387.4,
+ "exclusive": false,
+ "load_samples": [
+  4.53
+ ],
+ "deps": [
+  "ceb.py",
+  "fastmine.py",
+  "fsq_loader.py",
+  "run_suite_ceb.py",
+  "suite.py"
+ ],
+ "inputs": [
+  "dataset_TSMC2014_TKY.txt|79467384|050846dff3e946a8"
+ ],
+ "cmd": [
+  "run_suite_ceb.py",
+  "{FSQ_DIR}/dataset_TSMC2014_TKY.txt",
+  "TKY",
+  "out_suite_ceb",
+  "quality"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "8ead24bdab9e",
+  "cpus": 4,
+  "session": "8ead24bdab9e-1794561946"
+ },
+ "outputs": {
+  "stdout.txt": "a4b79c1777f7471f",
+  "out_suite_ceb/suite_CEB_TKY.json": "1d2751652496951a"
+ }
+}

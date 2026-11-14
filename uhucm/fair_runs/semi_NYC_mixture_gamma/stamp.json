@@ -1,0 +1,57 @@
+{
+ "name": "semi_NYC_mixture_gamma",
+ "fingerprint": "a78cf90a4cfb9f88",
+ "exit": 0,
+ "start": 1794562880.7561622,
+ "seconds": 226.2,
+ "exclusive": false,
+ "load_samples": [
+  4.58
+ ],
+ "deps": [
+  "ceb.py",
+  "fastmine.py",
+  "fsq_loader.py",
+  "paths.py",
+  "semisyn/semisyn_fsq.py"
+ ],
+ "inputs": [
+  "dataset_TSMC2014_NYC.txt|31480163|914b759287951548"
+ ],
+ "cmd": [
+  "semisyn/semisyn_fsq.py",
+  "NYC",
+  "20",
+  "mixture",
+  "gamma",
+  "diag"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}",
+  "FR": "1.0",
+  "KS": "100,300,1000",
+  "OUTD": "out",
+  "TRUTHK": "1",
+  "TRUTHC": "momc",
+  "SEED0": "0"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "8ead24bdab9e",
+  "cpus": 4,
+  "session": "8ead24bdab9e-1794561946"
+ },
+ "outputs": {
+  "stdout.txt": "bb32bdfa30cc5ae7",
+  "pilot/out/semisyn_NYC_mixture_gamma.json": "9bc243b84bc0ecaa"
+ }
+}

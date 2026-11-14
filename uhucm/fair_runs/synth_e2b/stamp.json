@@ -1,0 +1,43 @@
+{
+ "name": "synth_e2b",
+ "fingerprint": "f96672e1b3ef13a6",
+ "exit": 0,
+ "start": 1794575677.491165,
+ "seconds": 352.9,
+ "exclusive": false,
+ "load_samples": [
+  4.57
+ ],
+ "deps": [
+  "fastmine.py",
+  "synth.py",
+  "uhucm.py"
+ ],
+ "inputs": [],
+ "cmd": [
+  "synth.py",
+  "e2b"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "8ead24bdab9e",
+  "cpus": 4,
+  "session": "8ead24bdab9e-1794561946"
+ },
+ "outputs": {
+  "stdout.txt": "500c6486449bdec8",
+  "out_synth/e2b.json": "5465c348b9dadf42"
+ }
+}

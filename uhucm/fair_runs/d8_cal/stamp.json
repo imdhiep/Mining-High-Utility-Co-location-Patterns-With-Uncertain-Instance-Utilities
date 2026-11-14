@@ -1,0 +1,47 @@
+{
+ "name": "d8_cal",
+ "fingerprint": "0df948d3ab5e246e",
+ "exit": 0,
+ "start": 1794577530.8249757,
+ "seconds": 6546.6,
+ "exclusive": false,
+ "load_samples": [
+  4.36
+ ],
+ "deps": [
+  "d8/compare_d8.py",
+  "d8/run_authors.py",
+  "d8/run_d8_all.py",
+  "fastmine.py",
+  "paths.py"
+ ],
+ "inputs": [
+  "PSO-MUCP.py|16588|70e90c701a6cfa68"
+ ],
+ "cmd": [
+  "d8/run_d8_all.py",
+  "cal"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "8ead24bdab9e",
+  "cpus": 4,
+  "session": "8ead24bdab9e-1794561946"
+ },
+ "outputs": {
+  "stdout.txt": "bb4b4937b8ba134e",
+  "d8_results.jsonl": "5abcc38a3a4f5942"
+ }
+}

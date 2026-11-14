@@ -1,0 +1,60 @@
+{
+ "name": "semi_TKY_gamma_np",
+ "fingerprint": "68ba3cf50201f41b",
+ "exit": 0,
+ "start": 1794565147.530744,
+ "seconds": 4822.7,
+ "exclusive": false,
+ "load_samples": [
+  4.54
+ ],
+ "deps": [
+  "ceb.py",
+  "fastmine.py",
+  "fsq_loader.py",
+  "paths.py",
+  "semisyn/semisyn_fsq.py"
+ ],
+ "inputs": [
+  "dataset_TSMC2014_TKY.txt|79467384|050846dff3e946a8"
+ ],
+ "cmd": [
+  "semisyn/semisyn_fsq.py",
+  "TKY",
+  "20",
+  "gamma",
+  "np",
+  "zpost",
+  "cboot",
+  "diag",
+  "momc"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}",
+  "FR": "1.0",
+  "KS": "100,300,1000",
+  "OUTD": "out",
+  "TRUTHK": "1",
+  "TRUTHC": "momc",
+  "SEED0": "0"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "8ead24bdab9e",
+  "cpus": 4,
+  "session": "8ead24bdab9e-1794561946"
+ },
+ "outputs": {
+  "stdout.txt": "78958a7eb7ee8ad5",
+  "pilot/out/semisyn_TKY_gamma_np_zpost_cboot_momc.json": "1ce465c87a54fa16"
+ }
+}

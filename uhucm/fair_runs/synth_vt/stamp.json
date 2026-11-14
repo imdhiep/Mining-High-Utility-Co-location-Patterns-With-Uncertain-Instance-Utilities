@@ -1,0 +1,43 @@
+{
+ "name": "synth_vt",
+ "fingerprint": "1293ff03d1ce66b8",
+ "exit": 0,
+ "start": 1794576087.1284354,
+ "seconds": 64.3,
+ "exclusive": false,
+ "load_samples": [
+  4.72
+ ],
+ "deps": [
+  "fastmine.py",
+  "synth.py",
+  "synth_vt.py",
+  "uhucm.py"
+ ],
+ "inputs": [],
+ "cmd": [
+  "synth_vt.py"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "8ead24bdab9e",
+  "cpus": 4,
+  "session": "8ead24bdab9e-1794561946"
+ },
+ "outputs": {
+  "stdout.txt": "1ce88e288fdd61d7",
+  "out_synth/e2_vt_B20.json": "ddd3981d2caf8e0a"
+ }
+}

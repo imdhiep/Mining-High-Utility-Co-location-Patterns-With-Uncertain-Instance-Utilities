@@ -1,0 +1,50 @@
+{
+ "name": "yelp_New_Orleans_quality_d70",
+ "fingerprint": "0f9228d9f3582d75",
+ "exit": 0,
+ "start": 1794584589.2984035,
+ "seconds": 45.6,
+ "exclusive": false,
+ "load_samples": [
+  3.07
+ ],
+ "deps": [
+  "fastmine.py",
+  "run_yelp_fair.py",
+  "suite.py",
+  "yelp_full.py"
+ ],
+ "inputs": [
+  "yelp_academic_dataset_business.json|118863795|aef97b0def6e7f2b",
+  "yelp_academic_dataset_checkin.json|286958945|4f4a40d40c684c9b"
+ ],
+ "cmd": [
+  "run_yelp_fair.py",
+  "{YELP_DIR}",
+  "{RUNS}/yelp_prep/slim",
+  "New Orleans",
+  "70"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "12d45649dee6",
+  "cpus": 4,
+  "session": "12d45649dee6-1794584431"
+ },
+ "outputs": {
+  "stdout.txt": "813c0f5593048bd6",
+  "out_yelp/suite_YELP_New_Orleans_d70.json": "a46cd87f31626362"
+ }
+}

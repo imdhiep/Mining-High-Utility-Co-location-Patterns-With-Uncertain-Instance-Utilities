@@ -7,8 +7,10 @@ Rules
   R2  all stamps have the same Python/NumPy/SciPy versions and the same input identities for the same input file
   R3  semi-synthetic: within a comparison (same layout and truth), every method has the same valid (seed, K) draws, and
       there are at least 10 valid seeds for every K; all runs use TRUTHK=1, TRUTHC=momc and the same K list and seeds
-  R4  timing and z-sweep: exclusive jobs, all in one session (same machine), every variant has 5 timed runs with CPU
-      times at every K, and the process was not starved: median CPU time / wall time of every variant at least 0.9
+  R4  timing and z-sweep: exclusive jobs, every variant has 5 timed runs with CPU times at every K, and the process was
+      not starved: median CPU time / wall time of every variant at least 0.9. All variants compared at one K are timed
+      interleaved inside one job, hence in one session. Jobs may come from several sessions (a Kaggle session stops
+      after 12 hours) only if those sessions have the same number of CPUs and the same recorded CPU model
 """
 import json, os, sys, glob
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -72,8 +74,15 @@ def main():
                 if len(first_valid(R, K)) < 10: fail("R3", f"{n}: fewer than 10 valid seeds at K={K}", [n])
     # R4
     T = [j for j in JOBS if j["exclusive"] and j["name"] in stamps]
-    ses = {stamps[j["name"]]["host"].get("session") for j in T}
-    if len(ses) > 1: fail("R4", f"timing jobs come from {len(ses)} sessions", [j["name"] for j in T])
+    ses = {}
+    for j in T:
+        h = stamps[j["name"]]["host"]; ses.setdefault(h.get("session"), []).append(j["name"])
+    if len(ses) > 1:                                     # allowed: every compared variant is timed inside one job
+        print(f"note R4: timing jobs come from {len(ses)} sessions:", {s: len(v) for s, v in ses.items()})
+        cpus = {stamps[j["name"]]["host"].get("cpus") for j in T}
+        models = {stamps[j["name"]]["host"]["cpu_model"] for j in T if stamps[j["name"]]["host"].get("cpu_model")}
+        if len(cpus) > 1 or len(models) > 1:
+            fail("R4", f"timing sessions differ in hardware: cpus {sorted(cpus)}, cpu models {sorted(models)}", [j["name"] for j in T])
     for j in T:
         for f in glob.glob(os.path.join(ROOT, j["name"], "out_*", "*.json")):
             d = json.load(open(f)); recs = []

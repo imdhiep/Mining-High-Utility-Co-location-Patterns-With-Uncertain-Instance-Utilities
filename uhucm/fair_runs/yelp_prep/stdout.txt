@@ -1,0 +1,16 @@
+businesses kept: 76171
+  reviews: 500,000 lines read, 10s
+  reviews: 1,000,000 lines read, 17s
+  reviews: 1,500,000 lines read, 24s
+  reviews: 2,000,000 lines read, 31s
+  reviews: 2,500,000 lines read, 39s
+  reviews: 3,000,000 lines read, 46s
+  reviews: 3,500,000 lines read, 53s
+  reviews: 4,000,000 lines read, 60s
+  reviews: 4,500,000 lines read, 67s
+  reviews: 5,000,000 lines read, 74s
+  reviews: 5,500,000 lines read, 81s
+  reviews: 6,000,000 lines read, 88s
+  reviews: 6,500,000 lines read, 95s
+reviews: 6990280 lines read; kept Philadelphia=967552, New Orleans=635364, Tampa=454889, Tucson=404880, Indianapolis=361489, Nashville=451571, Reno=351573, Saint Louis=253437, Edmonton=101823, Santa Barbara=269630, Boise=105366
+done -> slim

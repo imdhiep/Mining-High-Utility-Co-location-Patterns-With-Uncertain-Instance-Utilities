@@ -1,0 +1,1 @@
+E1 {'instances': 2000, 'seeds_drawn': 2001, 'runs': 40000, 'mismatches': 0, 'nonempty': 1130, 'seconds': 178.4}

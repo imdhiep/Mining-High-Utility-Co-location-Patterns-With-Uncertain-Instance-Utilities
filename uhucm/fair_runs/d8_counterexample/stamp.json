@@ -1,0 +1,51 @@
+{
+ "name": "d8_counterexample",
+ "fingerprint": "712afedb3d2af2cd",
+ "exit": 0,
+ "start": 1794578427.2699327,
+ "seconds": 1.0,
+ "exclusive": false,
+ "load_samples": [
+  4.08
+ ],
+ "deps": [
+  "d8/compare_d8.py",
+  "d8/run_authors.py",
+  "fastmine.py",
+  "paths.py"
+ ],
+ "inputs": [
+  "PSO-MUCP.py|16588|70e90c701a6cfa68",
+  "strategy4_counterexample.csv|922|a6d74e01759cd705"
+ ],
+ "cmd": [
+  "d8/compare_d8.py",
+  "{H}/d8/strategy4_counterexample.csv",
+  "10",
+  "0.5",
+  "{'A': 10, 'B': -10, 'C': -1}",
+  "--authors"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "8ead24bdab9e",
+  "cpus": 4,
+  "session": "8ead24bdab9e-1794561946"
+ },
+ "outputs": {
+  "stdout.txt": "82980f072c878ffd",
+  "d8_results.jsonl": "b1a2f037b5324512"
+ }
+}

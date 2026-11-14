@@ -1,0 +1,62 @@
+{
+ "name": "yelp_prep",
+ "fingerprint": "1b31611e11d1ff5b",
+ "exit": 0,
+ "start": 1794584432.579774,
+ "seconds": 103.5,
+ "exclusive": false,
+ "load_samples": [
+  0.64
+ ],
+ "deps": [
+  "prep_yelp_reviews.py"
+ ],
+ "inputs": [
+  "yelp_academic_dataset_business.json|118863795|aef97b0def6e7f2b",
+  "yelp_academic_dataset_checkin.json|286958945|4f4a40d40c684c9b",
+  "yelp_academic_dataset_review.json|5341868833|08b882bfc8eef94b"
+ ],
+ "cmd": [
+  "prep_yelp_reviews.py",
+  "--archive",
+  "{YELP_DIR}",
+  "--out",
+  "slim",
+  "--no-tips",
+  "--cities",
+  "Philadelphia,New Orleans,Tampa,Tucson,Indianapolis,Nashville,Reno,Saint Louis,Edmonton,Santa Barbara,Boise"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "12d45649dee6",
+  "cpus": 4,
+  "session": "12d45649dee6-1794584431"
+ },
+ "outputs": {
+  "stdout.txt": "1729445158ac214e",
+  "slim/reviews_Boise.csv": "db00ee7e688aff91",
+  "slim/reviews_Edmonton.csv": "85d6e97182e538db",
+  "slim/reviews_Philadelphia.csv": "bf2a3a793b892b97",
+  "slim/reviews_Nashville.csv": "ee7a84bcd35e8f65",
+  "slim/reviews_Santa_Barbara.csv": "37415c1cca6cceb8",
+  "slim/reviews_Tampa.csv": "6e9e78b4bfe7aa96",
+  "slim/reviews_New_Orleans.csv": "f3c39c60b067d8e2",
+  "slim/reviews_Reno.csv": "e908b84f7020a024",
+  "slim/reviews_Saint_Louis.csv": "2a90da5a339541f6",
+  "slim/reviews_Indianapolis.csv": "e901587115712c10",
+  "slim/reviews_Tucson.csv": "ea54bd7185221264",
+  "slim/prep_log.txt": "5e58d1a76fdf3bde"
+ }
+}

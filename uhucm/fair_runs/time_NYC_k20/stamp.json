@@ -1,0 +1,73 @@
+{
+ "name": "time_NYC_k20",
+ "fingerprint": "1fb8f35975855655",
+ "exit": 0,
+ "start": 1794562124.174236,
+ "seconds": 111.0,
+ "exclusive": true,
+ "load_samples": [
+  0.09,
+  0.09,
+  0.16,
+  0.23,
+  0.29,
+  0.35,
+  0.4,
+  0.45,
+  0.5,
+  0.54,
+  0.57,
+  0.61,
+  0.64,
+  0.67,
+  0.7,
+  0.72,
+  0.74,
+  0.76,
+  0.78,
+  0.8,
+  0.82,
+  0.83,
+  0.84,
+  0.86
+ ],
+ "deps": [
+  "ceb.py",
+  "fastmine.py",
+  "fsq_loader.py",
+  "paths.py",
+  "run_timing_fair.py",
+  "suite.py"
+ ],
+ "inputs": [
+  "dataset_TSMC2014_NYC.txt|31480163|914b759287951548"
+ ],
+ "cmd": [
+  "run_timing_fair.py",
+  "NYC",
+  "20"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "e20e40fc5517",
+  "cpus": 4,
+  "session": "e20e40fc5517-1794562002"
+ },
+ "outputs": {
+  "stdout.txt": "5210520d8fdacba7",
+  "out_timing_fair/suite_FAIR_NYC_k20.json": "5027af85fbe0d425",
+  "out_timing_fair/suite_FAIR_NYC_k20_d70.json": "656e31eadef05e5c"
+ }
+}

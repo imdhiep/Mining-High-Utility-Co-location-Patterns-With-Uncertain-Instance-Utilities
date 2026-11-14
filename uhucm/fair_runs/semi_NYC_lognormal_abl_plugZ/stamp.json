@@ -1,0 +1,59 @@
+{
+ "name": "semi_NYC_lognormal_abl_plugZ",
+ "fingerprint": "de1b7f9ac0d5e73a",
+ "exit": 0,
+ "start": 1794563044.0741801,
+ "seconds": 1250.9,
+ "exclusive": false,
+ "load_samples": [
+  4.71
+ ],
+ "deps": [
+  "ceb.py",
+  "fastmine.py",
+  "fsq_loader.py",
+  "paths.py",
+  "semisyn/semisyn_fsq.py"
+ ],
+ "inputs": [
+  "dataset_TSMC2014_NYC.txt|31480163|914b759287951548"
+ ],
+ "cmd": [
+  "semisyn/semisyn_fsq.py",
+  "NYC",
+  "20",
+  "lognormal",
+  "np",
+  "cboot",
+  "diag",
+  "momc"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}",
+  "FR": "1.0",
+  "KS": "100,300,1000",
+  "OUTD": "out",
+  "TRUTHK": "1",
+  "TRUTHC": "momc",
+  "SEED0": "0"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "8ead24bdab9e",
+  "cpus": 4,
+  "session": "8ead24bdab9e-1794561946"
+ },
+ "outputs": {
+  "stdout.txt": "3c176905c1b90549",
+  "pilot/out/semisyn_NYC_lognormal_np_cboot_momc.json": "dbb5fd8fd243706e"
+ }
+}

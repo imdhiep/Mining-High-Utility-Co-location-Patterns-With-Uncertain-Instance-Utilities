@@ -265,6 +265,7 @@ def fig_e2_2c():
 def fig_eff_2c():
     from matplotlib.lines import Line2D
     meth = (("exact", "UHUCPM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
+    KSEL = os.environ.get("EFF_K", "300")               # threshold of panels (c), (d)
     fig, axes = plt.subplots(1, 4, figsize=(W2, 1.9))
     caps = ["(a) D1, nodes", "(b) D1, time", "(c) D5, nodes", "(d) D5, time"]
     for j, nm in enumerate(("Phi", "FSQ_TKY")):
@@ -283,10 +284,11 @@ def fig_eff_2c():
 
 
 def fig_eff_v2():
-    """Mining time (mean and SD of 10 runs, binary-search suffix bound) of UHUCM, the mean bound and NoPrune:
-    (a), (b) against the rank threshold K on D1 and D5 (k = 20); (c), (d) against the number of features k at K = 300."""
+    """Mining time (mean and SD of the timed runs) of UHUCPM, the mean bound and NoPrune: (a), (b) against the rank
+    threshold K on D4 and D5 (k = 20); (c), (d) against the number of features k at K = EFF_K (default 300)."""
     T = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out_synth", os.environ.get("STATS_TIMING", "stats_timing2.json"))))
     meth = (("exact", "UHUCPM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
+    KSEL = os.environ.get("EFF_K", "300")               # threshold of panels (c), (d)
     fig, axes = plt.subplots(1, 4, figsize=(W2, 1.9))
     def vsK(ax, key):
         R = T[key]["rows"]; Ks = sorted(R, key=int)
@@ -296,12 +298,12 @@ def fig_eff_v2():
     def vsk(ax, city):
         ks = sorted(int(x.split("|")[2]) for x in T if x.startswith(city + "|50|"))
         for k, lbl, c, m in meth:
-            ys = [T[f"{city}|50|{kk}"]["rows"]["300"]["table"][k] for kk in ks]
+            ys = [T[f"{city}|50|{kk}"]["rows"][KSEL]["table"][k] for kk in ks]
             ax.errorbar(ks, [y[0] for y in ys], yerr=[y[1] for y in ys], color=c, marker=m, label=lbl, capsize=1.5, elinewidth=0.6)
         ax.set_xlabel("Number of features $k$"); ax.set_xticks(ks)
     first = "D1" if "D1|50|20" in T else "D4"
     vsK(axes[0], f"{first}|50|20"); vsK(axes[1], "D5|50|20"); vsk(axes[2], "D4"); vsk(axes[3], "D5")
-    caps = [f"(a) {first}, $k=20$", "(b) D5, $k=20$", "(c) D4, $K=300$", "(d) D5, $K=300$"]
+    caps = [f"(a) {first}, $k=20$", "(b) D5, $k=20$", f"(c) D4, $K={KSEL}$", f"(d) D5, $K={KSEL}$"]
     for i, (ax, cp) in enumerate(zip(axes, caps)):
         if i >= 2: ax.set_yscale("log")
         else: ax.set_ylim(bottom=0)

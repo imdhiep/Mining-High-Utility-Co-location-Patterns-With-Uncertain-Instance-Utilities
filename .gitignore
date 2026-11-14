@@ -3,6 +3,5 @@
 __pycache__/
 data/
 external/
-fair_runs/
 uhucm/out_baseline/*_authors.csv
 uhucm/out_baseline/*_u_point.json

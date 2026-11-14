@@ -1,0 +1,50 @@
+{
+ "name": "yelp_Tampa_quality_d70",
+ "fingerprint": "e25787e98c0ce5d1",
+ "exit": 0,
+ "start": 1794584659.395196,
+ "seconds": 37.7,
+ "exclusive": false,
+ "load_samples": [
+  4.36
+ ],
+ "deps": [
+  "fastmine.py",
+  "run_yelp_fair.py",
+  "suite.py",
+  "yelp_full.py"
+ ],
+ "inputs": [
+  "yelp_academic_dataset_business.json|118863795|aef97b0def6e7f2b",
+  "yelp_academic_dataset_checkin.json|286958945|4f4a40d40c684c9b"
+ ],
+ "cmd": [
+  "run_yelp_fair.py",
+  "{YELP_DIR}",
+  "{RUNS}/yelp_prep/slim",
+  "Tampa",
+  "70"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "12d45649dee6",
+  "cpus": 4,
+  "session": "12d45649dee6-1794584431"
+ },
+ "outputs": {
+  "stdout.txt": "95f4d505872b4979",
+  "out_yelp/suite_YELP_Tampa_d70.json": "a002d5c21c94c527"
+ }
+}

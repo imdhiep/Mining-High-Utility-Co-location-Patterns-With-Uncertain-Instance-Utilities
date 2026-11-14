@@ -1,0 +1,49 @@
+{
+ "name": "fsq_NYC_sens",
+ "fingerprint": "f58e41b2add27171",
+ "exit": 0,
+ "start": 1794576300.4270265,
+ "seconds": 293.3,
+ "exclusive": false,
+ "load_samples": [
+  4.68
+ ],
+ "deps": [
+  "ceb.py",
+  "fastmine.py",
+  "fsq_loader.py",
+  "paths.py",
+  "run_inter_ceb.py",
+  "suite.py"
+ ],
+ "inputs": [
+  "dataset_TSMC2014_NYC.txt|31480163|914b759287951548"
+ ],
+ "cmd": [
+  "run_inter_ceb.py",
+  "NYC"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "8ead24bdab9e",
+  "cpus": 4,
+  "session": "8ead24bdab9e-1794561946"
+ },
+ "outputs": {
+  "stdout.txt": "b037921140c2483b",
+  "out_suite_ceb/suite_CEB_NYC_inter.json": "f252187ca5234a88",
+  "out_suite_ceb/sens_NYC.json": "c152ecf5355f35db"
+ }
+}

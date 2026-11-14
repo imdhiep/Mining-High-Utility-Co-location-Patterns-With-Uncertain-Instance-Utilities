@@ -103,7 +103,7 @@ def boot_diff(tables, plus, minus, B=10000, seed=0):
     sims /= tot
     disc_p, disc_m = sum(t[plus] for t in tables), sum(t[minus] for t in tables)
     p_mc = binomtest(disc_p, disc_p + disc_m, 0.5).pvalue if disc_p + disc_m else 1.0
-    return dict(diff=round(est, 3), ci=[round(float(np.quantile(sims, 0.025)), 3), round(float(np.quantile(sims, 0.975)), 3)],
+    return dict(diff=round(est, 4), ci=[round(float(np.quantile(sims, 0.025)), 4), round(float(np.quantile(sims, 0.975)), 4)],
                 n_pairs=tot, discordant=[disc_p, disc_m], mcnemar_p=float(f"{p_mc:.3g}"))
 
 
@@ -115,7 +115,7 @@ def cluster_boot(tables, plus, minus, B=10000, seed=0):
     idx = rng.integers(0, len(T), size=(B, len(T)))
     sims = d[idx].sum(1) / n[idx].sum(1)
     per = d / np.maximum(n, 1)
-    return dict(ci_cluster=[round(float(np.quantile(sims, 0.025)), 3), round(float(np.quantile(sims, 0.975)), 3)],
+    return dict(ci_cluster=[round(float(np.quantile(sims, 0.025)), 4), round(float(np.quantile(sims, 0.975)), 4)],
                 pos=int((per > 0).sum()), zero=int((per == 0).sum()), neg=int((per < 0).sum()))
 
 

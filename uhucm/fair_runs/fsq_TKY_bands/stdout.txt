@@ -1,0 +1,4 @@
+TKY 100 {'R0': 100, 'R_indep': 50, 'R_banded': 34, 'R_equi': 0, 'banded_subset': True, 'J_banded_indep': 0.68, 'nodes_indep': 1943, 'nodes_banded': 1943, 'hold_banded': 0.6471, 'hold_removed_by_band': 0.4375, 'hold_rej_indep': 0.32}
+TKY 300 {'R0': 300, 'R_indep': 188, 'R_banded': 144, 'R_equi': 3, 'banded_subset': True, 'J_banded_indep': 0.766, 'nodes_indep': 3513, 'nodes_banded': 3513, 'hold_banded': 0.8333, 'hold_removed_by_band': 0.4773, 'hold_rej_indep': 0.4375}
+TKY 1000 {'R0': 1000, 'R_indep': 538, 'R_banded': 419, 'R_equi': 76, 'banded_subset': True, 'J_banded_indep': 0.7788, 'nodes_indep': 6642, 'nodes_banded': 6642, 'hold_banded': 0.864, 'hold_removed_by_band': 0.7899, 'hold_rej_indep': 0.539}
+TKY rho [0.082, 0.068, 0.0544, 0.0392, 0.021, 0.0017]
