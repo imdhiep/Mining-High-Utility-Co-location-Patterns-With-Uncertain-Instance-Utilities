@@ -14,7 +14,7 @@ Protocol shared by all jobs
     largest TRUE score) and the same z = 1.645.
   * Real data: z = 1.645, K in {100, 300, 1000}, d = 50 m (30 and 70 m for the sensitivity), total variance V_T with
     B = 20 and the expected normalizer for ratings (Yelp) and counts (Foursquare).
-  * Timing: exclusive jobs (nothing else runs), all in one session, 1 untimed warm-up run, then 5 timed runs of every
+  * Timing: exclusive jobs (nothing else runs), 1 untimed warm-up run, then 5 timed runs of every
     variant at every K in rotated order, garbage collector off inside the timed region, wall and CPU time recorded.
 """
 import os
@@ -99,3 +99,8 @@ for K in ("30", "100", "300", "1000"):                                 # D5 at k
 for c in ("NYC", "TKY"):
     for k in ("20", "60"):
         job(f"zsweep_{c}_k{k}", "run_zsweep.py", [c, k], inputs=[FSQ[c]], exclusive=True, group="timing")
+# UHUCPM against the authors' code (whole processes, positive setting) and growth with n on EviGen
+for w, f in (("cal", "California_POI 13f.csv"), ("lv", "LasVegas_POI 10f.csv")):
+    job(f"time_d8_{w}", "d8/time_d8_fair.py", [w], inputs=PSO + [f"{{PSOMUCP_DIR}}/DATA/{f}"], exclusive=True, group="timing",
+        deps=["d8/run_uhucm_d8.py", "d8/run_authors.py"])
+job("time_scale_n", "run_scale_fair.py", exclusive=True, group="timing")
