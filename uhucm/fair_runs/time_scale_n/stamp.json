@@ -1,0 +1,62 @@
+{
+ "name": "time_scale_n",
+ "fingerprint": "1e680a578b714290",
+ "exit": 0,
+ "start": 1794725810.8610225,
+ "seconds": 88.0,
+ "exclusive": true,
+ "load_samples": [
+  0.14,
+  0.14,
+  0.2,
+  0.27,
+  0.33,
+  0.38,
+  0.43,
+  0.48,
+  0.52,
+  0.56,
+  0.59,
+  0.63,
+  0.66,
+  0.68,
+  0.71,
+  0.73,
+  0.75,
+  0.77,
+  0.79
+ ],
+ "deps": [
+  "fastmine.py",
+  "run_scale_fair.py",
+  "synth.py",
+  "uhucm.py"
+ ],
+ "inputs": [],
+ "cmd": [
+  "run_scale_fair.py"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "0272a74741f8",
+  "cpus": 4,
+  "session": "0272a74741f8-1794722405",
+  "cpu_model": "Intel(R) Xeon(R) CPU @ 2.20GHz"
+ },
+ "outputs": {
+  "stdout.txt": "005034287452fb85",
+  "out_scale/scale_n.json": "2233cf8a8b9911ab"
+ }
+}

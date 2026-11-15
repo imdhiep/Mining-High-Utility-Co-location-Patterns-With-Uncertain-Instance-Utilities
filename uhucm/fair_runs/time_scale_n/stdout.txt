@@ -1,0 +1,7 @@
+SCALE 1000 {"build": 0.033, "mine": 0.05} 742
+SCALE 3000 {"build": 0.111, "mine": 0.09} 2411
+SCALE 10000 {"build": 0.414, "mine": 0.138} 7975
+SCALE 30000 {"build": 1.556, "mine": 0.293} 25212
+SCALE 100000 {"build": 7.198, "mine": 0.749} 81331
+exponents {'build': 1.165, 'mine': 0.574} 
+DONE
