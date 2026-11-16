@@ -117,6 +117,6 @@ job("time_scale_n", "run_scale_fair.py", exclusive=True, group="timing")
 CQS = ["{PSOMUCP_DIR}/HUCPM/CQ-HUCPM.py"]
 EXTD = ["d8/run_uhucm_inst.py", "d8/run_cq_fair.py", "d8/run_pso_fair.py"]
 job("time_ext_NYC", "d8/time_ext_fsq.py", ["NYC"], inputs=[FSQ["NYC"]] + PSO + CQS, exclusive=True, group="timing", deps=EXTD)
-for K in ("100", "300", "1000"):              # D5: one K per job (one Kaggle session each), no time limit on a run
-    job(f"time_ext_TKY_K{K}", "d8/time_ext_fsq.py", ["TKY", K], env={"TIMEOUT": "1e9"}, inputs=[FSQ["TKY"]] + PSO + CQS,
+for K in ("100", "300", "1000"):              # D5: one K per job (one Kaggle session each); TIMEOUT 1e6 s (11.6 days) = no limit on a run
+    job(f"time_ext_TKY_K{K}", "d8/time_ext_fsq.py", ["TKY", K], env={"TIMEOUT": "1e6"}, inputs=[FSQ["TKY"]] + PSO + CQS,
         exclusive=True, group="timing", deps=EXTD)
