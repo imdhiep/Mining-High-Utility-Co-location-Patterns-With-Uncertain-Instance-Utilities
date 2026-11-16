@@ -1,0 +1,4 @@
+TKY 100 {"gamma": 0.008926560752072942, "R0": 100, "R_T": 50, "R_P": 55, "subset": true, "only_vt": 5, "only_vt_frac": 0.05, "atoms_only_vt": 882.0, "atoms_kept": 870.5, "hold_kept": 0.58, "hold_only_vt": 0.4, "hold_both": 0.3111}
+TKY 300 {"gamma": 0.004846176367457132, "R0": 300, "R_T": 188, "R_P": 191, "subset": true, "only_vt": 3, "only_vt_frac": 0.01, "atoms_only_vt": 648.0, "atoms_kept": 461.5, "hold_kept": 0.75, "hold_only_vt": 1.0, "hold_both": 0.422}
+TKY 1000 {"gamma": 0.002480722791625946, "R0": 1000, "R_T": 538, "R_P": 551, "subset": true, "only_vt": 13, "only_vt_frac": 0.013, "atoms_only_vt": 304.0, "atoms_kept": 216.5, "hold_kept": 0.8476, "hold_only_vt": 0.6923, "hold_both": 0.5345}
+DONE

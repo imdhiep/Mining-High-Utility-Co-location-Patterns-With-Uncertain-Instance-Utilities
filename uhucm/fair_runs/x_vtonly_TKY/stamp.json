@@ -1,0 +1,49 @@
+{
+ "name": "x_vtonly_TKY",
+ "fingerprint": "062d8b2d611d3777",
+ "exit": 0,
+ "start": 1794795512.462578,
+ "seconds": 209.0,
+ "exclusive": false,
+ "load_samples": [
+  4.02
+ ],
+ "deps": [
+  "ceb.py",
+  "fastmine.py",
+  "fsq_loader.py",
+  "paths.py",
+  "run_vt_only.py",
+  "suite.py"
+ ],
+ "inputs": [
+  "dataset_TSMC2014_TKY.txt|79467384|050846dff3e946a8"
+ ],
+ "cmd": [
+  "run_vt_only.py",
+  "TKY"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "a36e76844c5c",
+  "cpus": 4,
+  "session": "a36e76844c5c-1794794147",
+  "cpu_model": "Intel(R) Xeon(R) CPU @ 2.20GHz"
+ },
+ "outputs": {
+  "stdout.txt": "62a8f2ae751b6506",
+  "out_vt_only/vt_only_TKY.json": "58f2972c3336f0ee"
+ }
+}

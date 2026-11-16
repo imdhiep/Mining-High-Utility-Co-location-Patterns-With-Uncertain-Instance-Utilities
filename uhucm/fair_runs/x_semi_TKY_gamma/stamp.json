@@ -1,0 +1,61 @@
+{
+ "name": "x_semi_TKY_gamma",
+ "fingerprint": "9ed4201440aa24d6",
+ "exit": 0,
+ "start": 1794795114.0068474,
+ "seconds": 3180.1,
+ "exclusive": false,
+ "load_samples": [
+  4.03
+ ],
+ "deps": [
+  "ceb.py",
+  "fastmine.py",
+  "fsq_loader.py",
+  "paths.py",
+  "semisyn/semisyn_extra.py"
+ ],
+ "inputs": [
+  "dataset_TSMC2014_TKY.txt|79467384|050846dff3e946a8"
+ ],
+ "cmd": [
+  "semisyn/semisyn_extra.py",
+  "TKY",
+  "20",
+  "gamma",
+  "np",
+  "zpost",
+  "cboot",
+  "diag",
+  "momc"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}",
+  "FR": "1.0",
+  "KS": "100,300,1000",
+  "OUTD": "out",
+  "TRUTHK": "1",
+  "TRUTHC": "momc",
+  "SEED0": "0"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "a36e76844c5c",
+  "cpus": 4,
+  "session": "a36e76844c5c-1794794147",
+  "cpu_model": "Intel(R) Xeon(R) CPU @ 2.20GHz"
+ },
+ "outputs": {
+  "stdout.txt": "071a9f09cbf3693f",
+  "pilot/out/semisyn_extra_TKY_gamma_np_zpost_cboot_momc.json": "25a4a60a91d8705a"
+ }
+}

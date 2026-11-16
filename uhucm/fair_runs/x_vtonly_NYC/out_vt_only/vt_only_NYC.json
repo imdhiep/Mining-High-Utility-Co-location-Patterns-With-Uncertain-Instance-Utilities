@@ -1,0 +1,48 @@
+{
+ "city": "NYC",
+ "z": 1.645,
+ "results": {
+  "100": {
+   "gamma": 0.004040860930179038,
+   "R0": 100,
+   "R_T": 67,
+   "R_P": 67,
+   "subset": true,
+   "only_vt": 0,
+   "only_vt_frac": 0.0,
+   "atoms_only_vt": null,
+   "atoms_kept": 10.0,
+   "hold_kept": 0.9701,
+   "hold_only_vt": null,
+   "hold_both": 0.697
+  },
+  "300": {
+   "gamma": 0.0016606965422164082,
+   "R0": 300,
+   "R_T": 230,
+   "R_P": 231,
+   "subset": true,
+   "only_vt": 1,
+   "only_vt_frac": 0.0033,
+   "atoms_only_vt": 116.0,
+   "atoms_kept": 10.0,
+   "hold_kept": 0.9391,
+   "hold_only_vt": 1.0,
+   "hold_both": 0.3478
+  },
+  "1000": {
+   "gamma": 0.00036576967567824486,
+   "R0": 1000,
+   "R_T": 508,
+   "R_P": 519,
+   "subset": true,
+   "only_vt": 11,
+   "only_vt_frac": 0.011,
+   "atoms_only_vt": 46.0,
+   "atoms_kept": 9.0,
+   "hold_kept": 0.6811,
+   "hold_only_vt": 0.1818,
+   "hold_both": 0.2911
+  }
+ }
+}
