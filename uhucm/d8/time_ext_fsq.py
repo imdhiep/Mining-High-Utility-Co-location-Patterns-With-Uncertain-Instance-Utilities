@@ -92,7 +92,7 @@ for K in Ks:
     for p in progs: rec[p]["n"] = None if sets[p] is None else len(sets[p])
     cmp = {}
     for a, b in (("uhucpm_inst", "cq"), ("uhucpm_fl", "psomucp")):
-        if sets[a] is not None and sets[b] is not None:
+        if sets.get(a) is not None and sets.get(b) is not None:
             A, B = set(sets[a]), set(sets[b]); cmp[f"{a}_vs_{b}"] = dict(same=A == B, missed_by_b=sorted(A - B), extra_in_b=sorted(B - A))
     if kf not in fl_done: fl_done[kf] = K
     res["K"][str(K)] = dict(minutil_inst=m_i, minutil_fl=m_f, K_fl=kf, fl_same_as_K=fl_done[kf] if fl_done[kf] != K else None,
