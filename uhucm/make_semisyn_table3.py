@@ -5,6 +5,8 @@ on the truth only, so every method and ablation is scored on the same draws (fai
 so all methods are scored against the same truth set. Columns (lower-bound rule, z = 1.645 for every method):
 Point FDP, parametric Gamma-Poisson FDP, UHUCPM FDP (mean and SD over runs), UHUCPM detection, oracle FDP, and
 efficiency = true patterns found by UHUCPM / true patterns found by the oracle (ratio of sums over the common runs).
+With the runs x_semi_* (the np runs repeated with PLB and the filters of the real-data study), the table also has FDP
+and detection of Point, PLB and the median-evidence filter, and of the parametric posterior and the oracle.
 Also summarises the ablations and the spatial-field run (New York and Tokyo, log-normal truth).
 Writes out_ceb/semisyn_table2.tex (rows used by fill_v2.py) and out_ceb/semisyn_m7.json."""
 import json, os, numpy as np
@@ -54,10 +56,18 @@ for lab, c in LAY:
                  lb=mean(new, "lb1.645", 1), lb_sd=sd(new, "lb1.645", 1), lb_det=mean(new, "lb1.645", 2),
                  orc=mean(orc, "lb1.645", 1), orc_det=mean(orc, "lb1.645", 2),
                  eff=sum(td(v) for v in new.values()) / max(1e-9, sum(td(v) for v in orc.values())))
+        r["point_det"] = mean(new, "point", 2)
+        X = read(f"x_semi_{c}_{t}", c)
+        if X:
+            assert set(X) >= set(ks) and all(X[k]["lb1.645"] == new[k]["lb1.645"] for k in ks), f"x_semi_{c}_{t} differs"
+            X = {k: X[k] for k in ks}
+            for key in ("plb", "medev", "minpi", "pi"):
+                r[key], r[key + "_det"] = mean(X, key, 1), mean(X, key, 2)
         J["main"][f"{lab}|{t}"] = r
         name = {"D4": "D4", "D5": "D5"}[lab]
-        rows.append(f"{name if first else ''} & {tl} & {f(r['point'])} & {f(r['param'])} & {f(r['lb'])}$\\pm${f(r['lb_sd'])} & "
-                    f"{f(r['lb_det'])} & {f(r['orc'])} & {f(r['eff'])} \\\\")
+        g = lambda key: f"{f(r[key])} & {f(r[key + '_det'])}" if key in r else "-- & --"
+        rows.append(f"{name if first else ''} & {tl} & {f(r['point'])} & {f(r['point_det'])} & {g('plb')} & {g('medev')} & "
+                    f"{f(r['param'])} & {f(r['param_det'])} & {f(r['lb'])} & {f(r['lb_det'])} & {f(r['orc'])} & {f(r['orc_det'])} & {f(r['eff'])} \\\\")
         first = False
     base = read(f"semi_{c}_lognormal_np", c)
     for tag, job in [("median_center", "abl_median"), ("plugin_Z", "abl_plugZ"), ("no_VT", "abl_noVT"),
