@@ -1,0 +1,55 @@
+{
+ "name": "time_ext_NYC",
+ "fingerprint": "5c0a51e6e702a93f",
+ "exit": 0,
+ "start": 1794822134.4153428,
+ "seconds": 1320.3,
+ "exclusive": true,
+ "load_samples_transcribed": "omitted when copied from the Kaggle output; between 0.06 and 1.13 (one busy core), see the Kaggle notebook uhucpm-fair-ext-nyc, version 1",
+ "deps": [
+  "ceb.py",
+  "d8/run_cq_fair.py",
+  "d8/run_pso_fair.py",
+  "d8/run_uhucm_inst.py",
+  "d8/time_ext_fsq.py",
+  "fastmine.py",
+  "fsq_loader.py",
+  "paths.py",
+  "suite.py"
+ ],
+ "inputs": [
+  "dataset_TSMC2014_NYC.txt|31480163|914b759287951548",
+  "PSO-MUCP.py|16588|70e90c701a6cfa68",
+  "CQ-HUCPM.py|11461|cb6bfddc35d3f212"
+ ],
+ "cmd": [
+  "d8/time_ext_fsq.py",
+  "NYC"
+ ],
+ "env": {
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1",
+  "MKL_NUM_THREADS": "1",
+  "PYTHONHASHSEED": "0",
+  "FSQ_DIR": "{FSQ_DIR}",
+  "PSOMUCP_DIR": "{PSOMUCP_DIR}"
+ },
+ "versions": {
+  "python": "3.13.18",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3"
+ },
+ "host": {
+  "node": "6e6797f4c4f6",
+  "cpus": 4,
+  "session": "6e6797f4c4f6-1794822014",
+  "cpu_model": "Intel(R) Xeon(R) CPU @ 2.20GHz"
+ },
+ "outputs": {
+  "stdout.txt": "6cc5f5617b3a6654",
+  "out_timing_ext/NYC.csv": "34bb44413b79f3d5",
+  "out_timing_ext/time_ext_NYC.json": "30129c2a3e1994b8",
+  "out_timing_ext/NYC_ufl.json": "b153bcb88b83b01f",
+  "out_timing_ext/NYC_u.json": "7d722b69f60f37a9"
+ }
+}
