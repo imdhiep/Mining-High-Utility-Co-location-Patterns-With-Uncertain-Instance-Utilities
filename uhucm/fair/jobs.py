@@ -117,4 +117,4 @@ job("time_scale_n", "run_scale_fair.py", exclusive=True, group="timing")
 CQS = ["{PSOMUCP_DIR}/HUCPM/CQ-HUCPM.py"]
 for c in ("NYC", "TKY"):
     job(f"time_ext_{c}", "d8/time_ext_fsq.py", [c], inputs=[FSQ[c]] + PSO + CQS, exclusive=True, group="timing",
-        deps=["d8/run_uhucm_inst.py", "d8/run_cq_fair.py", "d8/run_uhucm_d8.py", "d8/run_authors.py"])
+        deps=["d8/run_uhucm_inst.py", "d8/run_cq_fair.py", "d8/run_pso_fair.py"])

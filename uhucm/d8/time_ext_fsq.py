@@ -7,7 +7,9 @@ TIMEOUT seconds is recorded as a timeout and not run again for that configuratio
   * Instance-level utilities (the posterior means, as Point utility in the paper): UHUCPM against CQ-HUCPM.
   * Feature-level utilities (the mean posterior mean of each feature, as PSO-MUCP assigns one utility per feature):
     UHUCPM against PSO-MUCP. Both use the authors' code from the PSO-MUCP repository with its mining logic unchanged.
-The threshold of each K is the K-th largest point score, given to every program as a share of the total utility.
+The threshold of each K is the K-th largest point score, given to every program as a share of the total positive
+utility of the instances (the sum of all utilities, which the authors' code divides by, is negative on D4 and D5).
+UHUCPM reads the feature-level utilities from a second utility file, expanded to the instances.
 The posteriors are computed once before timing and are not part of the times. The result sets of every run are compared.
 Usage: python time_ext_fsq.py CITY [K ...]   (default K = 100 300 1000)  -> out_timing_ext/time_ext_<CITY>.json"""
 import sys, os, json, time, resource, subprocess, string
@@ -31,13 +33,14 @@ with open(csvp, "w") as f:
     for j, (x, y) in zip(S.F, S.XY):
         cnt[j] = cnt.get(j, 0) + 1; ids.append(f"{L[j]}{cnt[j]}"); f.write(f"{L[j]},{cnt[j]},{x:.3f},{y:.3f},0\n")
 # instance level: posterior means; feature level: mean posterior mean of each feature
-P0 = S.mk(mu=S.mu, s2=np.zeros_like(S.mu)); U_all = float(S.mu.sum())
+P0 = S.mk(mu=S.mu, s2=np.zeros_like(S.mu)); U_all = float(np.clip(S.mu, 0, None).sum())
 ujson = os.path.abspath(os.path.join(out, f"{city}_u.json")); json.dump({i: float(x) for i, x in zip(ids, S.mu)}, open(ujson, "w"))
 F = np.array(S.F); v = {j: float(S.mu[F == j].mean()) for j in range(len(S.names))}
-mu_fl = np.array([v[j] for j in S.F]); Pfl = S.mk(mu=mu_fl, s2=np.zeros_like(mu_fl)); U_fl = float(mu_fl.sum())
+mu_fl = np.array([v[j] for j in S.F]); Pfl = S.mk(mu=mu_fl, s2=np.zeros_like(mu_fl)); U_fl = float(np.clip(mu_fl, 0, None).sum())
+ufl = os.path.abspath(os.path.join(out, f"{city}_ufl.json")); json.dump({i: float(x) for i, x in zip(ids, mu_fl)}, open(ufl, "w"))
 util_fl = {L[j]: v[j] for j in v}
 R0, sc0 = S.topk(P0, max(Ks)); Rf, scf = S.topk(Pfl, max(Ks))
-print("prep", city, "n", len(rows), "U_all", U_all, "U_fl", U_fl, flush=True)
+print("prep", city, "n", len(rows), "U_pos", U_all, "U_fl_pos", U_fl, "sum", float(S.mu.sum()), flush=True)
 
 
 def child_cpu():
@@ -59,12 +62,12 @@ def once(cmd):
 
 res = dict(city=city, n=len(rows), d=d, reps=REPS, timeout=TIMEOUT, U_all=U_all, U_fl=U_fl, util_fl=util_fl, K={})
 for K in Ks:
-    m_i = sc0[K - 1] * P0.Z / U_all * (1 - 1e-9); m_f = scf[K - 1] * Pfl.Z / U_fl * (1 - 1e-9)
+    m_i = float(sc0[K - 1] * P0.Z / U_all * (1 - 1e-9)); m_f = float(scf[K - 1] * Pfl.Z / U_fl * (1 - 1e-9))
     py = [sys.executable, "-I"]
     progs = {"uhucpm_inst": py + [os.path.join(HERE, "run_uhucm_inst.py"), csvp, ujson, repr(m_i), str(d)],
              "cq": py + [os.path.join(HERE, "run_cq_fair.py"), CQ, csvp, ujson, repr(m_i), str(d)],
-             "uhucpm_fl": py + [os.path.join(HERE, "run_uhucm_d8.py"), csvp, repr(util_fl), repr(m_f), str(d)],
-             "psomucp": py + [os.path.join(HERE, "run_authors.py"), PSO, csvp, repr(util_fl), repr(m_f), str(d)]}
+             "uhucpm_fl": py + [os.path.join(HERE, "run_uhucm_inst.py"), csvp, ufl, repr(m_f), str(d)],
+             "psomucp": py + [os.path.join(HERE, "run_pso_fair.py"), PSO, csvp, repr(util_fl), repr(m_f), str(d)]}
     rec = {p: dict(times=[], cpu=[], inner=[], timeout=False) for p in progs}; sets = {p: None for p in progs}
     order = list(progs)
     for it in range(-1, REPS):                                         # it = -1: untimed warm-up of every program
