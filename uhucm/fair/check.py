@@ -7,6 +7,7 @@ Rules
   R2  all stamps have the same Python/NumPy/SciPy versions and the same input identities for the same input file
   R3  semi-synthetic: within a comparison (same layout and truth), every method has the same valid (seed, K) draws, and
       there are at least 10 valid seeds for every K; all runs use TRUTHK=1, TRUTHC=momc and the same K list and seeds
+  R5  the semi-synthetic runs with PLB and filters (x_semi_*) repeat the draws and lower-bound records of the np runs
   R4  timing and z-sweep: exclusive jobs, every variant has 5 timed runs with CPU times at every K, and the process was
       not starved: median CPU time / wall time of every variant at least 0.9. All variants compared at one K are timed
       interleaved inside one job, hence in one session. Jobs may come from several sessions (a Kaggle session stops
@@ -72,6 +73,15 @@ def main():
         for n, R in recs.items():
             for K in (100, 300, 1000):
                 if len(first_valid(R, K)) < 10: fail("R3", f"{n}: fewer than 10 valid seeds at K={K}", [n])
+    # R5: the runs with PLB and filters repeat the np runs exactly (same draws and the same lower-bound records)
+    for j in JOBS:
+        if not j["name"].startswith("x_semi_") or j["name"] not in stamps: continue
+        ref = j["name"].replace("x_semi_", "semi_") + "_np"
+        if ref not in stamps: continue
+        a, b = semi_records(j["name"], j["args"][0]), semi_records(ref, j["args"][0])
+        same = a.keys() == b.keys() and all((a[k] is None) == (b[k] is None) and (a[k] is None or a[k]["lb1.645"] == b[k]["lb1.645"]
+                                                                                   and a[k]["point"] == b[k]["point"]) for k in a)
+        if not same: fail("R5", f"{j['name']} does not repeat {ref}", [j["name"]])
     # R4
     T = [j for j in JOBS if j["exclusive"] and j["name"] in stamps]
     ses = {}

@@ -54,6 +54,12 @@ for c in ("NYC", "TKY"):
     job(f"semi_{c}_lognormal_spf", "semisyn/semisyn_fsq.py", [c, SEMI_SEEDS, "lognormal"] + METHODS["np"],
         {**SEMI_ENV, "SPF": "100,0.3"}, [FSQ[c]], group=f"semi_{c}_spf", subdirs=["pilot/out"])
 
+# PLB and the prevalence/evidence filters on the same draws as the np runs (the records of semi_<c>_<t>_np are repeated)
+for c in ("NYC", "TKY"):
+    for t in ("lognormal", "gamma", "mixture"):
+        job(f"x_semi_{c}_{t}", "semisyn/semisyn_extra.py", [c, SEMI_SEEDS, t] + METHODS["np"], SEMI_ENV, [FSQ[c]],
+            group=f"x_semi_{c}_{t}", subdirs=["pilot/out"])
+
 # ---- EviGen (rating setting) and exactness --------------------------------------------------------------------------
 for e in ("e1", "e2", "e2b", "e2c", "e2d"):
     job(f"synth_{e}", "synth.py", [e])
@@ -67,6 +73,9 @@ for c in ("NYC", "TKY"):
         job(f"fsq_{c}_quality_d{d}", "run_suite_ceb.py", [FSQ[c], c, "out_suite_ceb", "quality", d], inputs=[FSQ[c]], group="real_d")
     job(f"fsq_{c}_sens", "run_inter_ceb.py", [c], inputs=[FSQ[c]], subdirs=["out_suite_ceb"])
     job(f"fsq_{c}_bands", "run_bands_ceb.py", [c], inputs=[FSQ[c]], subdirs=["out_suite_ceb"])
+
+for c in ("NYC", "TKY"):                                              # effect of the second term of V_T alone
+    job(f"x_vtonly_{c}", "run_vt_only.py", [c], inputs=[FSQ[c]])
 
 # ---- Yelp (Tables IV, VI, VII for D1-D3 and Y1-Y8, sensitivity, d = 30/70 m) ----------------------------------------
 YCITIES = ["Philadelphia", "New Orleans", "Tampa", "Tucson", "Indianapolis", "Nashville", "Reno", "Saint Louis",
