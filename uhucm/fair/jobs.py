@@ -115,6 +115,8 @@ for w, f in (("cal", "California_POI 13f.csv"), ("lv", "LasVegas_POI 10f.csv")):
 job("time_scale_n", "run_scale_fair.py", exclusive=True, group="timing")
 # UHUCPM at z = 0 against the authors' CQ-HUCPM (instance-level utilities) and PSO-MUCP (feature-level utilities) on D4/D5
 CQS = ["{PSOMUCP_DIR}/HUCPM/CQ-HUCPM.py"]
-for c in ("NYC", "TKY"):
-    job(f"time_ext_{c}", "d8/time_ext_fsq.py", [c], inputs=[FSQ[c]] + PSO + CQS, exclusive=True, group="timing",
-        deps=["d8/run_uhucm_inst.py", "d8/run_cq_fair.py", "d8/run_pso_fair.py"])
+EXTD = ["d8/run_uhucm_inst.py", "d8/run_cq_fair.py", "d8/run_pso_fair.py"]
+job("time_ext_NYC", "d8/time_ext_fsq.py", ["NYC"], inputs=[FSQ["NYC"]] + PSO + CQS, exclusive=True, group="timing", deps=EXTD)
+for K in ("100", "300", "1000"):              # D5: one K per job (one Kaggle session each), no time limit on a run
+    job(f"time_ext_TKY_K{K}", "d8/time_ext_fsq.py", ["TKY", K], env={"TIMEOUT": "1e9"}, inputs=[FSQ["TKY"]] + PSO + CQS,
+        exclusive=True, group="timing", deps=EXTD)
