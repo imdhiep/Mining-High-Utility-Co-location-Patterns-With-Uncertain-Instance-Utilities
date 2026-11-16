@@ -6,7 +6,7 @@ s = open(os.path.join(T, "main_tmpl.tex")).read()
 J = json.load(open(os.path.join(H, "out_ceb", "semisyn_table2.json")))
 pt = [v["point"] for v in J.values() if v["point"] == v["point"]]
 sub = {"@@SEMISYNROWS@@": open(os.path.join(H, "out_ceb", "semisyn_table2.tex")).read().strip(),
-       "@@POINT@@": f"{100 * min(pt):.0f}\\%~--~{100 * max(pt):.0f}\\%"}
+       "@@POINT@@": f"{100 * min(pt):.0f}\\%--{100 * max(pt):.0f}\\%"}
 ex = os.path.join(H, "out_ceb", "fill_text.json")
 if os.path.exists(ex): sub.update(json.load(open(ex)))
 for k, v in sub.items(): s = s.replace(k, v)
