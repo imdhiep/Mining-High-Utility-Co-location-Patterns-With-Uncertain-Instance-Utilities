@@ -7,7 +7,9 @@ TIMEOUT seconds is recorded as a timeout and not run again for that configuratio
   * Instance-level utilities (the posterior means, as Point utility in the paper): UHUCPM against CQ-HUCPM.
   * Feature-level utilities (the mean posterior mean of each feature, as PSO-MUCP assigns one utility per feature):
     UHUCPM against PSO-MUCP. Both use the authors' code from the PSO-MUCP repository with its mining logic unchanged.
-The threshold of each K is the K-th largest point score, given to every program as a share of the total positive
+The threshold of each K is the K-th largest point score (with feature-level utilities few patterns have a positive
+score, so the threshold is the smallest positive score when fewer than K patterns have one, and a threshold already
+timed for a smaller K is not timed again), given to every program as a share of the total positive
 utility of the instances (the sum of all utilities, which the authors' code divides by, is negative on D4 and D5).
 UHUCPM reads the feature-level utilities from a second utility file, expanded to the instances.
 The posteriors are computed once before timing and are not part of the times. The result sets of every run are compared.
@@ -60,14 +62,18 @@ def once(cmd):
     return wall, cpu, r["seconds"], sorted(r["patterns"])
 
 
+fl_done = {}
 res = dict(city=city, n=len(rows), d=d, reps=REPS, timeout=TIMEOUT, U_all=U_all, U_fl=U_fl, util_fl=util_fl, K={})
 for K in Ks:
-    m_i = float(sc0[K - 1] * P0.Z / U_all * (1 - 1e-9)); m_f = float(scf[K - 1] * Pfl.Z / U_fl * (1 - 1e-9))
+    kf = min(K, sum(1 for x in scf if x > 0))
+    m_i = float(sc0[K - 1] * P0.Z / U_all * (1 - 1e-9)); m_f = float(scf[kf - 1] * Pfl.Z / U_fl * (1 - 1e-9))
     py = [sys.executable, "-I"]
     progs = {"uhucpm_inst": py + [os.path.join(HERE, "run_uhucm_inst.py"), csvp, ujson, repr(m_i), str(d)],
              "cq": py + [os.path.join(HERE, "run_cq_fair.py"), CQ, csvp, ujson, repr(m_i), str(d)],
              "uhucpm_fl": py + [os.path.join(HERE, "run_uhucm_inst.py"), csvp, ufl, repr(m_f), str(d)],
              "psomucp": py + [os.path.join(HERE, "run_pso_fair.py"), PSO, csvp, repr(util_fl), repr(m_f), str(d)]}
+    if kf in fl_done:                                              # same feature-level threshold as a smaller K
+        for p in ("uhucpm_fl", "psomucp"): progs.pop(p)
     rec = {p: dict(times=[], cpu=[], inner=[], timeout=False) for p in progs}; sets = {p: None for p in progs}
     order = list(progs)
     for it in range(-1, REPS):                                         # it = -1: untimed warm-up of every program
@@ -88,7 +94,9 @@ for K in Ks:
     for a, b in (("uhucpm_inst", "cq"), ("uhucpm_fl", "psomucp")):
         if sets[a] is not None and sets[b] is not None:
             A, B = set(sets[a]), set(sets[b]); cmp[f"{a}_vs_{b}"] = dict(same=A == B, missed_by_b=sorted(A - B), extra_in_b=sorted(B - A))
-    res["K"][str(K)] = dict(minutil_inst=m_i, minutil_fl=m_f, programs=rec, compare=cmp)
+    if kf not in fl_done: fl_done[kf] = K
+    res["K"][str(K)] = dict(minutil_inst=m_i, minutil_fl=m_f, K_fl=kf, fl_same_as_K=fl_done[kf] if fl_done[kf] != K else None,
+                            programs=rec, compare=cmp)
     print(city, K, json.dumps({p: dict(n=r["n"], t=r["times"], to=r["timeout"]) for p, r in rec.items()}), json.dumps(cmp)[:400], flush=True)
     json.dump(res, open(os.path.join(out, f"time_ext_{city}.json"), "w"), indent=1)
 print("DONE", flush=True)
