@@ -86,7 +86,7 @@ def fig_eff_mu():
     fig, axes = plt.subplots(1, 2, figsize=(W2, 2.5))
     for ax, nm, lab in zip(axes, ("Phi", "FSQ_TKY"), ("(a) D1 (Yelp, Philadelphia)", "(b) D5 (Foursquare, Tokyo)")):
         em = db[nm]["eff_mu"]; Ks = sorted(em)
-        series = [(lbl, [float(em[K][k]["time"]) for K in Ks]) for k, lbl in (("exact", "UHUCPM"), ("mean", "Mean bound"), ("noprune", "NoPrune"))]
+        series = [(lbl, [float(em[K][k]["time"]) for K in Ks]) for k, lbl in (("exact", "UHUCPM"), ("mean", "Mean bound"), ("noprune", "No pruning"))]
         fs.bar_with_table(ax, [f"K={K}" for K in Ks], series, log2=True, ylabel="Run time (s)", fmt="{:.2f}")
         ax.set_title(lab, y=-0.62, fontsize=8)
     fig.subplots_adjust(wspace=0.45, bottom=0.30); save(fig, "fig_eff_mu.pdf")
@@ -96,7 +96,7 @@ def fig_eff_nodes():
     fig, axes = plt.subplots(1, 2, figsize=(W2, 2.5))
     for ax, nm, lab in zip(axes, ("Phi", "FSQ_TKY"), ("(a) D1 (Yelp, Philadelphia)", "(b) D5 (Foursquare, Tokyo)")):
         em = db[nm]["eff_mu"]; Ks = sorted(em)
-        series = [(lbl, [float(em[K][k]["evaluated"]) for K in Ks]) for k, lbl in (("exact", "UHUCPM"), ("mean", "Mean bound"), ("noprune", "NoPrune"))]
+        series = [(lbl, [float(em[K][k]["evaluated"]) for K in Ks]) for k, lbl in (("exact", "UHUCPM"), ("mean", "Mean bound"), ("noprune", "No pruning"))]
         fs.bar_with_table(ax, [f"K={K}" for K in Ks], series, log2=True, ylabel="Evaluated nodes", fmt="{:.0f}")
         ax.set_title(lab, y=-0.62, fontsize=8)
     fig.subplots_adjust(wspace=0.45, bottom=0.30); save(fig, "fig_eff_nodes.pdf")
@@ -108,7 +108,7 @@ def fig_scale():
     sk = syn["scale_k"]; sn = syn["scale_n"]
     for ax, S, key, lab in ((axes[0], sk, "k", "(a) Number of features ($n=10^4$)"), (axes[1], sn, "n", "(b) Number of instances ($k=10$)")):
         cats = [(f"{r[key] // 1000}k" if key == "n" else str(r[key])) for r in S]
-        series = [("UHUCPM", [r["uhucm"]["time"] for r in S]), ("NoPrune", [r["noprune"]["time"] for r in S]),
+        series = [("UHUCPM", [r["uhucm"]["time"] for r in S]), ("No pruning", [r["noprune"]["time"] for r in S]),
                   ("Build (nbr.+cliques)", [r["build_s"] for r in S])]
         fs.bar_with_table(ax, cats, series, log2=True, ylabel="Run time (s)", fmt="{:.2f}")
         ax.set_title(lab, y=-0.62, fontsize=8)
@@ -120,7 +120,7 @@ def fig_eff_d():
     fig, axes = plt.subplots(1, 2, figsize=(W2, 2.1))
     for ax, nm, lab in zip(axes, ("Phi", "FSQ_TKY"), ("(a) D1", "(b) D5")):
         ed = db[nm]["eff_d"]; ds = sorted(ed)
-        fs.line(ax, ds, [("UHUCPM", [ed[d]["exact"]["time"] for d in ds]), ("NoPrune", [ed[d]["noprune"]["time"] for d in ds])],
+        fs.line(ax, ds, [("UHUCPM", [ed[d]["exact"]["time"] for d in ds]), ("No pruning", [ed[d]["noprune"]["time"] for d in ds])],
                 fmt="{:.2f}", xlabel="Distance threshold $d$ (m)", ylabel="Run time (s)", logy=True)
         ax2 = ax.twinx(); ax2.plot(ds, [ed[d]["cliques"] for d in ds], color=fs.GRAY, linestyle=":", marker="^", label="Maximal cliques $C$")
         ax2.set_yscale("log"); ax2.set_ylabel("$C$"); ax2.grid(False)
@@ -200,7 +200,7 @@ def fig_e2_1c():
 
 def fig_eff_1c():
     fig, axes = plt.subplots(1, 2, figsize=(W1, 1.85))
-    meth = (("exact", "UHUCPM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
+    meth = (("exact", "UHUCPM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "No pruning", fs.GRAY, "^"))
     for nm, ls in (("Phi", "-"), ("FSQ_TKY", "--")):
         em = db[nm]["eff_mu"]; Ks = sorted(em)
         for k, lbl, c, m in meth:
@@ -227,7 +227,7 @@ def fig_scale_1c():
     def med(r, key): v = sorted(x[key] for x in r["reps"]); return v[1], v[0], v[2]
     fig, axes = plt.subplots(1, 2, figsize=(W1, 1.85))
     for ax, key, fixed, t in ((axes[0], "k", lambda r: r["n"] == 10000, "(a) $k$ ($n=10^4$)"), (axes[1], "n", lambda r: r["k"] == 10, "(b) $n$ ($k=10$)")):
-        for meth, lbl, c, m in (("uhucm", "UHUCPM", fs.BLUE, "o"), ("noprune", "NoPrune", fs.GRAY, "^")):
+        for meth, lbl, c, m in (("uhucm", "UHUCPM", fs.BLUE, "o"), ("noprune", "No pruning", fs.GRAY, "^")):
             rs = sorted([r for r in SM if r["method"] == meth and fixed(r)], key=lambda r: r[key])
             xs = [r[key] for r in rs]; ms = [med(r, "mine_s") for r in rs]
             ax.errorbar(xs, [a for a, _, _ in ms], yerr=[[a - lo for a, lo, _ in ms], [hi - a for a, _, hi in ms]], color=c, marker=m, label=lbl, capsize=1.5, elinewidth=0.6)
@@ -264,7 +264,7 @@ def fig_e2_2c():
 
 def fig_eff_2c():
     from matplotlib.lines import Line2D
-    meth = (("exact", "UHUCPM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
+    meth = (("exact", "UHUCPM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "No pruning", fs.GRAY, "^"))
     KSEL = os.environ.get("EFF_K", "300")               # threshold of panels (c), (d)
     fig, axes = plt.subplots(1, 4, figsize=(W2, 1.9))
     caps = ["(a) D1, nodes", "(b) D1, time", "(c) D5, nodes", "(d) D5, time"]
@@ -287,7 +287,7 @@ def fig_eff_v2():
     """Mining time (mean and SD of the timed runs) of UHUCPM, the mean bound and NoPrune: (a), (b) against the rank
     threshold K on D4 and D5 (k = 20); (c), (d) against the number of features k at K = EFF_K (default 300)."""
     T = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out_synth", os.environ.get("STATS_TIMING", "stats_timing2.json"))))
-    meth = (("exact", "UHUCPM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "NoPrune", fs.GRAY, "^"))
+    meth = (("exact", "UHUCPM", fs.BLUE, "o"), ("mean", "Mean bound", fs.ORANGE, "s"), ("noprune", "No pruning", fs.GRAY, "^"))
     KSEL = os.environ.get("EFF_K", "300")               # threshold of panels (c), (d)
     fig, axes = plt.subplots(1, 4, figsize=(W2, 1.9))
     def vsK(ax, key):
@@ -320,7 +320,7 @@ def fig_scale_2c():
              (axes[2], "n", lambda r: r["k"] == 10, "mine_s", "Time (s)", "(c) Time vs. $n$ ($k=10$)"),
              (axes[3], "n", lambda r: r["k"] == 10, "evaluated", "Evaluated nodes", "(d) Nodes vs. $n$"))
     for ax, key, fixed, val, yl, cap in specs:
-        for meth, lbl, c, m in (("uhucm", "UHUCPM", fs.BLUE, "o"), ("noprune", "NoPrune", fs.GRAY, "^")):
+        for meth, lbl, c, m in (("uhucm", "UHUCPM", fs.BLUE, "o"), ("noprune", "No pruning", fs.GRAY, "^")):
             rs = sorted([r for r in SM if r["method"] == meth and fixed(r)], key=lambda r: r[key])
             ms = [med(r, val) for r in rs]
             ax.errorbar([r[key] for r in rs], [a for a, _, _ in ms], yerr=[[a - lo for a, lo, _ in ms], [hi - a for a, _, hi in ms]],
