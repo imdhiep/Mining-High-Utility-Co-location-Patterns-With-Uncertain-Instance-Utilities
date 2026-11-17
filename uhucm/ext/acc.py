@@ -9,7 +9,8 @@ highest true score, and gamma is the K-th largest true score; every method is ju
           answer of the same search (exact miner); the point set is used for every seed and the authors' code is run on
           the first NCHK seeds of each setting, recording whether the sets agree
   pso     the authors' PSO-MUCP at z = 0 with one utility per feature (the mean posterior mean of the feature), run on
-          every seed; its pruning is not exact, so its own output is used
+          every seed; its pruning is not exact, so its own output is used. When no feature has a positive utility, no
+          pattern can reach gamma and its answer is empty (the program is not run, as it would divide by zero)
 All three use the same normalizer Z, so a pattern is reported by each when its total reaches gamma * Z.
 Usage:
   python acc.py LAYOUT VARY VALUES SEEDS        LAYOUT in NYC, TKY, Philadelphia, New_Orleans, Tampa
@@ -174,7 +175,10 @@ for st in settings:
             M = np.array([mu[x].sum() for x in As]); V = np.array([s2[x].sum() + UB[:, x].sum(1).var(ddof=1) for x in As])
             S_u = {key(p) for p, m_, v_ in zip(pool, M, V) if m_ - ZS * np.sqrt(v_) >= g * Z}
             S_cq = {key(p) for p in pool}
-            S_pso, t_pso = ext([os.path.join(HERE, "run_pso.py"), PSO, csvp, util_fl, repr(float(g * Z / Ufl * (1 - 1e-9))), str(st["d"])])
+            if Ufl > 0:
+                S_pso, t_pso = ext([os.path.join(HERE, "run_pso.py"), PSO, csvp, util_fl, repr(float(g * Z / Ufl * (1 - 1e-9))), str(st["d"])])
+            else:                                                 # no feature has a positive utility: no pattern reaches gamma
+                S_pso, t_pso = set(), None
             S_fl = {key(p) for p, v in mine(Pf, g * (1 - 1e-12))[0].items()}  # exact feature-level answer, for reference
             chk = None
             if seed < NCHK:

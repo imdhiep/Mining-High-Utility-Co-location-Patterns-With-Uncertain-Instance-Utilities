@@ -118,7 +118,7 @@ dead = set()                                                    # external progr
 for K in Ks:
     if K > len(sc0): continue
     m = sc0[K - 1]                                              # gamma_K on the normalizer Zn of P0
-    kf = min(K, sum(1 for x in scf if x > 0)); mf = scf[kf - 1]
+    kf = min(K, sum(1 for x in scf if x > 0)); mf = scf[kf - 1] if kf > 0 else None   # None: no positive feature-level score
     thr_u = m * Zn / (Z if Z else Zn)                           # UHUCPM threshold on its own normalizer
     progs = {"uhucpm": py + [os.path.join(HERE, "run_uhucpm.py"), csvp, npz, repr(float(thr_u)), str(d), str(ZS), "exact"],
              "uhucpm0": py + [os.path.join(HERE, "run_uhucpm.py"), csvp, npz, repr(float(thr_u)), str(d), "0", "exact"],
@@ -126,6 +126,7 @@ for K in Ks:
              "noprune": py + [os.path.join(HERE, "run_uhucpm.py"), csvp, npz, repr(float(thr_u)), str(d), str(ZS), "none"],
              "cq": py + [os.path.join(HERE, "run_cq.py"), CQ, csvp, uj, repr(float(m * Zn / U_pos * (1 - 1e-9))), str(d)],
              "pso": py + [os.path.join(HERE, "run_pso.py"), PSO, csvp, repr(util_fl), repr(float(mf * Zf / U_fl * (1 - 1e-9))), str(d)]}
+    if mf is None: progs.pop("pso")
     rec = {p: dict(times=[], cpu=[], inner=[], finished=True) for p in progs}; sets = {}
     fast = ["uhucpm", "uhucpm0", "meanbound", "noprune"]
     for it in range(-1, REPS):
@@ -135,6 +136,7 @@ for K in Ks:
             sets.setdefault(p, pats); rec[p]["evaluated"] = ev
             if it >= 0: rec[p]["times"].append(w); rec[p]["cpu"].append(c); rec[p]["inner"].append(inner)
     for p in ("pso", "cq"):
+        if p not in progs: continue
         if p in dead: rec[p]["finished"] = False; rec[p]["skipped"] = True; continue
         r = once(progs[p], CAP)
         if r is None:
