@@ -124,3 +124,7 @@ for K in ("100", "300", "1000"):
     for r in ("", "_r2"):
         job(f"time_ext_TKY_K{K}{r}", "d8/time_ext_d5.py", [K], inputs=[FSQ["TKY"]] + PSO + CQS, exclusive=True,
             group="timing", deps=EXTD)
+# Yelp D1-D3: same comparison with the rating posterior means; one Kaggle session per city (yelp_prep first)
+for c in YCITIES[:3]:
+    job(f"time_ext_YELP_{c.replace(' ', '_')}", "d8/time_ext_yelp.py", ["{YELP_DIR}", "{RUNS}/yelp_prep/slim", c],
+        inputs=YJ[:2] + PSO + CQS, after=["yelp_prep"], exclusive=True, group="timing", deps=EXTD)
