@@ -58,13 +58,15 @@ def load_layout(k):
     order = sorted(cnt, key=lambda f: (-cnt[f], f)); fi = {f: j for j, f in enumerate(order)}
     F = np.array([fi[r["feat"]] for r in rows]); XY = np.array([(r["x"], r["y"]) for r in rows], float)
     a = np.array([r["a"] for r in rows], float)
-    # law of the true log-rates: Gamma-Poisson posterior means of the real counts, moments per feature
-    lr = np.zeros(len(a))
+    # law of the true log-rates: Gamma-Poisson posterior means of the real counts (moments per feature), over the
+    # venues with at least one record (all venues on Foursquare; on Yelp the businesses without check-ins would give
+    # log-rates near -1/A for a strongly overdispersed feature and an unbounded spread)
+    lr = np.full(len(a), np.nan)
     for j in range(len(order)):
         x = a[F == j]; m, v = x.mean(), x.var(ddof=1)
         A = m * m / (v - m) if v > m else 1e6; be = A * W / max(m, 1e-9)
-        lr[F == j] = digamma(A + x) - np.log(be + W)
-    loc = np.array([lr[F == j].mean() for j in range(len(order))]); scl = np.array([lr[F == j].std() for j in range(len(order))])
+        lr[F == j] = np.where(x >= 1, digamma(A + x) - np.log(be + W), np.nan)
+    loc = np.array([np.nanmean(lr[F == j]) for j in range(len(order))]); scl = np.array([np.nanstd(lr[F == j]) for j in range(len(order))])
     _cache[k] = (F, XY, W, loc, scl, order); return _cache[k]
 
 
