@@ -117,7 +117,10 @@ job("time_scale_n", "run_scale_fair.py", exclusive=True, group="timing")
 CQS = ["{PSOMUCP_DIR}/HUCPM/CQ-HUCPM.py"]
 EXTD = ["d8/run_uhucm_inst.py", "d8/run_cq_fair.py", "d8/run_pso_fair.py"]
 job("time_ext_NYC", "d8/time_ext_fsq.py", ["NYC"], inputs=[FSQ["NYC"]] + PSO + CQS, exclusive=True, group="timing", deps=EXTD)
-for K in ("100", "300", "1000"):              # D5: one K per job (one Kaggle session each); no limit on a run (TIMEOUT 1e6 s); CQ-HUCPM takes hours
-# per run on D5, so 1 warm-up + 2 timed runs fit in the 12-hour Kaggle session
-    job(f"time_ext_TKY_K{K}", "d8/time_ext_fsq.py", ["TKY", K], env={"TIMEOUT": "1e6", "REPS": "2"}, inputs=[FSQ["TKY"]] + PSO + CQS,
-        exclusive=True, group="timing", deps=EXTD)
+# D5: one K per Kaggle session. CQ-HUCPM takes hours per run on D5, so time_ext_d5.py gives it one timed run without
+# warm-up (stopped after 40000 s to stay inside the 12-hour session); the fast programs get warm-up + 5 timed runs.
+# Two sessions per K (r2 repeats r1 on another machine of the same type) give two CQ-HUCPM measurements.
+for K in ("100", "300", "1000"):
+    for r in ("", "_r2"):
+        job(f"time_ext_TKY_K{K}{r}", "d8/time_ext_d5.py", [K], inputs=[FSQ["TKY"]] + PSO + CQS, exclusive=True,
+            group="timing", deps=EXTD)
