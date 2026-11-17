@@ -128,3 +128,41 @@ for K in ("100", "300", "1000"):
 for c in YCITIES[:3]:
     job(f"time_ext_YELP_{c.replace(' ', '_')}", "d8/time_ext_yelp.py", ["{YELP_DIR}", "{RUNS}/yelp_prep/slim", c],
         inputs=YJ[:2] + PSO + CQS, after=["yelp_prep"], exclusive=True, group="timing", deps=EXTD)
+
+# ---- redesigned Section VI: accuracy (B) and running time (C) against CQ-HUCPM and PSO-MUCP ---------------------------
+# Each subsection changes one parameter on two or three datasets, and the datasets differ between subsections.
+# Defaults K = 100, d = 50 m, k = 20, all instances, c = 1, lognormal truth with the fitted spread (sd = 1).
+EXT = ["ext/run_uhucpm.py", "ext/run_cq.py", "ext/run_pso.py"]
+YENV = {"YELP_DIR": "{YELP_DIR}", "REVIEW_DIR": "{RUNS}/yelp_prep/slim"}
+
+
+def _src(L):
+    return ([FSQ[L]], {}, ()) if L in ("NYC", "TKY") else (YJ[:2], YENV, ("yelp_prep",))
+
+
+ACC = [("K", "100,300,1000", ("Philadelphia", "Tampa", "NYC")),
+       ("d", "30,50,70", ("New_Orleans", "NYC")),
+       ("k", {"Tampa": "8,12,16,20", "NYC": "10,20,30,40"}, ("Tampa", "NYC")),
+       ("frac", "0.25,0.5,0.75,1", ("Philadelphia", "NYC")),
+       ("c", "0.5,1,2,4", ("New_Orleans", "Tampa")),
+       ("sd", "0.5,1,1.5,2", ("Philadelphia", "NYC"))]
+for vary, values, layouts in ACC:
+    for L in layouts:
+        inp, env, aft = _src(L)
+        v = values[L] if isinstance(values, dict) else values
+        job(f"acc_{L}_{vary}", "ext/acc.py", [L, vary, v, SEMI_SEEDS], env, inp + PSO + CQS, after=aft, group="acc",
+            subdirs=["out_acc"], deps=EXT)
+
+BENCH = {}                                                  # (layout, k, d, frac) -> thresholds K
+for L in ("Philadelphia", "New_Orleans", "NYC"):            # C1: threshold
+    BENCH.setdefault((L, 20, 50, 1.0), set()).update((100, 300, 1000))
+for L, ks in (("Tampa", (8, 12, 16, 20)), ("NYC", (20, 40, 60, 80))):    # C2: number of features
+    for k in ks: BENCH.setdefault((L, k, 50, 1.0), set()).add(100)
+for L in ("Philadelphia", "NYC"):                           # C3: distance
+    for d in (30, 50, 70): BENCH.setdefault((L, 20, d, 1.0), set()).add(100)
+for L in ("New_Orleans", "TKY"):                            # C4: share of the instances
+    for f in (0.25, 0.5, 0.75, 1.0): BENCH.setdefault((L, 20, 50, f), set()).add(100)
+for (L, k, d, f), Ks in sorted(BENCH.items()):
+    inp, env, aft = _src(L)
+    job(f"bench_{L}_k{k}_d{d}_f{int(round(100 * f))}", "ext/bench.py", [L, str(k), str(d), str(f)] + [str(K) for K in sorted(Ks)],
+        env, inp + PSO + CQS, after=aft, exclusive=True, group="bench", subdirs=["out_bench"], deps=EXT)

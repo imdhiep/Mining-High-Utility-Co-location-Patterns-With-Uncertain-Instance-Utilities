@@ -108,7 +108,8 @@ def state(j, recorded=False):
 
 
 def select(pattern):
-    return [j for j in JOBS if not pattern or fnmatch.fnmatch(j["name"], pattern)]
+    pats = [x for x in pattern.split(",") if x]                     # several patterns separated by commas
+    return [j for j in JOBS if not pats or any(fnmatch.fnmatch(j["name"], x) for x in pats)]
 
 
 def loadavg(): return float(open("/proc/loadavg").read().split()[0])

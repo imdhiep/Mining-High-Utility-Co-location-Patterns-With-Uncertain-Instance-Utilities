@@ -83,7 +83,7 @@ def load(path, city, nfeat=20, model="gamma", B=20, seed=1):
         mu, s2, ep, st = ceb_posterior(xa, Wtr, Fv, t=1)     # training venues have >= 1 check-in
         mt, _, _, _ = ceb_posterior(xt, Wte, Fv, t=0)        # test counts are not selected given the rates
         for i, r in enumerate(rows): r.update(mu=float(mu[i]), s2=float(s2[i]), mu_test=float(mt[i]))
-        info.update(UB=cboot(xa, Wtr, st, B=B, seed=seed), Zhat=float(ep.sum()))
+        info.update(UB=cboot(xa, Wtr, st, B=B, seed=seed), Zhat=float(ep.sum()), EP=np.asarray(ep, float))
     return rows, users, NU, info
 
 
