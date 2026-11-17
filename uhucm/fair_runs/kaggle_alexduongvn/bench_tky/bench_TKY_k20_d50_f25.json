@@ -1,0 +1,96 @@
+{
+ "source": "TKY",
+ "tag": "TKY_k20_d50_f25",
+ "n": 7444,
+ "d": 50.0,
+ "reps": 5,
+ "quick": 600.0,
+ "cap": 7200.0,
+ "z": 1.645,
+ "note": "transcribed from the Kaggle output of uhucpm-bench-tky v1 (alexduongvn); cpu/inner times omitted",
+ "K": {
+  "100": {
+   "gamma": 0.002156477513805285,
+   "K_fl": 100,
+   "programs": {
+    "uhucpm": {
+     "times": [
+      0.477,
+      0.477,
+      0.502,
+      0.471,
+      0.491
+     ],
+     "finished": true,
+     "n": 39,
+     "evaluated": 462
+    },
+    "uhucpm0": {
+     "times": [
+      0.481,
+      0.494,
+      0.503,
+      0.484,
+      0.479
+     ],
+     "finished": true,
+     "n": 100,
+     "evaluated": 528
+    },
+    "meanbound": {
+     "times": [
+      0.485,
+      0.485,
+      0.484,
+      0.496,
+      0.484
+     ],
+     "finished": true,
+     "n": 39,
+     "evaluated": 528
+    },
+    "noprune": {
+     "times": [
+      0.482,
+      0.472,
+      0.467,
+      0.473,
+      0.473
+     ],
+     "finished": true,
+     "n": 39,
+     "evaluated": 1022
+    },
+    "cq": {
+     "times": [
+      2.034,
+      2.057,
+      2.087,
+      2.065,
+      2.042
+     ],
+     "finished": true,
+     "n": 100,
+     "protocol": "warm-up + REPS"
+    },
+    "pso": {
+     "times": [
+      1.486,
+      1.477,
+      1.526,
+      1.481,
+      1.464
+     ],
+     "finished": true,
+     "n": 100,
+     "protocol": "warm-up + REPS"
+    }
+   },
+   "compare": {
+    "uhucpm0_equals_cq": true,
+    "uhucpm_equals_noprune": true,
+    "uhucpm_equals_meanbound": true
+   }
+  }
+ }
+}
