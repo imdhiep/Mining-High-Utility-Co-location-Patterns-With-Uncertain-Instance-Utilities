@@ -14,8 +14,11 @@ highest true score, and gamma is the K-th largest true score; every method is ju
 All three use the same normalizer Z, so a pattern is reported by each when its total reaches gamma * Z.
 Usage:
   python acc.py LAYOUT VARY VALUES SEEDS        LAYOUT in NYC, TKY, Philadelphia, New_Orleans, Tampa
-     VARY in K, d, k, frac, c, sd               VALUES comma-separated, SEEDS = number of seeds
-  defaults K = 100, d = 50, k = 20, frac = 1, c = 1, sd = 1 (lognormal truth); env NCHK (default 3), YELP_DIR, REVIEW_DIR
+     VARY in K, d, k, frac, c, sd, law          VALUES comma-separated, SEEDS = number of seeds
+  defaults K = 100, d = 50, k = 20, frac = 1, c = 1, sd = 1, law = lognormal; env KS (thresholds when VARY is not K,
+  default 100), NCHK (default 3), YELP_DIR, REVIEW_DIR
+  law: lognormal (normal log-rates), gamma (log of a Gamma rate with the same log-mean and log-sd) or mixture (two
+  components, 30% of the venues 1.5 standard deviations higher), as in the calibration of the paper
 -> out_acc/acc_<LAYOUT>_<VARY>.json, written after every seed"""
 import sys, os, json, time, functools, subprocess
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.dirname(HERE))
@@ -29,8 +32,8 @@ ALPHA = [chr(c) for c in range(65, 91)] + [chr(c) for c in range(97, 123)] + [ch
 CQ = os.path.join(paths.PSOMUCP_DIR, "HUCPM", "CQ-HUCPM.py"); PSO = os.path.join(paths.PSOMUCP_DIR, "HUCPM", "PSO-MUCP.py")
 OUT = "out_acc"; os.makedirs(OUT, exist_ok=True)
 layout, vary, vals, NS = sys.argv[1], sys.argv[2], sys.argv[3].split(","), int(sys.argv[4])
-DEF = dict(K=100, d=50.0, k=20, frac=1.0, c=1.0, sd=1.0)
-cast = dict(K=int, d=float, k=int, frac=float, c=float, sd=float)
+DEF = dict(K=100, d=50.0, k=20, frac=1.0, c=1.0, sd=1.0, law="lognormal")
+cast = dict(K=int, d=float, k=int, frac=float, c=float, sd=float, law=str)
 vals = [cast[vary](v) for v in vals]
 _cache = {}
 
@@ -136,7 +139,7 @@ def key(p): return "".join(sorted(p))
 res = dict(layout=layout, vary=vary, values=vals, defaults=DEF, z=ZS, B=B, nchk=NCHK, runs={})
 path = os.path.join(OUT, f"acc_{layout}_{vary}.json")
 settings = [dict(DEF, **{vary: v}) for v in vals] if vary != "K" else [dict(DEF)]
-Ks = vals if vary == "K" else [DEF["K"]]
+Ks = vals if vary == "K" else [int(x) for x in os.environ.get("KS", str(DEF["K"])).split(",")]
 for st in settings:
     F0, XY0, W, loc, scl, order = load_layout(st["k"])
     tagv = st[vary] if vary != "K" else "all"
@@ -146,7 +149,13 @@ for st in settings:
         sel = np.sort(rng.choice(len(F0), int(round(st["frac"] * len(F0))), replace=False)) if st["frac"] < 1 else np.arange(len(F0))
         F, XY = F0[sel], XY0[sel]; n = len(F)
         base = base_full if base_full is not None else Problem(F, XY, np.zeros(n), np.ones(n), st["d"], 0.0, feat_names=ALPHA[:len(order)])
-        lt = loc[F] + st["sd"] * scl[F] * rng.normal(size=n)                     # lognormal truth
+        s_ = st["sd"] * scl[F]
+        if st["law"] == "gamma":
+            kk = 1.0 / np.maximum(s_ ** 2, 1e-3); lt = np.log(rng.gamma(kk, 1.0)) - digamma(kk) + loc[F]
+        elif st["law"] == "mixture":
+            hi_ = rng.random(n) < 0.3; lt = rng.normal(loc[F] - 0.45 * s_ + hi_ * 1.5 * s_, 0.7 * s_)
+        else:
+            lt = loc[F] + s_ * rng.normal(size=n)
         ut = lt - np.array([momc_true(np.exp(lt[F == j])) if (F == j).any() else 0.0 for j in range(len(order))])[F]
         E = W * st["c"]; cnt = rng.poisson(np.exp(lt) * E).astype(float)
         mu, s2, Z, G = posterior(cnt, F, E); UB = boot(cnt, F, E, G, np.random.default_rng(seed))
@@ -188,7 +197,8 @@ for st in settings:
             def fd(S): k_ = len(S); return dict(n=k_, fdp=round(1 - len(S & T) / k_, 4) if k_ else 0.0, det=round(len(S & T) / len(T), 4))
             rec = dict(nT=len(T), gamma=float(g), uhucpm=fd(S_u), cq=fd(S_cq), pso=fd(S_pso), pso_exact_fl=fd(S_fl),
                        pso_missed=len(S_fl - S_pso), cq_check=chk, pso_seconds=t_pso, n=n, sec=round(time.time() - t0, 1))
-            res["runs"][f"{st[vary] if vary != 'K' else K}|{seed}"] = rec
+            rk = f"{K}|{seed}" if vary == "K" else (f"{st[vary]}|{seed}" if len(Ks) == 1 else f"{st[vary]}|{K}|{seed}")
+            res["runs"][rk] = rec
             print(layout, vary, st[vary] if vary != "K" else K, seed, json.dumps({m: rec[m] for m in ("uhucpm", "cq", "pso")}), chk, flush=True)
         for fn in (csvp, uj): os.remove(fn)
         json.dump(res, open(path, "w"), indent=1)

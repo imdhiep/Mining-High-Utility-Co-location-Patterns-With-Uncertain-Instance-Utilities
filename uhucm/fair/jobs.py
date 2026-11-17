@@ -166,3 +166,14 @@ for (L, k, d, f), Ks in sorted(BENCH.items()):
     inp, env, aft = _src(L)
     job(f"bench_{L}_k{k}_d{d}_f{int(round(100 * f))}", "ext/bench.py", [L, str(k), str(d), str(f)] + [str(K) for K in sorted(Ks)],
         env, inp + PSO + CQS, after=aft, exclusive=True, group="bench", subdirs=["out_bench"], deps=EXT)
+
+# the three laws of the true log-rates at K = 100, 300, 1000 (main table of VI-B), hold rates of the three methods on
+# the 13 real datasets, and the rating simulator with the three methods
+for L in ("Philadelphia", "NYC"):
+    inp, env, aft = _src(L)
+    job(f"acc_{L}_law", "ext/acc.py", [L, "law", "lognormal,gamma,mixture", SEMI_SEEDS], {**env, "KS": "100,300,1000"},
+        inp + PSO + CQS, after=aft, group="acc", subdirs=["out_acc"], deps=EXT)
+for L in ["NYC", "TKY"] + [c.replace(" ", "_") for c in YCITIES]:
+    inp, env, aft = _src(L)
+    job(f"hold_{L}", "ext/hold.py", [L], env, inp + PSO, after=aft, group="hold", subdirs=["out_hold"], deps=EXT)
+job("rsim", "ext/rsim.py", ["100"], inputs=PSO + CQS, group="rsim", subdirs=["out_rsim"], deps=EXT)
