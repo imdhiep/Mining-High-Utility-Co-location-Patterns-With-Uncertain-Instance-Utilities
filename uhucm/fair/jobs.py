@@ -194,3 +194,8 @@ for L in ("NYC", "TKY"):                                    # Foursquare: diagno
     inp, env, aft = _src(L)
     job(f"diag_{L}", "ext/diag_acc.py", [L, SEMI_SEEDS], env, inp + PSO, after=aft, group="diag", subdirs=["out_diag"], deps=EXT)
     job(f"holdcurve_{L}", "ext/hold_curve.py", [L], env, inp + PSO, after=aft, group="diag", subdirs=["out_hold"], deps=EXT)
+# New York at k = 40 alone (the 12 h session stopped acc_NYC_k after two seeds); CQ-HUCPM does not finish there, so the
+# authors' code is not run
+inp, env, aft = _src("NYC")
+job("acc_NYC_k40", "ext/acc.py", ["NYC", "k", "40", SEMI_SEEDS], {**env, "NCHK": "0"}, inp + PSO + CQS, after=aft, group="acc",
+    subdirs=["out_acc"], deps=EXT)
