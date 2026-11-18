@@ -140,4 +140,7 @@ for seed in range(NS):
                               pso_feature_mean_mu=fv, pso_feature_mean_true=ftv, mean_s2=round(float(s2.mean()), 4), median_count=float(np.median(cnt)))
     print(seed, json.dumps(dict(Z_over_Zt=round(Z / Zt, 3), cal=cal, margin=bins, bfdr=bf, pso_topK=pso_top)), flush=True)
     json.dump(res, open(os.path.join(OUT, f"diag_{layout}.json"), "w"), indent=1)
+    cmp_ = {k: {"curves": v.get("curves"), "calibration": {"VT": v["calibration"]["VT"]} if "calibration" in v else None}
+            for k, v in res["seeds"].items() if isinstance(v, dict) and "curves" in v}
+    json.dump(dict(layout=layout, seeds=cmp_), open(os.path.join(OUT, f"diag_{layout}_c.json"), "w"), separators=(",", ":"))  # compact copy: curves and V_T calibration only
 print("DONE")
