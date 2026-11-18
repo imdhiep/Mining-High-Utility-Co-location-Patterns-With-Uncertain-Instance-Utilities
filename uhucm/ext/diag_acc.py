@@ -32,7 +32,7 @@ F0, XY0, W, loc, scl, order = g_["load_layout"](20)
 base = Problem(F0, XY0, np.zeros(len(F0)), np.ones(len(F0)), 50.0, 0.0, feat_names=g_["ALPHA"][:len(order)])
 QGRID = [0.01, 0.025, 0.05, 0.1, 0.2]
 ZGRID = [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.645, 2.0, 2.5]; MGRID = [1.0, 1.1, 1.2, 1.3, 1.5, 1.75, 2.0, 2.5, 3.0]
-MINCNT = [2, 5, 10]; FGRID = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0]
+MINCNT = [int(x) for x in os.environ.get("MINCNT", "2,5,10").split(",")]; FGRID = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0]
 res = dict(layout=layout, K=K, seeds={})
 for seed in range(NS):
     rng = np.random.default_rng(1000 + seed); F, XY, n = F0, XY0, len(F0)
