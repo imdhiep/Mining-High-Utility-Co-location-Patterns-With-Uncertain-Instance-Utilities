@@ -1,0 +1,5 @@
+{"source":"uhucpm-bench-tky v2 (commit fc867c3, smoothed prior), Kaggle, K=100, k=20, d=50 m, z=1.645, warm-up + 5 runs (CQ: single run when the first run exceeds 600 s), cap 7200 s; median wall time in seconds; n = patterns reported",
+"rows":{"f25":{"n_inst":7444,"gamma":0.002220908799228134,"uhucpm":[0.502,39],"uhucpm0":[0.514,100],"noprune":0.488,"meanbound":0.519,"cq":2.031,"pso":1.643,"uhucpm0_equals_cq":true,"uhucpm_equals_noprune":true},
+"f50":{"n_inst":14887,"gamma":0.004868797154251142,"uhucpm":[1.031,45],"uhucpm0":[1.061,100],"noprune":1.136,"meanbound":1.051,"cq":163.253,"pso":10.721,"uhucpm0_equals_cq":true,"uhucpm_equals_noprune":true},
+"f75":{"n_inst":22330,"gamma":0.006986195430921069,"uhucpm":[2.203,52],"uhucpm0":[2.139,100],"noprune":2.512,"meanbound":2.172,"cq":2139.539,"cq_protocol":"single run","pso":38.125,"uhucpm0_equals_cq":true,"uhucpm_equals_noprune":true},
+"f100":{"n_inst":29774,"gamma":0.011459869469436968,"uhucpm":[4.349,53],"uhucpm0":[4.546,100],"noprune":5.979,"meanbound":4.419,"cq":null,"cq_note":"did not finish within 7200 s","pso":132.124,"uhucpm_equals_noprune":true}}}
