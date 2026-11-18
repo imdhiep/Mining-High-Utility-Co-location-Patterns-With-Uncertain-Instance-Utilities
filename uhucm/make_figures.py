@@ -366,8 +366,12 @@ def fig_case_ceb():
     mu = np.array([r["mu"] for r in rows]); s2 = np.array([r["s2"] for r in rows])
     P0 = Problem(F, XY, mu, s2, 50.0, 0.0, feat_names=names); P0.set_boot(UB, Zh)
     P1 = Problem(F, XY, mu, s2, 50.0, 1.645, feat_names=names); P1.set_boot(UB, Zh)
-    muK = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "out_suite_ceb", "suite_CEB_NYC.json")))
-    muK = [x for x in muK["quality"] if x["K"] == 300][0]["mu"]
+    m = 0.05                                                  # gamma at K = 300: the 300th largest point score
+    while True:
+        R = mine(P0, m)[0]
+        if len(R) >= 300 or m < 1e-12: break
+        m /= 2
+    muK = sorted(R.values(), reverse=True)[299]
     R0 = mine(P0, muK)[0]; R1 = mine(P1, muK)[0]
     rej = sorted(set(R0) - set(R1), key=lambda p: -R0[p]); kept = sorted(set(R1), key=lambda p: -R1[p])
     pr = rej[0]
