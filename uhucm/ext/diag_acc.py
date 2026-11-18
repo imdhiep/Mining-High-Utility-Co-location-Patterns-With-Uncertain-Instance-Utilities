@@ -9,6 +9,9 @@ For each seed of the default setting on one layout it records, over the patterns
   curves        FDP and detection of the lower-bound rule for z in a grid, and of the point rule with threshold m*gamma for m in a grid
   bfdr          posterior expected FDP rule: with p = Pr(true score >= gamma) = Phi((M - gamma Z) / sqrt(V_T)), report the
                 largest set of patterns with the highest p whose mean of (1 - p) is at most q, for q in a grid
+  error split   (true total - M) = instance part (true log-rate minus posterior mean, summed) + center part (estimated minus
+                true center, summed); each part scaled by its own variance (sum of sigma^2, bootstrap part of V_T), and the
+                center error of each feature divided by its bootstrap sd (Poisson redraws of the counts)
   pso           feature means of the posterior means (the utilities PSO-MUCP receives) and of the true utilities, and FDP and
                 detection of the K patterns with the highest feature-level score (PSO-MUCP ranked by its own score)
 Usage: python diag_acc.py LAYOUT SEEDS [K]     -> out_diag/diag_<LAYOUT>.json"""
@@ -49,6 +52,18 @@ for seed in range(NS):
     for nm, V in (("VT", VT), ("sum_s2", Vs)):
         zr = (TT - M) / np.sqrt(V)
         cal[nm] = dict(mean=round(float(zr.mean()), 3), sd=round(float(zr.std()), 3), coverage=round(float((TT >= M - 1.645 * np.sqrt(V)).mean()), 4))
+    # split of the error TT - M into the instance part (log-rate minus posterior mean) and the center part
+    pm = mu + chat[F]; cerr = chat - ctrue
+    EI = np.array([(lt[a] - pm[a]).sum() for a in A]); EC = np.array([cerr[F[a]].sum() for a in A]); VB = VT - Vs
+    zi = EI / np.sqrt(Vs); zc = EC / np.sqrt(np.maximum(VB, 1e-12))
+    cal["instance"] = dict(mean=round(float(zi.mean()), 3), sd=round(float(zi.std()), 3))
+    cal["center"] = dict(mean=round(float(zc.mean()), 3), sd=round(float(zc.std()), 3), share_var=round(float(EC.var() / max((TT - M).var(), 1e-12)), 3))
+    bsd = []
+    brng = np.random.default_rng(10_000 + seed)
+    for j in range(len(order)):
+        x = cnt[F == j]; bsd.append(float(np.std([g_["momc"](brng.poisson(x).astype(float), W) for _ in range(50)])))
+    cal["center_z_by_feature"] = [round(float(e / max(b, 1e-9)), 2) for e, b in zip(cerr, bsd)]
+    cal["n_by_feature"] = [int((F == j).sum()) for j in range(len(order))]
     inT = np.array([p in T for p in pats])
 
     def fd(sel):
@@ -69,8 +84,11 @@ for seed in range(NS):
         bf.append([q] + fd(sel) + [round(float(efdp[ok[-1]]), 4) if len(ok) else 0.0])
     curves["bfdr"] = bf
     fmu = np.array([mu[F == j].mean() for j in range(len(order))])
-    Pf = g_["with_values"](base, fmu[F], np.zeros(n)); Rf, scf = g_["topk"](Pf, K)
-    Sf = set(sorted(Rf, key=lambda p: -Rf[p])[:K]); tpf = len(Sf & T)
+    if (fmu > 0).any():
+        Pf = g_["with_values"](base, fmu[F], np.zeros(n)); Rf, scf = g_["topk"](Pf, K)
+        Sf = set(sorted(Rf, key=lambda p: -Rf[p])[:K])
+    else: Sf = set()
+    tpf = len(Sf & T)
     pso_top = dict(n=len(Sf), fdp=round(1 - tpf / len(Sf), 4) if Sf else 0.0, det=round(tpf / len(T), 4))
     fv = [round(float(mu[F == j].mean()), 4) for j in range(len(order))]; ftv = [round(float(ut[F == j].mean()), 4) for j in range(len(order))]
     res["seeds"][seed] = dict(nT=len(T), npool=len(pats), Z=Z, Zt=Zt, Z_over_Zt=round(Z / Zt, 4),
