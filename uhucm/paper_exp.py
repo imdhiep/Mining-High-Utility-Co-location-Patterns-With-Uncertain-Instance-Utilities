@@ -117,9 +117,17 @@ def fig_tradeoff():
            "NYC": fsq["diag"]["NYC"], "TKY": fsq["diag"]["TKY"]}
     bf = {"Philadelphia": yelp["diag"]["Philadelphia"]["bfdr"], "Tampa": yelp["diag"]["Tampa"]["bfdr"],
           "NYC": fsq["diag"]["NYC"]["bfdr"], "TKY": fsq["diag"]["TKY"]["bfdr"]}
+    orc = {}
+    if os.path.exists(os.path.join(S, "diag_oracle.json")):              # runs with the oracle and minimum-count curves
+        for L, v in J("diag_oracle.json")["layouts"].items():
+            cur[L] = v["curves"]; bf[L] = v["curves"]["bfdr"]; orc[L] = v["curves"]
+    else: print("missing diag_oracle.json")
     fig, axes = plt.subplots(1, 4, figsize=(W2, 1.9)); caps = []
     for ax, (L, c) in zip(axes, cur.items()):
         lb, pt = np.array(c["lb"]), np.array(c["point"])
+        if L in orc:
+            ob = np.array(orc[L]["oracle_bfdr"])
+            ax.plot(ob[:, 2], ob[:, 1], color=fs.GRAY, marker="x", ms=2.5, lw=1.0, ls="--", label=r"Oracle posterior, $\delta$ varied")
         ax.plot(lb[:, 2], lb[:, 1], color=COL["uhucpm"], marker="o", ms=2.5, lw=1.0, label="Lower bound, $z$ varied")
         ax.plot(pt[:, 2], pt[:, 1], color=COL["cq"], marker="s", ms=2.5, lw=1.0, label=r"Point score, threshold $m\gamma$ varied")
         zi = [r[0] for r in c["lb"]].index(1.645)
@@ -130,7 +138,11 @@ def fig_tradeoff():
                 color=COL["uhucpm_q05"], ls="none", label=r"UHUCPM-S$_{0.05}$, S$_{0.10}$")
         ax.set_xlabel("Detection", fontsize=7, labelpad=1); ax.set_ylabel("FDP", fontsize=7, labelpad=1); ax.tick_params(labelsize=6)
         caps.append(f"({chr(97 + len(caps))}) {NAME[L]}")
-    h, l = axes[0].get_legend_handles_labels(); fig.subplots_adjust(wspace=0.38, left=0.06, right=0.99, top=0.97)
+    h, l = [], []
+    for ax in axes:                                                      # legend entries of all panels, once each
+        for hh, ll in zip(*ax.get_legend_handles_labels()):
+            if ll not in l: h.append(hh); l.append(ll)
+    fig.subplots_adjust(wspace=0.38, left=0.06, right=0.99, top=0.97)
     fs.finalize(fig, axes, caps, h, l, ncol=3, bottom=0.42, leg_y=0.03, lab_y=0.20, fontsize=6.5)
     save(fig, "fig_tradeoff.pdf")
     # numbers for the text: FDP of the lower-bound rule and of the point rule at matched detection (linear interpolation)
@@ -139,6 +151,11 @@ def fig_tradeoff():
         dz = lb[[r[0] for r in c["lb"]].index(1.0), 2]                      # detection of the lower bound at z = 1
         o = np.argsort(pt[:, 2]); fpt = float(np.interp(dz, pt[o, 2], pt[o, 1]))
         nums[f"tradeoff_{L}"] = dict(det=round(float(dz), 3), fdp_lb=round(float(lb[[r[0] for r in c['lb']].index(1.0), 1]), 3), fdp_point=round(fpt, 3))
+        if L in orc:
+            q5 = lambda rows: [r for r in rows if r[0] == 0.05][0]
+            mins = [r[1] for k in ("min2", "min5", "min10") for r in orc[L][k] if r[3] > 0]
+            nums[f"oracle_{L}"] = dict(ours=q5(orc[L]["bfdr"])[1:3], oracle=q5(orc[L]["oracle_bfdr"])[1:3],
+                                       min_fdp=[round(min(mins), 3), round(max(mins), 3)])
 
 
 # ------------------------------------------------------------------ hold rates at matched size
