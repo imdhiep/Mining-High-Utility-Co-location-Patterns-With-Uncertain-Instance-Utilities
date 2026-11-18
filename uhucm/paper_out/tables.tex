@@ -1,0 +1,81 @@
+%BEGIN-LAW
+\begin{tabular}{@{}llrrrrrrrrrrr@{}}
+\toprule
+ & & & \multicolumn{2}{c}{UHUCPM} & \multicolumn{2}{c}{S$_{0.05}$} & \multicolumn{2}{c}{S$_{0.10}$} & \multicolumn{2}{c}{CQ-HUCPM} & \multicolumn{2}{c}{PSO-MUCP} \\
+\cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11} \cmidrule(lr){12-13}
+City & Law & $K$ & FDP & Det & FDP & Det & FDP & Det & FDP & Det & FDP & Det \\
+\midrule
+Philadelphia & Lognormal & 100 & 0.006 & 0.45 & 0.043 & 0.62 & 0.084 & 0.72 & 0.110 & 0.78 & 0.511 & 0.06 \\
+ &  & 300 & 0.004 & 0.51 & 0.042 & 0.70 & 0.083 & 0.79 & 0.100 & 0.82 & 0.495 & 0.03 \\
+ &  & 1000 & 0.006 & 0.58 & 0.049 & 0.77 & 0.085 & 0.84 & 0.090 & 0.85 & 0.469 & 0.03 \\
+\addlinespace[1pt]
+ & Gamma & 100 & 0.006 & 0.60 & 0.050 & 0.78 & 0.082 & 0.84 & 0.088 & 0.85 & 0.000 & 0.00 \\
+ &  & 300 & 0.008 & 0.68 & 0.058 & 0.84 & 0.084 & 0.89 & 0.084 & 0.89 & 0.000 & 0.00 \\
+ &  & 1000 & 0.008 & 0.72 & 0.052 & 0.89 & 0.067 & 0.91 & 0.067 & 0.91 & 0.000 & 0.00 \\
+\addlinespace[1pt]
+ & Mixture & 100 & 0.008 & 0.44 & 0.042 & 0.61 & 0.067 & 0.72 & 0.100 & 0.77 & 0.100 & 0.00 \\
+ &  & 300 & 0.008 & 0.50 & 0.039 & 0.70 & 0.073 & 0.79 & 0.083 & 0.82 & 0.111 & 0.00 \\
+ &  & 1000 & 0.006 & 0.58 & 0.044 & 0.77 & 0.080 & 0.83 & 0.082 & 0.84 & 0.111 & 0.00 \\
+\midrule
+New York & Lognormal & 100 & -- & -- & -- & -- & -- \\
+ &  & 300 & -- & -- & -- & -- & -- \\
+ &  & 1000 & -- & -- & -- & -- & -- \\
+\addlinespace[1pt]
+ & Gamma & 100 & -- & -- & -- & -- & -- \\
+ &  & 300 & -- & -- & -- & -- & -- \\
+ &  & 1000 & -- & -- & -- & -- & -- \\
+\addlinespace[1pt]
+ & Mixture & 100 & -- & -- & -- & -- & -- \\
+ &  & 300 & -- & -- & -- & -- & -- \\
+ &  & 1000 & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+%END-LAW
+%BEGIN-HOLD
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+City & UHUCPM & CQ-HUCPM & PSO-MUCP \\
+\midrule
+Philadelphia & \textbf{0.97} & \textbf{0.97} & 0.96 \\
+New Orleans & \textbf{1.00} & \textbf{1.00} & \textbf{1.00} \\
+Tampa & \textbf{1.00} & \textbf{1.00} & 0.98 \\
+New York & \textbf{0.98} & 0.95 & 0.61 \\
+Tokyo & \textbf{0.91} & 0.90 & 0.79 \\
+\midrule
+Tucson & \textbf{0.99} & \textbf{0.99} & 0.91 \\
+Indianapolis & \textbf{0.98} & \textbf{0.98} & 0.90 \\
+Nashville & 0.96 & 0.95 & \textbf{0.97} \\
+Reno & \textbf{1.00} & \textbf{1.00} & 0.99 \\
+St. Louis & \textbf{0.99} & \textbf{0.99} & 0.93 \\
+Edmonton & 0.90 & \textbf{0.91} & 0.87 \\
+Santa Barbara & \textbf{0.97} & \textbf{0.97} & 0.96 \\
+Boise & \textbf{1.00} & \textbf{1.00} & 0.91 \\
+\bottomrule
+\end{tabular}
+%END-HOLD
+%BEGIN-TIME
+\begin{tabular}{@{}llrrrrrr@{}}
+\toprule
+City & Value & UHUCPM & $z{=}0$ & No pr. & Mean & CQ & PSO \\
+\midrule
+\multicolumn{8}{@{}l}{\emph{Threshold $K$}} \\
+New Orleans & 100 &  &  &  &  &  &  \\
+ & 300 &  &  &  &  &  &  \\
+ & 1000 &  &  &  &  &  &  \\
+Tampa & 100 &  &  &  &  &  &  \\
+ & 300 &  &  &  &  &  &  \\
+ & 1000 &  &  &  &  &  &  \\
+New York & 100 & 0.81 & 0.81 & 0.87 & 0.82 & 69.85 & 4.80 \\
+ & 300 & 0.87 & 0.87 & 0.86 & 0.88 & 61.52 & 6.87 \\
+ & 1000 & 1.02 & 0.99 & 0.87 & 0.98 & 47.31 & 7.18 \\
+\midrule
+\multicolumn{8}{@{}l}{\emph{Distance $d$ (m)}} \\
+Tampa & 30 &  &  &  &  &  &  \\
+ & 50 &  &  &  &  &  &  \\
+ & 70 &  &  &  &  &  &  \\
+New York & 30 & 0.67 & 0.66 & 0.68 & 0.66 & 6.37 & 2.39 \\
+ & 50 & 0.81 & 0.81 & 0.87 & 0.82 & 69.85 & 4.80 \\
+ & 70 & 1.07 & 1.06 & 1.32 & 1.07 & 615 & 10.62 \\
+\bottomrule
+\end{tabular}
+%END-TIME

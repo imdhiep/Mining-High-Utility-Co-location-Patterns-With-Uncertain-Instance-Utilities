@@ -1,0 +1,44 @@
+{
+ "hold_vs_cq": {
+  "better": 62,
+  "tie": 133,
+  "worse": 11
+ },
+ "hold_vs_pso": {
+  "better": 135,
+  "tie": 56,
+  "worse": 13
+ },
+ "hold_own_uhucpm_gt_cq": [
+  37,
+  37
+ ],
+ "z0_equals_cq": [
+  8,
+  8
+ ],
+ "equals_noprune": [
+  12,
+  12
+ ],
+ "tradeoff_Philadelphia": {
+  "det": 0.561,
+  "fdp_lb": 0.024,
+  "fdp_point": 0.038
+ },
+ "tradeoff_Tampa": {
+  "det": 0.692,
+  "fdp_lb": 0.023,
+  "fdp_point": 0.033
+ },
+ "tradeoff_NYC": {
+  "det": 0.145,
+  "fdp_lb": 0.05,
+  "fdp_point": 0.092
+ },
+ "tradeoff_TKY": {
+  "det": 0.071,
+  "fdp_lb": 0.054,
+  "fdp_point": 0.028
+ }
+}
