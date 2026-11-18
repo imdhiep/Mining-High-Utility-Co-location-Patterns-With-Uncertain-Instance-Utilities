@@ -1,0 +1,528 @@
+{
+"source": "Kaggle uhucpm-bench-nyc v2 and uhucpm-bench-tky v2 (commit fc867c3, smoothed prior), Intel Xeon 2.20 GHz; per program [mean wall seconds, timed runs, patterns reported, nodes evaluated]; null = did not finish",
+"cpu": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+"data": {
+"NYC_k20_d30_f100": {
+"100": {
+"cmp": {
+"uhucpm0_equals_cq": true,
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+0.669,
+5,
+79,
+464
+],
+"uhucpm0": [
+0.662,
+5,
+100,
+487
+],
+"meanbound": [
+0.655,
+5,
+79,
+487
+],
+"noprune": [
+0.681,
+5,
+79,
+1385
+],
+"cq": [
+6.366,
+5,
+100,
+null
+],
+"pso": [
+2.387,
+5,
+100,
+null
+]
+},
+"n": 13932
+},
+"NYC_k20_d50_f100": {
+"100": {
+"cmp": {
+"uhucpm0_equals_cq": true,
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+0.812,
+5,
+67,
+799
+],
+"uhucpm0": [
+0.813,
+5,
+100,
+858
+],
+"meanbound": [
+0.82,
+5,
+67,
+858
+],
+"noprune": [
+0.87,
+5,
+67,
+3481
+],
+"cq": [
+69.848,
+5,
+100,
+null
+],
+"pso": [
+4.799,
+5,
+100,
+null
+]
+},
+"300": {
+"cmp": {
+"uhucpm0_equals_cq": true,
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+0.867,
+5,
+230,
+1298
+],
+"uhucpm0": [
+0.869,
+5,
+300,
+1420
+],
+"meanbound": [
+0.879,
+5,
+230,
+1420
+],
+"noprune": [
+0.865,
+5,
+230,
+3481
+],
+"cq": [
+61.517,
+5,
+300,
+null
+],
+"pso": [
+6.87,
+5,
+295,
+null
+]
+},
+"1000": {
+"cmp": {
+"uhucpm0_equals_cq": true,
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+1.017,
+5,
+524,
+2391
+],
+"uhucpm0": [
+0.986,
+5,
+1000,
+2672
+],
+"meanbound": [
+0.976,
+5,
+524,
+2672
+],
+"noprune": [
+0.871,
+5,
+524,
+3481
+],
+"cq": [
+47.314,
+5,
+1000,
+null
+],
+"pso": [
+7.184,
+5,
+320,
+null
+]
+},
+"n": 13932
+},
+"NYC_k20_d70_f100": {
+"100": {
+"cmp": {
+"uhucpm0_equals_cq": true,
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+1.067,
+5,
+59,
+1449
+],
+"uhucpm0": [
+1.063,
+5,
+100,
+1580
+],
+"meanbound": [
+1.067,
+5,
+59,
+1580
+],
+"noprune": [
+1.32,
+5,
+59,
+8301
+],
+"cq": [
+615.461,
+1,
+100,
+null
+],
+"pso": [
+10.615,
+5,
+100,
+null
+]
+},
+"n": 13932
+},
+"NYC_k40_d50_f100": {
+"100": {
+"cmp": {
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+1.471,
+5,
+65,
+2666
+],
+"uhucpm0": [
+1.466,
+5,
+100,
+2940
+],
+"meanbound": [
+1.516,
+5,
+65,
+2940
+],
+"noprune": [
+3.076,
+5,
+65,
+29381
+],
+"cq": null,
+"pso": [
+50.217,
+5,
+100,
+null
+]
+},
+"n": 19082
+},
+"NYC_k60_d50_f100": {
+"100": {
+"cmp": {
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+2.176,
+5,
+59,
+5096
+],
+"uhucpm0": [
+2.193,
+5,
+100,
+5729
+],
+"meanbound": [
+2.222,
+5,
+59,
+5729
+],
+"noprune": [
+7.221,
+5,
+59,
+74068
+],
+"cq": null,
+"pso": [
+216.828,
+5,
+100,
+null
+]
+},
+"n": 22246
+},
+"NYC_k80_d50_f100": {
+"100": {
+"cmp": {
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+2.718,
+5,
+50,
+6381
+],
+"uhucpm0": [
+2.818,
+5,
+100,
+7081
+],
+"meanbound": [
+2.813,
+5,
+50,
+7081
+],
+"noprune": [
+15.763,
+5,
+50,
+157401
+],
+"cq": null,
+"pso": [
+605.193,
+5,
+100,
+null
+]
+},
+"n": 24291
+},
+"TKY_k20_d50_f25": {
+"100": {
+"cmp": {
+"uhucpm0_equals_cq": true,
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+0.501,
+5,
+39,
+449
+],
+"uhucpm0": [
+0.507,
+5,
+100,
+521
+],
+"meanbound": [
+0.518,
+5,
+39,
+521
+],
+"noprune": [
+0.502,
+5,
+39,
+1022
+],
+"cq": [
+2.042,
+5,
+100,
+null
+],
+"pso": [
+1.648,
+5,
+100,
+null
+]
+},
+"n": 7444
+},
+"TKY_k20_d50_f50": {
+"100": {
+"cmp": {
+"uhucpm0_equals_cq": true,
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+1.034,
+5,
+45,
+1027
+],
+"uhucpm0": [
+1.059,
+5,
+100,
+1144
+],
+"meanbound": [
+1.058,
+5,
+45,
+1144
+],
+"noprune": [
+1.136,
+5,
+45,
+5044
+],
+"cq": [
+163.857,
+5,
+100,
+null
+],
+"pso": [
+10.723,
+5,
+100,
+null
+]
+},
+"n": 14887
+},
+"TKY_k20_d50_f75": {
+"100": {
+"cmp": {
+"uhucpm0_equals_cq": true,
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+2.221,
+5,
+52,
+1526
+],
+"uhucpm0": [
+2.189,
+5,
+100,
+1679
+],
+"meanbound": [
+2.158,
+5,
+52,
+1679
+],
+"noprune": [
+2.558,
+5,
+52,
+13140
+],
+"cq": [
+2139.539,
+1,
+100,
+null
+],
+"pso": [
+38.142,
+5,
+100,
+null
+]
+},
+"n": 22330
+},
+"TKY_k20_d50_f100": {
+"100": {
+"cmp": {
+"uhucpm_equals_noprune": true,
+"uhucpm_equals_meanbound": true
+},
+"uhucpm": [
+4.377,
+5,
+53,
+1846
+],
+"uhucpm0": [
+4.546,
+5,
+100,
+2001
+],
+"meanbound": [
+4.512,
+5,
+53,
+2001
+],
+"noprune": [
+6.025,
+5,
+53,
+33376
+],
+"cq": null,
+"pso": [
+131.979,
+5,
+100,
+null
+]
+},
+"n": 29774
+}
+}
+}
