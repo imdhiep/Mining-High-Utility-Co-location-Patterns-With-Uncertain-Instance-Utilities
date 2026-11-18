@@ -1,7 +1,11 @@
 """Compound empirical Bayes posteriors for count evidence (Section IV-A).
 
 For every feature f, counts x_o | lambda_o ~ Poisson(lambda_o * E).  The prior of theta = ln(lambda) is the NPMLE of
-Kiefer and Wolfowitz on a grid (EM); the utility is u(o) = theta_o - c_f with the moment center
+Kiefer and Wolfowitz on a grid (EM), smoothed by a Gaussian kernel (Gu and Koenker, Econometrica 2023, Sec. 6.3) with the
+bandwidth 0.9 sd n^(-1/5) of the prior; the NPMLE itself has a few atoms, and without smoothing the posterior of an
+instance with many events sits on one atom, so its variance is close to zero.  Posteriors of instances whose likelihood is
+narrower than the grid (sd 1/sqrt(x + 0.5) below five grid steps) are computed on a local grid of 201 points around
+ln((x + 0.5) / E), with the smoothed prior density interpolated; the utility is u(o) = theta_o - c_f with the moment center
 c_f = 2 ln m - 0.5 ln s (m, s: first and second moments of the rates, estimated by factorial moments of the counts).
 Returned per instance: posterior mean and variance of u(o), and E[u(o)^+] (expected normalizer).
 `cboot` returns the conditional (compound) bootstrap matrix: counts redrawn x* ~ Poisson(x) with the instances kept,
@@ -55,6 +59,38 @@ def _em(L, w, iters):
     return w
 
 
+def smooth_prior(th, w, n):
+    """Gaussian-kernel smoothing of the grid prior w with bandwidth 0.9 * sd(prior) * n^(-1/5)."""
+    m = w @ th; sd = np.sqrt(max(w @ th ** 2 - m * m, 1e-12)); h = 0.9 * sd * n ** (-0.2)
+    if h <= 0.5 * (th[1] - th[0]): return w
+    K = np.exp(-0.5 * ((th[:, None] - th[None, :]) / h) ** 2); ws = K @ w
+    return ws / ws.sum()
+
+
+LOCAL_PTS, LOCAL_SD, LOCAL_STEPS = 201, 7.0, 5.0
+
+
+def post_moments(x, E, th, w, t=0, L=None):
+    """Posterior mean, variance and the posterior (on the global grid) of theta for counts x under the grid prior w;
+    instances with a likelihood narrower than LOCAL_STEPS grid steps get mean and variance from a local fine grid.
+    Returns mm, vv, post (rows of the sharp instances are set to the nearest global grid point for E[(theta-c)+]), loc
+    where loc = (indices, local grids, local posteriors) for the sharp instances."""
+    x = np.asarray(x, float)
+    if L is None: L = _lik(x, th, E, t)
+    post = L * w; post /= post.sum(1, keepdims=True); mm = post @ th; vv = np.maximum(post @ th ** 2 - mm ** 2, 1e-12)
+    h = th[1] - th[0]; sd = 1.0 / np.sqrt(x + 0.5); sh = np.nonzero(sd < LOCAL_STEPS * h)[0]
+    loc = (sh, None, None)
+    if len(sh):
+        lg = np.log(np.maximum(w, 1e-300)); xs = x[sh]
+        tl = np.log((xs + 0.5) / E)[:, None] + sd[sh][:, None] * np.linspace(-LOCAL_SD, LOCAL_SD, LOCAL_PTS)[None, :]
+        ll = xs[:, None] * tl - E * np.exp(tl) + np.interp(tl, th, lg)
+        if t > 0: ll = ll - np.log(np.maximum(poisson.sf(t - 1, E * np.exp(tl)), 1e-300))
+        q = np.exp(ll - ll.max(1, keepdims=True)); q /= q.sum(1, keepdims=True)
+        m2 = (q * tl).sum(1); mm[sh] = m2; vv[sh] = np.maximum((q * tl * tl).sum(1) - m2 * m2, 1e-12)
+        loc = (sh, tl, q)
+    return mm, vv, post, loc
+
+
 def ceb_posterior(counts, E, F, J=300, iters=300, t=0):
     """Returns mu, s2, ep (arrays over instances) and a state dict for cboot.  t > 0: counts observed only when >= t
     (zero-truncated for t = 1); the center is then the moment center of the estimated prior."""
@@ -63,9 +99,12 @@ def ceb_posterior(counts, E, F, J=300, iters=300, t=0):
     for f in np.unique(F):
         idx = np.nonzero(F == f)[0]; x = counts[idx]
         th = _grid(x, E, J); L = _lik(x, th, E, t); w = _em(L, np.full(J, 1.0 / J), iters)
-        post = L * w; post /= post.sum(1, keepdims=True)
-        c = moment_center(x, E) if t == 0 else plugin_center(th, w); mm = post @ th
-        mu[idx] = mm - c; s2[idx] = np.maximum(post @ th ** 2 - mm ** 2, 1e-12); ep[idx] = post @ np.clip(th - c, 0, None)
+        ws = smooth_prior(th, w, len(x))
+        c = moment_center(x, E) if t == 0 else plugin_center(th, w)
+        mm, vv, post, (sh, tl, q) = post_moments(x, E, th, ws, t, L)
+        e = post @ np.clip(th - c, 0, None)
+        if len(sh): e[sh] = (q * np.clip(tl - c, 0, None)).sum(1)
+        mu[idx] = mm - c; s2[idx] = vv; ep[idx] = e
         state[f] = (idx, th, L, w, c, t)
     return mu, s2, ep, state
 
@@ -82,8 +121,8 @@ def cboot(counts, E, state, B=20, iters=40, seed=0):
             while t > 0 and (xb < t).any():                       # redraw below the inclusion threshold
                 bad = xb < t; xb[bad] = rng.poisson(x[bad])
             Lb = _lik(xb, th, E, t); w = _em(Lb, w0.copy(), iters)
-            post = L * w; post /= post.sum(1, keepdims=True)
-            U[b, idx] = post @ th - (moment_center(xb, E) if t == 0 else plugin_center(th, w))
+            mm = post_moments(x, E, th, smooth_prior(th, w, len(x)), t, L)[0]
+            U[b, idx] = mm - (moment_center(xb, E) if t == 0 else plugin_center(th, w))
     return U
 
 

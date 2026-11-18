@@ -190,3 +190,7 @@ for L in ("Philadelphia", "New_Orleans", "Tampa"):
 for L in [c.replace(" ", "_") for c in YCITIES]:
     inp, env, aft = _src(L)
     job(f"holdcurve_{L}", "ext/hold_curve.py", [L], env, inp + PSO, after=aft, group="diag", subdirs=["out_hold"], deps=EXT)
+for L in ("NYC", "TKY"):                                    # Foursquare: diagnostics and matched-size hold rates
+    inp, env, aft = _src(L)
+    job(f"diag_{L}", "ext/diag_acc.py", [L, SEMI_SEEDS], env, inp + PSO, after=aft, group="diag", subdirs=["out_diag"], deps=EXT)
+    job(f"holdcurve_{L}", "ext/hold_curve.py", [L], env, inp + PSO, after=aft, group="diag", subdirs=["out_hold"], deps=EXT)

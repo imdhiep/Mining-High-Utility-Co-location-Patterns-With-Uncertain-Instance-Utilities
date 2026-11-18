@@ -5,12 +5,17 @@ per feature from a law fitted to the real counts, counts are drawn from Poisson(
 the true utility is the log-rate minus the moment center of the drawn rates. The true patterns are the K patterns with the
 highest true score, and gamma is the K-th largest true score; every method is judged at this gamma.
   uhucpm  lower bound at z* = 1.645 with V_T (B = 20) and the expected normalizer, posterior of Definition (count utility)
+  uhucpm_q05, uhucpm_q10  the set rule: among the patterns whose point score reaches gamma, the largest set with the highest
+          p = Pr(score >= gamma) = Phi((M - gamma Z) / sqrt(V_T)) whose mean of (1 - p) is at most q (q = 0.05, 0.10)
   cq      the authors' CQ-HUCPM at z = 0 with the posterior means as instance utilities. Its answer set equals the point
           answer of the same search (exact miner); the point set is used for every seed and the authors' code is run on
           the first NCHK seeds of each setting, recording whether the sets agree
   pso     the authors' PSO-MUCP at z = 0 with one utility per feature (the mean posterior mean of the feature), run on
           every seed; its pruning is not exact, so its own output is used. When no feature has a positive utility, no
           pattern can reach gamma and its answer is empty (the program is not run, as it would divide by zero)
+  pso_topk  the authors' PSO-MUCP run at the K-th largest feature-level score (its own ranking), so that it reports about
+          K patterns whatever the level of the feature means; when fewer than K patterns have a positive feature-level
+          score, the smallest positive score is used
 All three use the same normalizer Z, so a pattern is reported by each when its total reaches gamma * Z.
 Usage:
   python acc.py LAYOUT VARY VALUES SEEDS        LAYOUT in NYC, TKY, Philadelphia, New_Orleans, Tampa
@@ -26,6 +31,7 @@ import numpy as np
 from scipy.special import digamma, gammaln
 import paths
 from fastmine import Problem, mine, pattern_atoms
+from ceb import ceb_posterior, cboot, bfdr_select
 
 ZS = 1.645; B = 20; NCHK = int(os.environ.get("NCHK", "3"))
 ALPHA = [chr(c) for c in range(65, 91)] + [chr(c) for c in range(97, 123)] + [chr(0x4E00 + i) for i in range(200)]
@@ -79,35 +85,16 @@ def momc_true(lam):
     m = lam.mean(); v = lam.var(); return float(np.log(m) - 0.5 * np.log1p(v / (m * m)))
 
 
-def posterior(cnt, F, E, J=300, iters=300):
-    """NPMLE prior per feature on a grid of log-rates, moment center, posterior mean / variance and E[u+]"""
-    n = len(cnt); m = np.zeros(n); v = np.zeros(n); ep = np.zeros(n); G = {}
-    for j in np.unique(F):
-        idx = np.nonzero(F == j)[0]; x = cnt[idx]
-        lo = np.log((x.min() + 0.5) / E) - 2; hi = np.log((x.max() + 0.5) / E) + 1
-        th = np.linspace(lo, hi, J); ll = x[:, None] * th[None, :] - E * np.exp(th)[None, :] - gammaln(x + 1)[:, None]
-        L = np.exp(ll - ll.max(1, keepdims=True)); w = np.full(J, 1.0 / J)
-        for _ in range(iters):
-            post = L * w; post /= post.sum(1, keepdims=True); w = np.maximum(post.mean(0), 1e-300)
-        post = L * w; post /= post.sum(1, keepdims=True); c = momc(x, E)
-        mm = post @ th; m[idx] = mm - c; v[idx] = np.maximum(post @ th ** 2 - mm ** 2, 1e-12)
-        ep[idx] = post @ np.clip(th - c, 0, None); G[j] = (th, L, w)
-    return m, v, float(ep.sum()), G
+def posterior(cnt, F, E):
+    """posterior of Definition (count utility) from ceb.py: smoothed NPMLE prior per feature, moment center; returns
+    posterior means and variances of u, the expected normalizer sum E[u+] and the state for the bootstrap"""
+    mu, s2, ep, st = ceb_posterior(cnt, E, F, t=0)
+    return mu, s2, float(ep.sum()), st
 
 
-def boot(cnt, F, E, G, rng, iters=40):
-    """V_T: counts redrawn from Poisson(x), venues fixed; prior and center estimated again; posterior means of the observed x"""
-    U = np.zeros((B, len(cnt)))
-    for j, (th, L, w0) in G.items():
-        idx = np.nonzero(F == j)[0]; x = cnt[idx]
-        for b in range(B):
-            xb = rng.poisson(x).astype(float)
-            llb = xb[:, None] * th[None, :] - E * np.exp(th)[None, :]; Lb = np.exp(llb - llb.max(1, keepdims=True)); w = w0.copy()
-            for _ in range(iters):
-                post = Lb * w; post /= post.sum(1, keepdims=True); w = np.maximum(post.mean(0), 1e-300)
-            post = L * w; post /= post.sum(1, keepdims=True)
-            U[b, idx] = post @ th - (momc(xb, E) if xb.sum() > 0 else 0.0)
-    return U
+def boot(cnt, F, E, G, rng):
+    """V_T: counts redrawn from Poisson(x), venues fixed; prior and center estimated again (ceb.cboot)"""
+    return cboot(cnt, E, G, B=B, seed=int(rng.integers(2 ** 31)))
 
 
 def with_values(base, mu, s2, Z=None):
@@ -191,17 +178,29 @@ for st in settings:
             else:                                                 # no feature has a positive utility: no pattern reaches gamma
                 S_pso, t_pso = set(), None
             S_fl = {key(p) for p, v in mine(Pf, g * (1 - 1e-12))[0].items()}  # exact feature-level answer, for reference
+            S_q = {}
+            for q in (0.05, 0.10):
+                selq = bfdr_select(M, V, g * Z, q)[0] if len(pool) else np.zeros(0, bool)
+                S_q[q] = {key(p) for p, s_ in zip(pool, selq) if s_}
+            S_pk, t_pk, n_pk_exact = set(), None, 0
+            if Ufl > 0:
+                Rf, scf = topk(Pf, K); n_pk_exact = min(K, len(scf))
+                if scf:
+                    tk = scf[min(K, len(scf)) - 1]
+                    S_pk, t_pk = ext([os.path.join(HERE, "run_pso.py"), PSO, csvp, util_fl, repr(float(tk * Z / Ufl * (1 - 1e-9))), str(st["d"])])
             chk = None
             if seed < NCHK:
                 S_cq_ext, t_cq = ext([os.path.join(HERE, "run_cq.py"), CQ, csvp, uj, repr(float(g * Z / Upos * (1 - 1e-9))), str(st["d"])])
                 chk = dict(equal=S_cq_ext == S_cq, n_ext=len(S_cq_ext), seconds=t_cq)
 
             def fd(S): k_ = len(S); return dict(n=k_, fdp=round(1 - len(S & T) / k_, 4) if k_ else 0.0, det=round(len(S & T) / len(T), 4))
-            rec = dict(nT=len(T), gamma=float(g), uhucpm=fd(S_u), cq=fd(S_cq), pso=fd(S_pso), pso_exact_fl=fd(S_fl),
-                       pso_missed=len(S_fl - S_pso), cq_check=chk, pso_seconds=t_pso, n=n, sec=round(time.time() - t0, 1))
+            rec = dict(nT=len(T), gamma=float(g), uhucpm=fd(S_u), uhucpm_q05=fd(S_q[0.05]), uhucpm_q10=fd(S_q[0.10]), cq=fd(S_cq),
+                       pso=fd(S_pso), pso_topk=fd(S_pk), pso_topk_exact_n=n_pk_exact, pso_exact_fl=fd(S_fl),
+                       pso_missed=len(S_fl - S_pso), cq_check=chk, pso_seconds=t_pso, pso_topk_seconds=t_pk, n=n,
+                       sec=round(time.time() - t0, 1))
             rk = f"{K}|{seed}" if vary == "K" else (f"{st[vary]}|{seed}" if len(Ks) == 1 else f"{st[vary]}|{K}|{seed}")
             res["runs"][rk] = rec
-            print(layout, vary, st[vary] if vary != "K" else K, seed, json.dumps({m: rec[m] for m in ("uhucpm", "cq", "pso")}), chk, flush=True)
+            print(layout, vary, st[vary] if vary != "K" else K, seed, json.dumps({m: rec[m] for m in ("uhucpm", "uhucpm_q05", "cq", "pso_topk")}), chk, flush=True)
         for fn in (csvp, uj): os.remove(fn)
         json.dump(res, open(path, "w"), indent=1)
 print("DONE", flush=True)
