@@ -22,14 +22,42 @@
   25
  ],
  "tradeoff_Philadelphia": {
-  "det": 0.561,
+  "det": 0.558,
   "fdp_lb": 0.024,
-  "fdp_point": 0.038
+  "fdp_point": 0.036
+ },
+ "oracle_Philadelphia": {
+  "ours": [
+   0.0432,
+   0.6225
+  ],
+  "oracle": [
+   0.0466,
+   0.653
+  ],
+  "min_fdp": [
+   0.512,
+   0.966
+  ]
  },
  "tradeoff_Tampa": {
-  "det": 0.692,
+  "det": 0.697,
   "fdp_lb": 0.023,
-  "fdp_point": 0.033
+  "fdp_point": 0.035
+ },
+ "oracle_Tampa": {
+  "ours": [
+   0.0464,
+   0.7765
+  ],
+  "oracle": [
+   0.0423,
+   0.795
+  ],
+  "min_fdp": [
+   0.232,
+   0.838
+  ]
  },
  "tradeoff_NYC": {
   "det": 0.145,
