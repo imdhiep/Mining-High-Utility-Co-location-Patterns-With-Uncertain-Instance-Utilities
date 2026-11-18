@@ -179,3 +179,14 @@ for L in ["NYC", "TKY"] + [c.replace(" ", "_") for c in YCITIES]:
     inp, env, aft = _src(L)
     job(f"hold_{L}", "ext/hold.py", [L], env, inp + PSO, after=aft, group="hold", subdirs=["out_hold"], deps=EXT)
 job("rsim", "ext/rsim.py", ["100"], inputs=PSO + CQS, group="rsim", subdirs=["out_rsim"], deps=EXT)
+
+# ---- diagnostics for the weak results of VI-B (root causes) ------------------------------------------------------------
+# diag_acc: calibration of V, detection by true margin, FDP-detection curves of the lower-bound and point rules, the
+# posterior expected FDP rule, and PSO-MUCP ranked by its own score, on the default accuracy setting (K = 100)
+# hold_curve: hold rates of the three methods at matched answer sizes on the real datasets
+for L in ("Philadelphia", "New_Orleans", "Tampa"):
+    inp, env, aft = _src(L)
+    job(f"diag_{L}", "ext/diag_acc.py", [L, SEMI_SEEDS], env, inp + PSO, after=aft, group="diag", subdirs=["out_diag"], deps=EXT)
+for L in [c.replace(" ", "_") for c in YCITIES]:
+    inp, env, aft = _src(L)
+    job(f"holdcurve_{L}", "ext/hold_curve.py", [L], env, inp + PSO, after=aft, group="diag", subdirs=["out_hold"], deps=EXT)
