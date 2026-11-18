@@ -203,4 +203,9 @@ for st in settings:
             print(layout, vary, st[vary] if vary != "K" else K, seed, json.dumps({m: rec[m] for m in ("uhucpm", "uhucpm_q05", "cq", "pso_topk")}), chk, flush=True)
         for fn in (csvp, uj): os.remove(fn)
         json.dump(res, open(path, "w"), indent=1)
+        # compact copy (one line per run, the five reported methods only) for reading back large result files
+        CM = ("uhucpm", "uhucpm_q05", "uhucpm_q10", "cq", "pso_topk")
+        json.dump({"layout": layout, "vary": vary, "methods": CM,
+                   "runs": {k: [r["nT"]] + [[r[m]["n"], r[m]["fdp"], r[m]["det"]] for m in CM] for k, r in res["runs"].items() if "cq" in r}},
+                  open(path.replace(".json", "_c.json"), "w"), separators=(",", ":"))
 print("DONE", flush=True)
