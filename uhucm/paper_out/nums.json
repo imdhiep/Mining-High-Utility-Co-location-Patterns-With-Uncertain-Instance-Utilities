@@ -14,12 +14,12 @@
   37
  ],
  "z0_equals_cq": [
-  8,
-  8
+  21,
+  21
  ],
  "equals_noprune": [
-  12,
-  12
+  25,
+  25
  ],
  "tradeoff_Philadelphia": {
   "det": 0.561,
@@ -33,12 +33,40 @@
  },
  "tradeoff_NYC": {
   "det": 0.145,
-  "fdp_lb": 0.05,
-  "fdp_point": 0.092
+  "fdp_lb": 0.047,
+  "fdp_point": 0.087
+ },
+ "oracle_NYC": {
+  "ours": [
+   0.0399,
+   0.1125
+  ],
+  "oracle": [
+   0.051,
+   0.1745
+  ],
+  "min_fdp": [
+   0.596,
+   0.819
+  ]
  },
  "tradeoff_TKY": {
-  "det": 0.071,
-  "fdp_lb": 0.054,
-  "fdp_point": 0.028
+  "det": 0.068,
+  "fdp_lb": 0.051,
+  "fdp_point": 0.034
+ },
+ "oracle_TKY": {
+  "ours": [
+   0.0144,
+   0.047
+  ],
+  "oracle": [
+   0.0379,
+   0.103
+  ],
+  "min_fdp": [
+   0.7,
+   0.927
+  ]
  }
 }
