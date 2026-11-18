@@ -150,15 +150,16 @@ for vary, values, layouts in ACC:
     for L in layouts:
         inp, env, aft = _src(L)
         v = values[L] if isinstance(values, dict) else values
+        if L == "Philadelphia": env = {**env, "NCHK": "0"}   # CQ-HUCPM does not finish on D1: no run of the authors' code
         job(f"acc_{L}_{vary}", "ext/acc.py", [L, vary, v, SEMI_SEEDS], env, inp + PSO + CQS, after=aft, group="acc",
             subdirs=["out_acc"], deps=EXT)
 
 BENCH = {}                                                  # (layout, k, d, frac) -> thresholds K
-for L in ("Philadelphia", "New_Orleans", "NYC"):            # C1: threshold
+for L in ("Tampa", "New_Orleans", "NYC"):                   # C1: threshold (D1 left out: CQ-HUCPM does not finish)
     BENCH.setdefault((L, 20, 50, 1.0), set()).update((100, 300, 1000))
 for L, ks in (("Tampa", (8, 12, 16, 20)), ("NYC", (20, 40, 60, 80))):    # C2: number of features
     for k in ks: BENCH.setdefault((L, k, 50, 1.0), set()).add(100)
-for L in ("Philadelphia", "NYC"):                           # C3: distance
+for L in ("Tampa", "NYC"):                                  # C3: distance
     for d in (30, 50, 70): BENCH.setdefault((L, 20, d, 1.0), set()).add(100)
 for L in ("New_Orleans", "TKY"):                            # C4: share of the instances
     for f in (0.25, 0.5, 0.75, 1.0): BENCH.setdefault((L, 20, 50, f), set()).add(100)
@@ -171,7 +172,8 @@ for (L, k, d, f), Ks in sorted(BENCH.items()):
 # the 13 real datasets, and the rating simulator with the three methods
 for L in ("Philadelphia", "NYC"):
     inp, env, aft = _src(L)
-    job(f"acc_{L}_law", "ext/acc.py", [L, "law", "lognormal,gamma,mixture", SEMI_SEEDS], {**env, "KS": "100,300,1000"},
+    job(f"acc_{L}_law", "ext/acc.py", [L, "law", "lognormal,gamma,mixture", SEMI_SEEDS],
+        {**env, "KS": "100,300,1000", **({"NCHK": "0"} if L == "Philadelphia" else {})},
         inp + PSO + CQS, after=aft, group="acc", subdirs=["out_acc"], deps=EXT)
 for L in ["NYC", "TKY"] + [c.replace(" ", "_") for c in YCITIES]:
     inp, env, aft = _src(L)
