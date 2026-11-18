@@ -1,0 +1,26 @@
+{
+ "kept": [
+  "Bar",
+  "Chinese_Restaurant",
+  "Food_and_Drink_Shop",
+  "Gas_Station___Garage",
+  "Salon___Barbershop"
+ ],
+ "kept_score": 0.004393638266456052,
+ "kept_s0": 0.004719657855308751,
+ "kept_atoms": 11,
+ "rejected": [
+  "Bar",
+  "Salon___Barbershop"
+ ],
+ "rejected_s0": 0.004718883745198116,
+ "rejected_lb": 0.0012102931638380676,
+ "rejected_atoms": 329,
+ "muK": 0.0017445117885559458,
+ "Vpost_kept": 1.9572976592351115,
+ "Vpost_rej": 177.54823544602382,
+ "VT_kept": 2.031520947385712,
+ "VT_rej": 235.28774116839523,
+ "med_c_kept": 35.0,
+ "med_c_rej": 2.0
+}

@@ -390,7 +390,7 @@ def fig_case_ceb():
         ax.set_xlabel("x (km, UTM 18N)", fontsize=8.5, labelpad=1); ax.set_ylabel("y (km)", fontsize=8.5, labelpad=1); ax.tick_params(labelsize=7.5); ax.grid(False)
         lbl = " + ".join(s.replace("___", " / ").replace("_and_", " & ").replace("_", " ") for s in p)
         caps.append(lab)
-        ax.text(0.02, 0.98, f"{len(A)} venues, median {np.median(np.array([rows[j]['a'] for j in a])):g} check-ins", transform=ax.transAxes, va="top", fontsize=6.8, bbox=dict(facecolor="white", edgecolor="none", pad=0.5, alpha=0.8))
+        ax.text(0.02, 0.98, f"{len(A)} venues\nmedian {np.median(np.array([rows[j]['a'] for j in a])):g} check-ins", transform=ax.transAxes, va="top", fontsize=6, bbox=dict(facecolor="white", edgecolor="none", pad=0.5, alpha=0.8))
     from matplotlib.lines import Line2D
     h = [Line2D([], [], marker="o", color="w", markerfacecolor=fs.BLUE, label=r"$\mu_o\geq 0$"), Line2D([], [], marker="o", color="w", markerfacecolor=fs.ORANGE, label=r"$\mu_o<0$"),
          Line2D([], [], marker="o", color="w", markerfacecolor="#D9D9D9", label="Other venues")]
