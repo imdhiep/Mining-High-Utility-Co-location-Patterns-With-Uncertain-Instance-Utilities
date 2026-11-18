@@ -19,7 +19,9 @@ Usage:
   python bench.py LAYOUT k d frac K [K ...]   LAYOUT in NYC, TKY (Foursquare D4, D5) or Philadelphia, New_Orleans, Tampa
                                               (Yelp D1-D3, env YELP_DIR and REVIEW_DIR); k most frequent features,
                                               distance d (m), a random share frac of the instances (seed 7)
-  python bench.py sim n K [K ...]             the simulator of the scalability experiment (k = 10, seed 7), n instances
+  python bench.py sim n K [K ...]             the earlier rating simulator (k = 10, seed 7), n instances
+  python bench.py syn n K [K ...]             the check-in generator of the scalability experiment (ext/syngen.py,
+                                              k = 20, d = 50, seed 7), n instances
 -> out_bench/bench_<tag>.json, written after every K"""
 import sys, os, json, time, resource, subprocess
 HERE = os.path.dirname(os.path.abspath(__file__)); sys.path.insert(0, os.path.dirname(HERE))
@@ -39,6 +41,12 @@ if src == "sim":
     n = int(sys.argv[2]); Ks = [int(x) for x in sys.argv[3:]] or [300]
     G = evigen2(n, 10, 7); F, XY, mu, s2, d = np.asarray(G["feat"]), [tuple(p) for p in np.asarray(G["xy"])], np.asarray(G["pm"], float), np.asarray(G["pv"], float), float(G["d"])
     UB = None; Z = None; tag = f"sim_n{n}"
+elif src == "syn":                                            # check-in generator of the scalability experiment (syngen.py)
+    from syngen import colgen
+    n = int(sys.argv[2]); Ks = [int(x) for x in sys.argv[3:]] or [100]
+    G = colgen(n, k=20, seed=7)
+    F, XY, mu, s2, d = G["feat"], [tuple(p) for p in G["xy"]], G["mu"], G["s2"], float(G["d"])
+    UB, Z = G["UB"], G["Z"]; tag = f"syn_n{n}"
 else:
     k, d, frac = int(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]); Ks = [int(x) for x in sys.argv[5:]]
     if src in ("NYC", "TKY"):

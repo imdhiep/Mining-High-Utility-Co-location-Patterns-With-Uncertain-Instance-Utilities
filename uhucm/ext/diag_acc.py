@@ -12,6 +12,9 @@ For each seed of the default setting on one layout it records, over the patterns
   error split   (true total - M) = instance part (true log-rate minus posterior mean, summed) + center part (estimated minus
                 true center, summed); each part scaled by its own variance (sum of sigma^2, bootstrap part of V_T), and the
                 center error of each feature divided by its bootstrap sd (Poisson redraws of the counts)
+  oracle        the same lower-bound and bfdr curves with posteriors under the true law of the log-rates and the true
+                center (upper limit of what any posterior rule can detect at a given FDP)
+  min-count     CQ-HUCPM after dropping the venues with fewer than m = 2, 5, 10 training check-ins, threshold c * gamma
   pso           feature means of the posterior means (the utilities PSO-MUCP receives) and of the true utilities, and FDP and
                 detection of the K patterns with the highest feature-level score (PSO-MUCP ranked by its own score)
 Usage: python diag_acc.py LAYOUT SEEDS [K]     -> out_diag/diag_<LAYOUT>.json"""
@@ -29,6 +32,7 @@ F0, XY0, W, loc, scl, order = g_["load_layout"](20)
 base = Problem(F0, XY0, np.zeros(len(F0)), np.ones(len(F0)), 50.0, 0.0, feat_names=g_["ALPHA"][:len(order)])
 QGRID = [0.01, 0.025, 0.05, 0.1, 0.2]
 ZGRID = [0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.645, 2.0, 2.5]; MGRID = [1.0, 1.1, 1.2, 1.3, 1.5, 1.75, 2.0, 2.5, 3.0]
+MINCNT = [2, 5, 10]; FGRID = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0]
 res = dict(layout=layout, K=K, seeds={})
 for seed in range(NS):
     rng = np.random.default_rng(1000 + seed); F, XY, n = F0, XY0, len(F0)
@@ -83,6 +87,46 @@ for seed in range(NS):
         ok = np.nonzero(efdp <= q)[0]; sel = np.zeros(len(pats), bool); sel[o[:ok[-1] + 1] if len(ok) else []] = True
         bf.append([q] + fd(sel) + [round(float(efdp[ok[-1]]), 4) if len(ok) else 0.0])
     curves["bfdr"] = bf
+
+    # oracle: the true law N(loc_f, scl_f^2) of the log-rates and the true center are known; the posterior of each venue
+    # is computed on a fine grid, the pattern variance is the sum of the instance variances (no prior error to add), and
+    # the normalizer is the expected positive part under these posteriors.  Same pattern rules as above.
+    def fd_on(sel, pp_):
+        k = int(sel.sum()); inT_ = np.array([p in T for p in pp_]); tp = int((sel & inT_).sum())
+        return [round(1 - tp / k, 4) if k else 0.0, round(tp / len(T), 4), k]
+
+    def bfdr_curve(M_, V_, Z_, pp_):
+        pr = np.array([0.5 * math.erfc(-(m - g * Z_) / math.sqrt(2 * v)) for m, v in zip(M_, V_)]); oo = np.argsort(-pr)
+        ef = np.cumsum(1 - pr[oo]) / np.arange(1, len(oo) + 1); out = []
+        for q in QGRID:
+            ok = np.nonzero(ef <= q)[0]; sel = np.zeros(len(pp_), bool); sel[oo[:ok[-1] + 1] if len(ok) else []] = True
+            out.append([q] + fd_on(sel, pp_) + [round(float(ef[ok[-1]]), 4) if len(ok) else 0.0])
+        return out
+
+    mo = np.zeros(n); so = np.zeros(n); epo = 0.0
+    for j in range(len(order)):
+        ix = np.nonzero(F == j)[0]; th = np.linspace(loc[j] - 8 * scl[j], loc[j] + 8 * scl[j], 4001)
+        lp = -0.5 * ((th - loc[j]) / scl[j]) ** 2
+        xs, inv = np.unique(cnt[ix], return_inverse=True)
+        ll = xs[:, None] * th[None, :] - np.exp(th)[None, :] * W + lp[None, :]
+        w_ = np.exp(ll - ll.max(1, keepdims=True)); w_ /= w_.sum(1, keepdims=True)
+        u_ = th - ctrue[j]; m_ = w_ @ u_; v_ = w_ @ (u_ ** 2) - m_ ** 2; e_ = w_ @ np.clip(u_, 0, None)
+        mo[ix] = m_[inv]; so[ix] = np.maximum(v_[inv], 1e-12); epo += float(e_[inv].sum())
+    Po = g_["with_values"](base, mo, so, epo); pats_o = list(mine(Po, g / 2)[0])
+    Ao = [pattern_atoms(Po, p) for p in pats_o]
+    Mo = np.array([mo[a].sum() for a in Ao]); Vo = np.array([so[a].sum() for a in Ao])
+    curves["oracle_lb"] = [[z] + fd_on(Mo - z * np.sqrt(Vo) >= g * epo, pats_o) for z in ZGRID]
+    curves["oracle_bfdr"] = bfdr_curve(Mo, Vo, epo, pats_o)
+
+    # minimum-evidence filter: drop the venues with fewer than m training check-ins, then report the patterns whose
+    # point score (posterior means of the kept venues over the full-data normalizer Z) reaches c * gamma
+    for mmin in MINCNT:
+        keep = np.nonzero(cnt >= mmin)[0]
+        if len(keep) == 0 or len(set(F[keep])) < 2: curves[f"min{mmin}"] = []; continue
+        bm = Problem(F[keep], XY[keep], np.zeros(len(keep)), np.ones(len(keep)), 50.0, 0.0, feat_names=g_["ALPHA"][:len(order)])
+        Pm = g_["with_values"](bm, mu[keep], s2[keep], Z); pats_m = list(mine(Pm, FGRID[0] * g)[0])
+        Mm = np.array([mu[keep][pattern_atoms(Pm, p)].sum() for p in pats_m])
+        curves[f"min{mmin}"] = [[c_] + fd_on(Mm >= c_ * g * Z, pats_m) for c_ in FGRID]
     fmu = np.array([mu[F == j].mean() for j in range(len(order))])
     if (fmu > 0).any():
         Pf = g_["with_values"](base, fmu[F], np.zeros(n)); Rf, scf = g_["topk"](Pf, K)

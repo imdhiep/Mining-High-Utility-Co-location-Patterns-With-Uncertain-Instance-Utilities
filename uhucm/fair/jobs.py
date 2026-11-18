@@ -199,3 +199,10 @@ for L in ("NYC", "TKY"):                                    # Foursquare: diagno
 inp, env, aft = _src("NYC")
 job("acc_NYC_k40", "ext/acc.py", ["NYC", "k", "40", SEMI_SEEDS], {**env, "NCHK": "0"}, inp + PSO + CQS, after=aft, group="acc",
     subdirs=["out_acc"], deps=EXT)
+
+# ---- scalability: synthetic check-in data (ext/syngen.py) from 20,000 to 120,000 instances, k = 20, d = 50, K = 100;
+# the area grows with n so that the mean number of neighbours stays the same; each run of the authors' code is capped
+# at one hour and a program that did not finish is reported as not finished
+for nsyn in (20000, 40000, 60000, 80000, 100000, 120000):
+    job(f"bench_syn_n{nsyn}", "ext/bench.py", ["syn", str(nsyn), "100"], {"CAP": "3600"}, PSO + CQS, exclusive=True,
+        group="bench", subdirs=["out_bench"], deps=EXT + ["ext/syngen.py"])
