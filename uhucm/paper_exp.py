@@ -90,7 +90,7 @@ def tab_law():
 # ------------------------------------------------------------------ Figure: one parameter at a time
 PARAMS = [("K", "Philadelphia"), ("K", "Tampa"), ("K", "NYC"), ("d", "New_Orleans"), ("d", "NYC"), ("k", "Tampa"), ("k", "NYC"),
           ("frac", "Philadelphia"), ("frac", "NYC"), ("c", "New_Orleans"), ("c", "Tampa"), ("sd", "Philadelphia"), ("sd", "NYC")]
-PLAB = {"K": "$K$", "d": "$d$ (m)", "k": "$k$", "frac": "share of instances", "c": "evidence factor $c$", "sd": "spread of log-rates"}
+PLAB = {"K": "threshold rank $K$", "d": "distance threshold $d$ (m)", "k": "number of features", "frac": "share of instances", "c": "evidence factor $c$", "sd": "spread of log-rates"}
 
 
 def fig_params():
@@ -229,7 +229,7 @@ def bench(yelp_file):
                                              ("NYC", [(f"NYC_k20_d50_f100", K, K) for K in (100, 300, 1000)])]),
         "fig_time_d": ("Distance threshold $d$ (m)", [("Tampa", [(f"Tampa_k20_d{d}_f100", 100, d) for d in (30, 50, 70)]),
                                                      ("NYC", [(f"NYC_k20_d{d}_f100", 100, d) for d in (30, 50, 70)])]),
-        "fig_time_k": ("Number of features $k$", [("Tampa", [(f"Tampa_k{k}_d50_f100", 100, k) for k in (12, 16, 20)]),
+        "fig_time_k": ("Number of features", [("Tampa", [(f"Tampa_k{k}_d50_f100", 100, k) for k in (12, 16, 20)]),
                                                  ("NYC", [(f"NYC_k{k}_d50_f100", 100, k) for k in (20, 40, 60, 80)])]),
         "fig_time_n": (None, [("New_Orleans", [(f"New_Orleans_k20_d50_f{f}", 100, f) for f in (25, 50, 75, 100)]),
                               ("TKY", [(f"TKY_k20_d50_f{f}", 100, f) for f in (25, 50, 75, 100)]),
