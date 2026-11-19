@@ -1,0 +1,107 @@
+{
+ "n": 789,
+ "compare": {
+  "uhucpm0_equals_cq": true,
+  "uhucpm_equals_noprune": true,
+  "uhucpm_equals_meanbound": true
+ },
+ "programs": {
+  "uhucpm": {
+   "times": [
+    0.238,
+    0.23,
+    0.231,
+    0.231,
+    0.228
+   ],
+   "inner": [
+    0.05,
+    0.05,
+    0.05,
+    0.05,
+    0.05
+   ]
+  },
+  "uhucpm0": {
+   "times": [
+    0.233,
+    0.233,
+    0.228,
+    0.231,
+    0.225
+   ],
+   "inner": [
+    0.05,
+    0.05,
+    0.05,
+    0.05,
+    0.05
+   ]
+  },
+  "meanbound": {
+   "times": [
+    0.232,
+    0.229,
+    0.224,
+    0.232,
+    0.231
+   ],
+   "inner": [
+    0.05,
+    0.05,
+    0.05,
+    0.05,
+    0.05
+   ]
+  },
+  "noprune": {
+   "times": [
+    0.229,
+    0.228,
+    0.227,
+    0.225,
+    0.224
+   ],
+   "inner": [
+    0.04,
+    0.04,
+    0.04,
+    0.05,
+    0.04
+   ]
+  },
+  "cq": {
+   "times": [
+    0.133,
+    0.137,
+    0.137,
+    0.137,
+    0.138
+   ],
+   "inner": [
+    0.04,
+    0.04,
+    0.04,
+    0.04,
+    0.04
+   ]
+  },
+  "pso": {
+   "times": [
+    0.197,
+    0.2,
+    0.198,
+    0.206,
+    0.201
+   ],
+   "inner": [
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1
+   ]
+  }
+ },
+ "source": "Kaggle uhucpm-bench-yelp v3, fair_runs/bench_New_Orleans_k20_d50_f25/out_bench/bench_New_Orleans_k20_d50_f25.json, K = 100; times = wall seconds from process start to exit, inner = seconds measured inside the program after its imports (reading the data, neighbors, cliques, mining)"
+}
