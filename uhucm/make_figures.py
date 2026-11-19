@@ -378,8 +378,8 @@ def fig_case_ceb():
     # kept pattern whose point score is closest to that of the rejected pattern (same comparison as the score matching)
     pk = min(kept, key=lambda p: abs(R0[p] - R0[pr]))
     Ar = pattern_atoms(P0, pr); Ak = pattern_atoms(P0, pk)
-    fig, axes = plt.subplots(1, 2, figsize=(W1, 2.35)); caps = []
-    for ax, A, p, lab in ((axes[0], Ak, pk, "(a) Kept"), (axes[1], Ar, pr, "(b) Rejected")):
+    fig, axes = plt.subplots(1, 2, figsize=(W1, 2.05)); caps = []
+    for ax, A, p, lab in ((axes[0], Ak, pk, "(a) Kept pattern"), (axes[1], Ar, pr, "(b) Rejected pattern")):
         ax.scatter(XY[:, 0] / 1000, XY[:, 1] / 1000, s=0.3, color="#D9D9D9", linewidths=0, rasterized=True)
         a = A[A < P0.n]; sig = np.sqrt(s2[a]); col = np.where(mu[a] >= 0, fs.BLUE, fs.ORANGE)
         alpha = np.clip(1 - sig / (sig.max() + 1e-12), 0.25, 1)
@@ -387,15 +387,17 @@ def fig_case_ceb():
             ax.scatter(XY[j, 0] / 1000, XY[j, 1] / 1000, s=3, color=col[i], alpha=float(alpha[i]), linewidths=0)
         cx, cy = XY[a, 0].mean() / 1000, XY[a, 1].mean() / 1000; span = max(np.ptp(XY[a, 0]), np.ptp(XY[a, 1])) / 1000 / 2 + 1.0
         ax.set_xlim(cx - span, cx + span); ax.set_ylim(cy - span, cy + span); ax.set_aspect("equal")
-        ax.set_xlabel("x (km, UTM 18N)", fontsize=8.5, labelpad=1); ax.set_ylabel("y (km)", fontsize=8.5, labelpad=1); ax.tick_params(labelsize=7.5); ax.grid(False)
-        lbl = " + ".join(s.replace("___", " / ").replace("_and_", " & ").replace("_", " ") for s in p)
-        caps.append(lab)
-        ax.text(0.02, 0.98, f"{len(A)} venues\nmedian {np.median(np.array([rows[j]['a'] for j in a])):g} check-ins", transform=ax.transAxes, va="top", fontsize=6, bbox=dict(facecolor="white", edgecolor="none", pad=0.5, alpha=0.8))
+        ax.set_xlabel("x (km)", fontsize=7, labelpad=1); ax.set_ylabel("y (km)", fontsize=7, labelpad=1); ax.tick_params(labelsize=6); ax.grid(False)
+        caps.append(f"{lab} ({len(a)} venues)")
     from matplotlib.lines import Line2D
-    h = [Line2D([], [], marker="o", color="w", markerfacecolor=fs.BLUE, label=r"$\mu_o\geq 0$"), Line2D([], [], marker="o", color="w", markerfacecolor=fs.ORANGE, label=r"$\mu_o<0$"),
-         Line2D([], [], marker="o", color="w", markerfacecolor="#D9D9D9", label="Other venues")]
-    fig.subplots_adjust(wspace=0.42, left=0.13, right=0.99, top=0.99)
-    fs.finalize(fig, axes, caps, h, [x.get_label() for x in h], ncol=3, bottom=0.345, leg_y=0.175, lab_y=0.01, fontsize=8); save(fig, "fig_case.pdf")
+    h = [Line2D([], [], marker="o", ls="", color=fs.BLUE, ms=3, label=r"Instance with $\mu_o\geq 0$"),
+         Line2D([], [], marker="o", ls="", color=fs.ORANGE, ms=3, label=r"Instance with $\mu_o<0$"),
+         Line2D([], [], marker="o", ls="", color="#BBBBBB", ms=3, label="Other venues")]
+    fig.subplots_adjust(wspace=0.45, left=0.12, right=0.99, top=0.90, bottom=0.15)
+    fig.legend(handles=h, loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=3, fontsize=6, frameon=False, handletextpad=0.3, columnspacing=1.0)
+    for ax, cap in zip(axes, caps):
+        bb = ax.get_position(); fig.text((bb.x0 + bb.x1) / 2, 0.005, cap, ha="center", va="bottom", fontsize=7.5)
+    save(fig, "fig_case.pdf")
     Vk = float(s2[Ak[Ak < P0.n]].sum()); Vr = float(s2[Ar[Ar < P0.n]].sum())
     json.dump(dict(kept=list(pk), kept_score=R1[pk], kept_s0=float(P0.score(Ak)), kept_atoms=int(len(Ak)), rejected=list(pr), rejected_s0=R0[pr],
                    rejected_lb=float(P1.score(Ar)), rejected_atoms=int(len(Ar)), muK=muK, Vpost_kept=Vk, Vpost_rej=Vr,
