@@ -90,7 +90,7 @@ def tab_law():
 # ------------------------------------------------------------------ Figure: one parameter at a time
 PARAMS = [("K", "Philadelphia"), ("K", "Tampa"), ("K", "NYC"), ("d", "New_Orleans"), ("d", "NYC"), ("k", "Tampa"), ("k", "NYC"),
           ("frac", "Philadelphia"), ("frac", "NYC"), ("c", "New_Orleans"), ("c", "Tampa"), ("sd", "Philadelphia"), ("sd", "NYC")]
-PLAB = {"K": "threshold rank $K$", "d": "distance threshold $d$ (m)", "k": "number of features", "frac": "share of instances", "c": "evidence factor $c$", "sd": "spread of log-rates"}
+PLAB = {"K": "threshold $K$", "d": "distance threshold $d$ (m)", "k": "number of features", "frac": "share of instances", "c": "evidence factor $c$", "sd": "spread of log-rates"}
 
 
 def fig_params():
@@ -129,10 +129,10 @@ def fig_tradeoff():
             ob = np.array(orc[L]["oracle_bfdr"])
             ax.plot(ob[:, 2], ob[:, 1], color=fs.GRAY, marker="x", ms=2.5, lw=1.0, ls="--", label=r"Oracle posterior, $\delta$ varied")
         ax.plot(lb[:, 2], lb[:, 1], color=COL["uhucpm"], marker="o", ms=2.5, lw=1.0, label="Lower bound, $z$ varied")
-        ax.plot(pt[:, 2], pt[:, 1], color=COL["cq"], marker="s", ms=2.5, lw=1.0, label=r"Point score, threshold $m\gamma$ varied")
+        ax.plot(pt[:, 2], pt[:, 1], color=COL["cq"], marker="s", ms=2.5, lw=1.0, label=r"Point score, threshold varied")
         zi = [r[0] for r in c["lb"]].index(1.645)
         ax.plot([lb[zi, 2]], [lb[zi, 1]], marker="*", ms=7, color=COL["uhucpm"], ls="none", label="UHUCPM ($z^*$)")
-        ax.plot([pt[0, 2]], [pt[0, 1]], marker="*", ms=7, color=COL["cq"], ls="none", label="CQ-HUCPM ($m=1$)")
+        ax.plot([pt[0, 2]], [pt[0, 1]], marker="*", ms=7, color=COL["cq"], ls="none", label="CQ-HUCPM")
         b = np.array(bf[L]); qi = [r[0] for r in bf[L]]
         ax.plot([b[qi.index(0.05), 2], b[qi.index(0.1), 2]], [b[qi.index(0.05), 1], b[qi.index(0.1), 1]], marker="D", ms=3.5,
                 color=COL["uhucpm_q05"], ls="none", label=r"UHUCPM-S$_{0.05}$, S$_{0.10}$")
@@ -142,8 +142,10 @@ def fig_tradeoff():
     for ax in axes:                                                      # legend entries of all panels, once each
         for hh, ll in zip(*ax.get_legend_handles_labels()):
             if ll not in l: h.append(hh); l.append(ll)
-    fig.subplots_adjust(wspace=0.38, left=0.06, right=0.99, top=0.97)
-    fs.finalize(fig, axes, caps, h, l, ncol=3, bottom=0.42, leg_y=0.03, lab_y=0.20, fontsize=6.5)
+    fig.subplots_adjust(wspace=0.38, left=0.06, right=0.99, top=0.87, bottom=0.27)
+    fig.legend(h, l, loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=6, fontsize=6, frameon=False, handlelength=1.8, columnspacing=1.0)
+    for ax, cap in zip(axes, caps):
+        bb = ax.get_position(); fig.text((bb.x0 + bb.x1) / 2, 0.005, cap, ha="center", va="bottom", fontsize=7.5)
     save(fig, "fig_tradeoff.pdf")
     # numbers for the text: FDP of the lower-bound rule and of the point rule at matched detection (linear interpolation)
     for L, c in cur.items():
@@ -224,7 +226,7 @@ def bench(yelp_file):
     # one figure per varied parameter; the others stay at their defaults (stated in the caption)
     nm = dict(NAME, syn="Synthetic")
     figs = {
-        "fig_time_K": ("Threshold rank $K$", [("New_Orleans", [(f"New_Orleans_k20_d50_f100", K, K) for K in (100, 300, 1000)]),
+        "fig_time_K": ("Threshold $K$", [("New_Orleans", [(f"New_Orleans_k20_d50_f100", K, K) for K in (100, 300, 1000)]),
                                              ("Tampa", [(f"Tampa_k20_d50_f100", K, K) for K in (100, 300, 1000)]),
                                              ("NYC", [(f"NYC_k20_d50_f100", K, K) for K in (100, 300, 1000)])]),
         "fig_time_d": ("Distance threshold $d$ (m)", [("Tampa", [(f"Tampa_k20_d{d}_f100", 100, d) for d in (30, 50, 70)]),
@@ -247,7 +249,7 @@ def bench(yelp_file):
                 ax.plot([u for u, _ in xy], [v for _, v in xy], marker=mk, ms=3, lw=1.1, color=c, label=lab); ys += [v for _, v in xy]
             ax.set_yscale("log"); lo, hi = min(ys), max(ys)
             R = np.log10(hi / lo); ax.set_ylim(lo / 10 ** 0.15, hi * 10 ** (0.3 * R + 0.35))        # head room for the legend
-            if xl == "Threshold rank $K$": ax.set_xscale("log"); ax.set_xticks([100, 300, 1000]); ax.set_xticklabels(["100", "300", "1000"]); ax.minorticks_off()
+            if xl == "Threshold $K$": ax.set_xscale("log"); ax.set_xticks([100, 300, 1000]); ax.set_xticklabels(["100", "300", "1000"]); ax.minorticks_off()
             else: ax.set_xticks([x for _, _, x in pts])
             xlab = xl or ("Number of instances ($\\times$1000)" if L == "syn" else "Proportion of instances (%)")
             ax.set_xlabel(xlab, fontsize=6.5, labelpad=1); ax.tick_params(labelsize=6)
