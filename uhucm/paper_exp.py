@@ -199,7 +199,7 @@ def hold():
                 if isinstance(r, list): own.append(r[1] > r[3])
     nums["hold_own_uhucpm_gt_cq"] = [int(sum(own)), len(own)]
     # figure: hold rate against n on Philadelphia and New York, K = 300
-    fig, axes = plt.subplots(1, 2, figsize=(W1, 1.9)); caps = []
+    fig, axes = plt.subplots(1, 2, figsize=(W2 * 0.62, 1.75)); caps = []
     for ax, L in zip(axes, ("Philadelphia", "NYC")):
         rows = hc[L]["300"]; ns = sorted((int(n) for n in rows if int(n) <= 500))
         for j, m in enumerate(("uhucpm", "cq", "pso_topk")):
@@ -210,7 +210,7 @@ def hold():
         ax.set_ylabel("Hold rate", fontsize=7, labelpad=1); ax.tick_params(labelsize=6); caps.append(f"({chr(97 + len(caps))}) {NAME[L]}")
         ax.grid(True, lw=0.4, alpha=0.5)
     h, l = axes[0].get_legend_handles_labels()
-    fig.subplots_adjust(wspace=0.45, left=0.13, right=0.98, top=0.87, bottom=0.27)
+    fig.subplots_adjust(wspace=0.3, left=0.08, right=0.99, top=0.87, bottom=0.27)
     fig.legend(h, l, loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=3, fontsize=6, frameon=False, handlelength=1.8, columnspacing=1.0)
     for ax, cap in zip(axes, caps):
         bb = ax.get_position(); fig.text((bb.x0 + bb.x1) / 2, 0.005, cap, ha="center", va="bottom", fontsize=7.5)
