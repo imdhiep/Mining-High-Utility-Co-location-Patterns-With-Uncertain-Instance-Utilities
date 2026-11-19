@@ -88,26 +88,26 @@ def tab_law():
 
 
 # ------------------------------------------------------------------ Figure: one parameter at a time
-PARAMS = [("K", "Philadelphia"), ("K", "Tampa"), ("K", "NYC"), ("d", "New_Orleans"), ("d", "NYC"), ("k", "Tampa"), ("k", "NYC"),
-          ("frac", "Philadelphia"), ("frac", "NYC"), ("c", "New_Orleans"), ("c", "Tampa"), ("sd", "Philadelphia"), ("sd", "NYC")]
+PARAMS = [("d", "New_Orleans"), ("k", "NYC"), ("frac", "NYC"), ("c", "Tampa"), ("sd", "NYC")]   # Fig. 3: one panel per parameter
 PLAB = {"K": "threshold $K$", "d": "distance threshold $d$ (m)", "k": "number of features", "frac": "share of instances", "c": "evidence factor $c$", "sd": "spread of log-rates"}
 
 
 def fig_params():
-    fig, axes = plt.subplots(3, 5, figsize=(W2, 4.6)); axes = axes.ravel()
+    fig, axes = plt.subplots(1, len(PARAMS), figsize=(W2, 1.95))
     for i, (V, L) in enumerate(PARAMS):
         ax = axes[i]; rows = ACC.get((L, V), {})
         xs = sorted(rows, key=float); x = [float(v) for v in xs]
         for m in ("uhucpm", "uhucpm_q05", "cq"):
             ax.plot(x, [rows[v][m][1] for v in xs], color=COL[m], marker="o", ms=2.5, lw=1.0, ls="-", label=MLAB[m] + ", detection")
             ax.plot(x, [rows[v][m][0] for v in xs], color=COL[m], marker="x", ms=2.5, lw=1.0, ls="--", label=MLAB[m] + ", FDP")
-        if V == "K": ax.set_xscale("log"); ax.set_xticks([100, 300, 1000]); ax.set_xticklabels(["100", "300", "1000"]); ax.minorticks_off()
-        ax.set_ylim(0, 1); ax.set_xlabel(PLAB[V], fontsize=7, labelpad=1); ax.tick_params(labelsize=6)
-        ax.set_title(f"({chr(97 + i)}) {NAME[L]}", fontsize=7, pad=2)
-    for ax in axes[len(PARAMS):]: ax.axis("off")
+        ax.set_ylim(0, 1); ax.set_xticks(x); ax.tick_params(labelsize=6); ax.grid(True, lw=0.4, alpha=0.5)
+        ax.set_xlabel(PLAB[V][0].upper() + PLAB[V][1:], fontsize=6.5, labelpad=1)
+        if i == 0: ax.set_ylabel("FDP and detection", fontsize=6.5, labelpad=1)
     h, l = axes[0].get_legend_handles_labels()
-    fig.subplots_adjust(wspace=0.35, hspace=0.62, left=0.05, right=0.99, top=0.95, bottom=0.08)
-    axes[len(PARAMS)].legend(h, l, loc="center", fontsize=6, frameon=False, bbox_to_anchor=(1.1, 0.5), ncol=1)
+    fig.subplots_adjust(wspace=0.3, left=0.055, right=0.99, top=0.80, bottom=0.30)
+    fig.legend(h, l, loc="upper center", bbox_to_anchor=(0.5, 1.0), ncol=6, fontsize=5.8, frameon=False, handlelength=1.8, columnspacing=0.9)
+    for i, (ax, (V, L)) in enumerate(zip(axes, PARAMS)):
+        bb = ax.get_position(); fig.text((bb.x0 + bb.x1) / 2, 0.005, f"({chr(97 + i)}) {NAME[L]}", ha="center", va="bottom", fontsize=7.5)
     save(fig, "fig_params.pdf")
 
 
