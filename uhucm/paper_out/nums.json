@@ -13,14 +13,15 @@
   37,
   37
  ],
+ "time_settings": 31,
+ "time_slower": [
+  "New_Orleans_k20_d50_f25@100"
+ ],
  "z0_equals_cq": [
-  21,
-  21
+  23,
+  23
  ],
- "equals_noprune": [
-  25,
-  25
- ],
+ "scored_k80": 4.1,
  "tradeoff_Philadelphia": {
   "det": 0.558,
   "fdp_lb": 0.024,
