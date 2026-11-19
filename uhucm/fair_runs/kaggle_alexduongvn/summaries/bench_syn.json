@@ -1,0 +1,275 @@
+{
+ "source": "Kaggle uhucpm-bench-nyc v3 (commit 99de94e), Intel Xeon 2.20 GHz, ext/syngen.py check-in generator (k = 20, d = 50 m, seed 7, area grows with n), K = 100, one run of the authors' code capped at one hour; per program [mean wall seconds, timed runs, patterns reported, nodes evaluated]; null = did not finish",
+ "data": {
+  "syn_n20000": {
+   "n": 20000,
+   "100": {
+    "K_fl": 89,
+    "t": {
+     "uhucpm": [
+      1.305,
+      5,
+      5,
+      2181
+     ],
+     "uhucpm0": [
+      1.306,
+      5,
+      100,
+      2618
+     ],
+     "meanbound": [
+      1.299,
+      5,
+      5,
+      2618
+     ],
+     "noprune": [
+      1.28,
+      5,
+      5,
+      6384
+     ],
+     "cq": [
+      388.205,
+      5,
+      100,
+      null
+     ],
+     "pso": [
+      10.178,
+      5,
+      89,
+      null
+     ]
+    },
+    "cmp": {
+     "uhucpm0_equals_cq": true,
+     "uhucpm_equals_noprune": true,
+     "uhucpm_equals_meanbound": true
+    }
+   }
+  },
+  "syn_n40000": {
+   "n": 40000,
+   "100": {
+    "K_fl": 100,
+    "t": {
+     "uhucpm": [
+      2.624,
+      5,
+      1,
+      3925
+     ],
+     "uhucpm0": [
+      2.628,
+      5,
+      100,
+      4528
+     ],
+     "meanbound": [
+      2.641,
+      5,
+      1,
+      4528
+     ],
+     "noprune": [
+      2.673,
+      5,
+      1,
+      11806
+     ],
+     "cq": [
+      1946.205,
+      1,
+      100,
+      null
+     ],
+     "pso": [
+      34.869,
+      5,
+      100,
+      null
+     ]
+    },
+    "cmp": {
+     "uhucpm0_equals_cq": true,
+     "uhucpm_equals_noprune": true,
+     "uhucpm_equals_meanbound": true
+    }
+   }
+  },
+  "syn_n60000": {
+   "n": 60000,
+   "100": {
+    "K_fl": 100,
+    "t": {
+     "uhucpm": [
+      3.911,
+      5,
+      7,
+      4627
+     ],
+     "uhucpm0": [
+      3.949,
+      5,
+      100,
+      5362
+     ],
+     "meanbound": [
+      3.914,
+      5,
+      7,
+      5362
+     ],
+     "noprune": [
+      3.955,
+      5,
+      7,
+      15850
+     ],
+     "cq": null,
+     "pso": [
+      67.743,
+      5,
+      100,
+      null
+     ]
+    },
+    "cmp": {
+     "uhucpm_equals_noprune": true,
+     "uhucpm_equals_meanbound": true
+    }
+   }
+  },
+  "syn_n80000": {
+   "n": 80000,
+   "100": {
+    "K_fl": 100,
+    "t": {
+     "uhucpm": [
+      4.762,
+      5,
+      10,
+      4596
+     ],
+     "uhucpm0": [
+      4.815,
+      5,
+      100,
+      5066
+     ],
+     "meanbound": [
+      4.771,
+      5,
+      10,
+      5066
+     ],
+     "noprune": [
+      4.848,
+      5,
+      10,
+      16463
+     ],
+     "cq": null,
+     "pso": [
+      118.836,
+      5,
+      100,
+      null
+     ]
+    },
+    "cmp": {
+     "uhucpm_equals_noprune": true,
+     "uhucpm_equals_meanbound": true
+    }
+   }
+  },
+  "syn_n100000": {
+   "n": 100000,
+   "100": {
+    "K_fl": 100,
+    "t": {
+     "uhucpm": [
+      5.905,
+      5,
+      10,
+      5794
+     ],
+     "uhucpm0": [
+      5.93,
+      5,
+      100,
+      6381
+     ],
+     "meanbound": [
+      5.856,
+      5,
+      10,
+      6381
+     ],
+     "noprune": [
+      6.169,
+      5,
+      10,
+      21551
+     ],
+     "cq": null,
+     "pso": [
+      198.722,
+      5,
+      100,
+      null
+     ]
+    },
+    "cmp": {
+     "uhucpm_equals_noprune": true,
+     "uhucpm_equals_meanbound": true
+    }
+   }
+  },
+  "syn_n120000": {
+   "n": 120000,
+   "100": {
+    "K_fl": 100,
+    "t": {
+     "uhucpm": [
+      8.371,
+      5,
+      9,
+      5478
+     ],
+     "uhucpm0": [
+      8.317,
+      5,
+      100,
+      6065
+     ],
+     "meanbound": [
+      8.368,
+      5,
+      9,
+      6065
+     ],
+     "noprune": [
+      8.798,
+      5,
+      9,
+      24217
+     ],
+     "cq": null,
+     "pso": [
+      316.121,
+      5,
+      100,
+      null
+     ]
+    },
+    "cmp": {
+     "uhucpm_equals_noprune": true,
+     "uhucpm_equals_meanbound": true
+    }
+   }
+  }
+ }
+}
