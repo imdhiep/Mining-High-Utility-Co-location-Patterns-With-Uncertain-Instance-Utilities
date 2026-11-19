@@ -214,48 +214,47 @@ def hold():
 
 # ------------------------------------------------------------------ running time
 def bench(yelp_file):
+    """Fig. time: running time of UHUCPM, CQ-HUCPM and PSO-MUCP when one parameter changes (blank = did not finish)."""
     B = J("bench_FSQ_fc867c3_mean.json")["data"]
+    for k, v in J("bench_syn.json")["data"].items(): B[k] = {K: dict(cmp=r["cmp"], **r["t"]) for K, r in v.items() if K != "n"}
     if yelp_file and os.path.exists(os.path.join(S, yelp_file)):
-        for k, v in J(yelp_file)["data"].items(): B[k] = {K: dict(cmp=r["cmp"], **{p: x for p, x in r["t"].items()}) for K, r in v.items() if K != "n"}
+        for k, v in J(yelp_file)["data"].items(): B[k] = {K: dict(cmp=r["cmp"], **r["t"]) for K, r in v.items() if K != "n"}
     else: print("missing Yelp timing file", yelp_file)
-    P = ["uhucpm", "uhucpm0", "noprune", "meanbound", "cq", "pso"]
     t = lambda key, K, p: (B.get(key, {}).get(str(K), {}) or {}).get(p)
-    fmt = lambda x: "" if x is None else (f"{x[0]:.2f}" if x[0] < 100 else f"{x[0]:.0f}")
-
-    def rows(spec):
-        out = []
-        for lab, key, K in spec:
-            out.append(lab + " & " + " & ".join(fmt(t(key, K, p)) for p in P) + r" \\")
-        return out
-    head = [r"\begin{tabular}{@{}llrrrrrr@{}}", r"\toprule", r"City & Value & UHUCPM & $z{=}0$ & No pr. & Mean & CQ & PSO \\", r"\midrule"]
-    tK = head + [r"\multicolumn{8}{@{}l}{\emph{Threshold $K$}} \\"]
-    for L in ("New_Orleans", "Tampa", "NYC"):
-        tK += rows([(f"{NAME[L] if K == 100 else ''} & {K}", f"{L}_k20_d50_f100", K) for K in (100, 300, 1000)])
-    tK += [r"\midrule", r"\multicolumn{8}{@{}l}{\emph{Distance $d$ (m)}} \\"]
-    for L in ("Tampa", "NYC"):
-        tK += rows([(f"{NAME[L] if d == 30 else ''} & {d}", f"{L}_k20_d{d}_f100", 100) for d in (30, 50, 70)])
-    tK += [r"\bottomrule", r"\end{tabular}"]
-    # figure: number of features (Tampa, New York) and share of instances (New Orleans, Tokyo)
-    fig, axes = plt.subplots(1, 4, figsize=(W2, 1.9)); caps = []
-    spec = [("Tampa", [(f"Tampa_k{k}_d50_f100", k) for k in (12, 16, 20)], "$k$"),
-            ("NYC", [(f"NYC_k{k}_d50_f100", k) for k in (20, 40, 60, 80)], "$k$"),
-            ("New_Orleans", [(f"New_Orleans_k20_d50_f{f}", f) for f in (25, 50, 75, 100)], "share of instances (%)"),
-            ("TKY", [(f"TKY_k20_d50_f{f}", f) for f in (25, 50, 75, 100)], "share of instances (%)")]
-    MK = {"uhucpm": ("o", fs.BLUE, "UHUCPM"), "noprune": ("v", fs.GREEN, "No pruning"), "cq": ("s", fs.ORANGE, "CQ-HUCPM"), "pso": ("^", fs.GRAY, "PSO-MUCP")}
-    for ax, (L, pts, xl) in zip(axes, spec):
+    spec = [("NYC", [(f"NYC_k20_d50_f100", K, K) for K in (100, 300, 1000)], "$K$"),
+            ("NYC", [(f"NYC_k20_d{d}_f100", 100, d) for d in (30, 50, 70)], "$d$ (m)"),
+            ("NYC", [(f"NYC_k{k}_d50_f100", 100, k) for k in (20, 40, 60, 80)], "$k$"),
+            ("TKY", [(f"TKY_k20_d50_f{f}", 100, f) for f in (25, 50, 75, 100)], "share of instances (%)"),
+            ("syn", [(f"syn_n{n}", 100, n // 1000) for n in range(20000, 120001, 20000)], "instances (thousands)"),
+            ("New_Orleans", [(f"New_Orleans_k20_d50_f100", K, K) for K in (100, 300, 1000)], "$K$"),
+            ("Tampa", [(f"Tampa_k20_d50_f100", K, K) for K in (100, 300, 1000)], "$K$"),
+            ("Tampa", [(f"Tampa_k20_d{d}_f100", 100, d) for d in (30, 50, 70)], "$d$ (m)"),
+            ("Tampa", [(f"Tampa_k{k}_d50_f100", 100, k) for k in (12, 16, 20)], "$k$"),
+            ("New_Orleans", [(f"New_Orleans_k20_d50_f{f}", 100, f) for f in (25, 50, 75, 100)], "share of instances (%)")]
+    MK = {"uhucpm": ("o", fs.BLUE, "UHUCPM"), "cq": ("s", fs.ORANGE, "CQ-HUCPM"), "pso": ("^", fs.GRAY, "PSO-MUCP")}
+    nm = dict(NAME, syn="Synthetic")
+    fig, axes = plt.subplots(2, 5, figsize=(W2, 3.4)); axes = axes.ravel()
+    for i, (ax, (L, pts, xl)) in enumerate(zip(axes, spec)):
         for p, (mk, c, lab) in MK.items():
-            xx = [x for key, x in pts if t(key, 100, p)]; yy = [t(key, 100, p)[0] for key, x in pts if t(key, 100, p)]
-            ax.plot(xx, yy, marker=mk, ms=2.5, lw=1.0, color=c, label=lab)
-        ax.set_yscale("log"); ax.set_xlabel(xl, fontsize=7, labelpad=1); ax.set_ylabel("Time (s)", fontsize=7, labelpad=1); ax.tick_params(labelsize=6)
-        caps.append(f"({chr(97 + len(caps))}) {NAME[L]}")
-    h, l = axes[0].get_legend_handles_labels(); fig.subplots_adjust(wspace=0.42, left=0.06, right=0.99, top=0.97)
-    fs.finalize(fig, axes, caps, h, l, ncol=4, bottom=0.42, leg_y=0.03, lab_y=0.20, fontsize=6.5)
+            xy = [(x, t(key, K, p)[0]) for key, K, x in pts if t(key, K, p)]
+            ax.plot([a for a, _ in xy], [b for _, b in xy], marker=mk, ms=2.5, lw=1.0, color=c, label=lab)
+        if xl == "$K$": ax.set_xscale("log"); ax.set_xticks([100, 300, 1000]); ax.set_xticklabels(["100", "300", "1000"]); ax.minorticks_off()
+        else: ax.set_xticks([x for _, _, x in pts])
+        ax.set_yscale("log"); ax.set_xlabel(xl, fontsize=7, labelpad=1); ax.tick_params(labelsize=6)
+        if i % 5 == 0: ax.set_ylabel("Time (s)", fontsize=7, labelpad=1)
+        ax.set_title(f"({chr(97 + i)}) {nm[L]}", fontsize=7, pad=2)
+    h, l = axes[0].get_legend_handles_labels()
+    fig.subplots_adjust(wspace=0.32, hspace=0.62, left=0.055, right=0.99, top=0.94, bottom=0.17)
+    fig.legend(h, l, loc="lower center", ncol=3, fontsize=6.5, frameon=False, bbox_to_anchor=(0.5, 0.0))
     save(fig, "fig_time.pdf")
-    eq = [r["cmp"].get("uhucpm0_equals_cq") for v in B.values() for K, r in v.items() if K != "n" and isinstance(r, dict) and "cmp" in r]
-    nums["z0_equals_cq"] = [int(sum(1 for e in eq if e)), int(sum(1 for e in eq if e is not None))]
-    npr = [r["cmp"].get("uhucpm_equals_noprune") for v in B.values() for K, r in v.items() if K != "n" and isinstance(r, dict) and "cmp" in r]
-    nums["equals_noprune"] = [int(sum(1 for e in npr if e)), len(npr)]
-    return "\n".join(tK)
+    used = {key for _, pts, _ in spec for key, _, _ in pts}
+    keys = [(k, K) for k in used for K in B.get(k, {}) if K != "n" and isinstance(B[k][K], dict)]
+    nums["time_settings"] = len(keys)
+    nums["time_slower"] = sorted(f"{k}@{K}" for k, K in keys if any(t(k, K, p) and t(k, K, p)[0] <= t(k, K, "uhucpm")[0] for p in ("cq", "pso")))
+    eq = [B[k][K]["cmp"]["uhucpm0_equals_cq"] for k, K in keys if "uhucpm0_equals_cq" in B[k][K].get("cmp", {})]
+    nums["z0_equals_cq"] = [int(sum(eq)), len(eq)]
+    n80 = B["NYC_k80_d50_f100"]["100"]; nums["scored_k80"] = round(100 * n80["uhucpm"][3] / n80["noprune"][3], 1)
+    return ""
 
 
 if __name__ == "__main__":
