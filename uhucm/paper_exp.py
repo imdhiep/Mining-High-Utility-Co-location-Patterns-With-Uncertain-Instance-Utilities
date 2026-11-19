@@ -221,32 +221,44 @@ def bench(yelp_file):
         for k, v in J(yelp_file)["data"].items(): B[k] = {K: dict(cmp=r["cmp"], **r["t"]) for K, r in v.items() if K != "n"}
     else: print("missing Yelp timing file", yelp_file)
     t = lambda key, K, p: (B.get(key, {}).get(str(K), {}) or {}).get(p)
-    spec = [("NYC", [(f"NYC_k20_d50_f100", K, K) for K in (100, 300, 1000)], "$K$"),
-            ("NYC", [(f"NYC_k20_d{d}_f100", 100, d) for d in (30, 50, 70)], "$d$ (m)"),
-            ("NYC", [(f"NYC_k{k}_d50_f100", 100, k) for k in (20, 40, 60, 80)], "$k$"),
-            ("TKY", [(f"TKY_k20_d50_f{f}", 100, f) for f in (25, 50, 75, 100)], "share of instances (%)"),
-            ("syn", [(f"syn_n{n}", 100, n // 1000) for n in range(20000, 120001, 20000)], "instances (thousands)"),
-            ("New_Orleans", [(f"New_Orleans_k20_d50_f100", K, K) for K in (100, 300, 1000)], "$K$"),
-            ("Tampa", [(f"Tampa_k20_d50_f100", K, K) for K in (100, 300, 1000)], "$K$"),
-            ("Tampa", [(f"Tampa_k20_d{d}_f100", 100, d) for d in (30, 50, 70)], "$d$ (m)"),
-            ("Tampa", [(f"Tampa_k{k}_d50_f100", 100, k) for k in (12, 16, 20)], "$k$"),
-            ("New_Orleans", [(f"New_Orleans_k20_d50_f{f}", 100, f) for f in (25, 50, 75, 100)], "share of instances (%)")]
-    MK = {"uhucpm": ("o", fs.BLUE, "UHUCPM"), "cq": ("s", fs.ORANGE, "CQ-HUCPM"), "pso": ("^", fs.GRAY, "PSO-MUCP")}
+    # one figure per varied parameter; the others stay at their defaults (stated in the caption)
     nm = dict(NAME, syn="Synthetic")
-    fig, axes = plt.subplots(2, 5, figsize=(W2, 3.4)); axes = axes.ravel()
-    for i, (ax, (L, pts, xl)) in enumerate(zip(axes, spec)):
-        for p, (mk, c, lab) in MK.items():
-            xy = [(x, t(key, K, p)[0]) for key, K, x in pts if t(key, K, p)]
-            ax.plot([a for a, _ in xy], [b for _, b in xy], marker=mk, ms=2.5, lw=1.0, color=c, label=lab)
-        if xl == "$K$": ax.set_xscale("log"); ax.set_xticks([100, 300, 1000]); ax.set_xticklabels(["100", "300", "1000"]); ax.minorticks_off()
-        else: ax.set_xticks([x for _, _, x in pts])
-        ax.set_yscale("log"); ax.set_xlabel(xl, fontsize=7, labelpad=1); ax.tick_params(labelsize=6)
-        if i % 5 == 0: ax.set_ylabel("Time (s)", fontsize=7, labelpad=1)
-        ax.set_title(f"({chr(97 + i)}) {nm[L]}", fontsize=7, pad=2)
-    h, l = axes[0].get_legend_handles_labels()
-    fig.subplots_adjust(wspace=0.32, hspace=0.62, left=0.055, right=0.99, top=0.94, bottom=0.17)
-    fig.legend(h, l, loc="lower center", ncol=3, fontsize=6.5, frameon=False, bbox_to_anchor=(0.5, 0.0))
-    save(fig, "fig_time.pdf")
+    figs = {
+        "fig_time_K": ("Threshold rank $K$", [("New_Orleans", [(f"New_Orleans_k20_d50_f100", K, K) for K in (100, 300, 1000)]),
+                                             ("Tampa", [(f"Tampa_k20_d50_f100", K, K) for K in (100, 300, 1000)]),
+                                             ("NYC", [(f"NYC_k20_d50_f100", K, K) for K in (100, 300, 1000)])]),
+        "fig_time_d": ("Distance threshold $d$ (m)", [("Tampa", [(f"Tampa_k20_d{d}_f100", 100, d) for d in (30, 50, 70)]),
+                                                     ("NYC", [(f"NYC_k20_d{d}_f100", 100, d) for d in (30, 50, 70)])]),
+        "fig_time_k": ("Number of features $k$", [("Tampa", [(f"Tampa_k{k}_d50_f100", 100, k) for k in (12, 16, 20)]),
+                                                 ("NYC", [(f"NYC_k{k}_d50_f100", 100, k) for k in (20, 40, 60, 80)])]),
+        "fig_time_n": (None, [("New_Orleans", [(f"New_Orleans_k20_d50_f{f}", 100, f) for f in (25, 50, 75, 100)]),
+                              ("TKY", [(f"TKY_k20_d50_f{f}", 100, f) for f in (25, 50, 75, 100)]),
+                              ("syn", [(f"syn_n{n}", 100, n // 1000) for n in range(20000, 120001, 20000)])])}
+    MK = {"uhucpm": ("o", fs.BLUE, "UHUCPM"), "cq": ("s", fs.ORANGE, "CQ-HUCPM"), "pso": ("^", fs.GREEN, "PSO-MUCP")}
+    spec = []
+    for name, (xl, panels) in figs.items():
+        wide = len(panels) == 3
+        fig, axes = plt.subplots(1, len(panels), figsize=(W2 if wide else W1, 1.75 if wide else 1.6))
+        for i, (ax, (L, pts)) in enumerate(zip(axes, panels)):
+            spec.append((L, pts, xl))
+            ys = []
+            for p, (mk, c, lab) in MK.items():
+                xy = [(x, t(key, K, p)[0]) for key, K, x in pts if t(key, K, p)]
+                ax.plot([u for u, _ in xy], [v for _, v in xy], marker=mk, ms=3, lw=1.1, color=c, label=lab); ys += [v for _, v in xy]
+            ax.set_yscale("log"); lo, hi = min(ys), max(ys)
+            R = np.log10(hi / lo); ax.set_ylim(lo / 10 ** 0.15, hi * 10 ** (0.3 * R + 0.35))        # head room for the legend
+            if xl == "Threshold rank $K$": ax.set_xscale("log"); ax.set_xticks([100, 300, 1000]); ax.set_xticklabels(["100", "300", "1000"]); ax.minorticks_off()
+            else: ax.set_xticks([x for _, _, x in pts])
+            xlab = xl or ("Number of instances ($\\times$1000)" if L == "syn" else "Proportion of instances (%)")
+            ax.set_xlabel(xlab, fontsize=6.5, labelpad=1); ax.tick_params(labelsize=6)
+            ax.set_ylabel("Running time (s)", fontsize=6.5, labelpad=1)
+            ax.grid(True, which="major", lw=0.4, alpha=0.5)
+            ax.legend(loc="upper center", ncol=3 if wide else 2, fontsize=5, frameon=True, framealpha=0.9, handlelength=1.6, columnspacing=0.8, borderpad=0.3)
+        fig.subplots_adjust(wspace=0.38 if wide else 0.55, left=0.07 if wide else 0.15, right=0.99, top=0.98, bottom=0.27 if wide else 0.29)
+        for i, (ax, (L, _)) in enumerate(zip(axes, panels)):
+            bb = ax.get_position()
+            fig.text((bb.x0 + bb.x1) / 2, 0.005, f"({chr(97 + i)}) {nm[L]}", ha="center", va="bottom", fontsize=7.5)
+        save(fig, name + ".pdf")
     used = {key for _, pts, _ in spec for key, _, _ in pts}
     keys = [(k, K) for k in used for K in B.get(k, {}) if K != "n" and isinstance(B[k][K], dict)]
     nums["time_settings"] = len(keys)
