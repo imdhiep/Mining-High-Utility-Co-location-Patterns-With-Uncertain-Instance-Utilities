@@ -53,6 +53,9 @@ it is below 1e-7.
   - PSO-MUCP port against brute force with positive utilities (its pruning is safe there); with negative utilities it
     never reports a pattern below the threshold.
   - UTM against pyproj reference points.
-- `tests/verify_*.py`: the programs against the earlier Python implementation (`uhucm/`) and the authors' PSO-MUCP code.
+- `tests/verify_cq.py CQ_BINARY`: the authors' CQ-HUCPM in total-utility mode against brute force. The fixed build
+  agrees on every pattern decision (6,166 on 200 random datasets); the original build misses pairs.
+- `tests/verify_*.py` (others): the programs against the earlier Python implementation (`uhucm/`) and the authors'
+  PSO-MUCP code.
 
 Random streams (bootstrap of V_T) differ from numpy, so V_T agrees with the Python code in distribution only.
