@@ -1,7 +1,7 @@
 #!/bin/bash
 # Untimed runs of Section VI on a Kaggle CPU notebook (Internet on, the same two inputs as run_accuracy.sh):
 #   candidate counts of every program (pruning ratio) at the points of C.1 and C.4, counts on the real datasets (local
-#   rules, answer sizes by K and delta), the case study of D.2. Usage: bash experiments/kaggle/run_extras.sh
+#   rules, answer sizes by K and delta), the case study of D.2. Usage: bash experiments/kaggle/run_extras.sh [--no-c4]
 #   -> /kaggle/working/extras_raw.tar.gz
 set -e
 ROOT=$(cd "$(dirname "$0")/../.." && pwd); EXP=$ROOT/experiments; WORK=/kaggle/working
@@ -18,7 +18,9 @@ python3 "$EXP/scripts/check_layouts.py" "$EXP/data/layouts" "$EXP/kaggle/layout_
 cd "$EXP"
 python3 scripts/run_counts_real.py configs/timing.json && echo "finished counts on real data" || echo "failed counts on real data"
 python3 scripts/run_case.py configs/hold.json && echo "finished case study" || echo "failed case study"
-for e in C1_features C4_las_vegas C4_toronto C4_california; do
+COUNTS="C1_features C4_las_vegas C4_toronto C4_california"
+[ "$1" = "--no-c4" ] && COUNTS="C1_features"   # the C.4 counts are slow at large d: run them elsewhere
+for e in $COUNTS; do
   python3 scripts/run_timing.py configs/timing.json "$e" --counts > "$WORK/counts_$e.log" 2>&1 && echo "finished counts $e" || { echo "failed counts $e"; tail -5 "$WORK/counts_$e.log"; }
 done
 tar czf "$WORK/extras_raw.tar.gz" -C "$EXP" results/raw
