@@ -1,0 +1,218 @@
+diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm cq_cpp/CQ-HUCPM/CQ-HUCPM.cpp cq_total_fix/CQ-HUCPM.cpp
+--- cq_cpp/CQ-HUCPM/CQ-HUCPM.cpp	2026-11-21 09:45:18.936472380 +0700
++++ cq_total_fix/CQ-HUCPM.cpp	2026-11-21 10:37:00.328372490 +0700
+@@ -28,10 +28,10 @@
+ #include "tree.hh"
+ 
+ // For collecting memory usage
+-#include <Windows.h>
+ #include <stdio.h>
+-#include <Psapi.h>
+-#pragma comment(lib, "psapi.lib")
++#include <sys/resource.h>
++#include <cstdlib>
++#include <cstring>
+ 
+ // Import my function
+ #include "Object.h"
+@@ -43,7 +43,7 @@
+ using namespace std;
+ 
+ 
+-int main()
++int main(int argc, char** argv)
+ {
+ 	// Set time
+ 	clock_t startTime, endTime;
+@@ -62,15 +62,20 @@
+ 	startTime = clock();
+ 
+ 	// 1. Set parameters
+-	double dist_thres = 3200.0f;  // set the distance threshold
+-	double prev_thres = 0.2f; // set the prevalence
++	if (argc < 4) { std::cerr << "usage: cq_hucpm DATA_CSV DIST THRESHOLD [--patterns] [--score total --norm N]" << std::endl; return 2; }
++	for (int i = 4; i < argc; ++i)
++	{
++		if (std::strcmp(argv[i], "--score") == 0 && i + 1 < argc) g_total_score = std::strcmp(argv[++i], "total") == 0;
++		else if (std::strcmp(argv[i], "--norm") == 0 && i + 1 < argc) g_norm = std::atof(argv[++i]);
++	}
++	double dist_thres = std::atof(argv[2]);  // set the distance threshold
++	double prev_thres = std::atof(argv[3]); // set the prevalence
+ 	std::vector<int> topk{ 2, 4, 6, 8, 10 }; // set the number of top-k patterns
+ 	int numtopk = 10; // get the Qc for each size pattern in top of numtopk
+ 	int topkpersize = 2; // get QC of top-k of each size
+ 
+ 	// 2. Experiment number of instances
+-	string file_name = "./Data/quality/gongshan_plant_alphabet_sample_50_checkin.csv";
+-	freopen("./Data/quality/gongshan_plant_alphabet_sample_50_checkin_distance_3200_PI_02.txt", "w", stdout);
++	string file_name = argv[1];
+ 
+ 	// 2.1 Load the dataset
+ 	CSVReader reader(file_name); // Creating an object of CSVReader/CSVWriter	
+@@ -121,7 +126,7 @@
+ 	filterHighUtilityPatterns(Pk, HUPk, prev_thres);
+ 
+ 	std::cout << "The number of patterns: " << HUPk.size() << endl;
+-	//printPatterns(HUPk);
++	for (int i = 4; i < argc; ++i) if (std::strcmp(argv[i], "--patterns") == 0) printPatterns(HUPk);
+ 
+ 	timeFilHighPat = clock();
+ 	totalTimeFilHighPat = totalTimeFilHighPat + double(timeFilHighPat - timeCalcUitility);
+@@ -139,13 +144,8 @@
+ 	std::cout << "Time taken by the program is : " << time_taken / CLOCKS_PER_SEC << " s." << endl;
+ 
+ 	// 8. Show memory usage
+-	HANDLE handle = GetCurrentProcess();
+-	PROCESS_MEMORY_COUNTERS memCounter;
+-	GetProcessMemoryInfo(handle, &memCounter, sizeof(memCounter));
+-	SIZE_T physMemUsedByMe = memCounter.WorkingSetSize;
+-	SIZE_T physPeackMemUsedByMe = memCounter.PeakWorkingSetSize;
+-	std::cout << "Memory usage: " << physMemUsedByMe / 1024 << " (kB)" << std::endl;
+-	std::cout << "Peack memory usage: " << physPeackMemUsedByMe / 1024 << " (kB)" << std::endl;
++	struct rusage ru; getrusage(RUSAGE_SELF, &ru);
++	std::cout << "Peack memory usage: " << ru.ru_maxrss << " (kB)" << std::endl;
+ 
+ 	// 9. Count the number of each size
+ 	std::vector<int> maxsize;
+@@ -170,7 +170,7 @@
+ 		// Terminate
+ 		++itAllPats;
+ 	}
+-	int maxSize = *std::max_element(maxsize.begin(), maxsize.end());
++	int maxSize = maxsize.empty() ? 0 : *std::max_element(maxsize.begin(), maxsize.end());
+ 	std::cout << "The maximal size of patterns is: " << maxSize << endl;
+ 	std::cout << "Patters by sizes: \n";
+ 	printPattbySize(sizePats);
+diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm cq_cpp/CQ-HUCPM/Object.cpp cq_total_fix/Object.cpp
+--- cq_cpp/CQ-HUCPM/Object.cpp	2026-11-21 09:45:18.937270051 +0700
++++ cq_total_fix/Object.cpp	2026-11-21 10:37:00.328429174 +0700
+@@ -33,8 +33,11 @@
+ // Hash function for unordered_map
+ std::size_t myHashFunc::operator()(const ObjWithoutCoord& inst) const
+ {
+-	std::size_t h1 = std::hash<char>()(inst.feature);
+-	std::size_t h2 = std::hash<int>()(inst.instance);
++	// MSVC std::hash: FNV-1a over the bytes of the value (64-bit), as on the authors' Windows build
++	auto fnv = [](const unsigned char* p, std::size_t n) { std::size_t h = 14695981039346656037ULL;
++		for (std::size_t i = 0; i < n; ++i) { h ^= p[i]; h *= 1099511628211ULL; } return h; };
++	std::size_t h1 = fnv(reinterpret_cast<const unsigned char*>(&inst.feature), sizeof(inst.feature));
++	std::size_t h2 = fnv(reinterpret_cast<const unsigned char*>(&inst.instance), sizeof(inst.instance));
+ 	
+ 	return h1 ^ h2;
+ }
+\ No newline at end of file
+diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm cq_cpp/CQ-HUCPM/readerCSV.cpp cq_total_fix/readerCSV.cpp
+--- cq_cpp/CQ-HUCPM/readerCSV.cpp	2026-11-21 09:45:18.937270051 +0700
++++ cq_total_fix/readerCSV.cpp	2026-11-21 10:37:00.328447433 +0700
+@@ -5,7 +5,7 @@
+ #include <ostream>
+ #include <fstream>
+ #include <sstream>
+-#include <boost/algorithm/string.hpp>
++
+ 
+ 
+ /*
+@@ -23,7 +23,10 @@
+ 	while (getline(file, line))
+ 	{
+ 		std::vector<std::string> vec;
+-		boost::algorithm::split(vec, line, boost::is_any_of(delimeter));
++		if (!line.empty() && line.back() == '\r') line.pop_back();
++		std::stringstream ss(line); std::string cell;
++		while (std::getline(ss, cell, delimeter[0])) vec.push_back(cell);
++		if (!line.empty() && line.back() == delimeter[0]) vec.push_back("");
+ 		dataList.push_back(vec);
+ 	}
+ 	// Close the File
+diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm cq_cpp/CQ-HUCPM/toolFunctions.cpp cq_total_fix/toolFunctions.cpp
+--- cq_cpp/CQ-HUCPM/toolFunctions.cpp	2026-11-21 09:45:18.937270051 +0700
++++ cq_total_fix/toolFunctions.cpp	2026-11-21 10:37:00.345896854 +0700
+@@ -16,7 +16,7 @@
+ 
+ #include"tree.hh"
+ 
+-#include <boost/algorithm/string.hpp>
++
+ 
+ 
+ using namespace std;
+@@ -25,6 +25,8 @@
+ std::unordered_map<std::string, std::vector<std::unordered_set<ObjWithoutCoord, myHashFunc>>> coHM;
+ clock_t timeBuildHash;
+ double totalTimeBuildHash = 0.0f;
++bool g_total_score = false;
++double g_norm = 1.0;
+ 
+ 
+ // ------ For compare of set_intersection ------//
+@@ -195,7 +197,7 @@
+ 		{			
+ 			// Calculate nomorlized utiltiy of this instances
+ 			itminmaxU = minmaxU.find(currentInst.feature);
+-			float uc = (currentInst.u - itminmaxU->second[0]) / (itminmaxU->second[1] - itminmaxU->second[0]);
++			float uc = g_total_score ? currentInst.u : (currentInst.u - itminmaxU->second[0]) / (itminmaxU->second[1] - itminmaxU->second[0]);
+ 			// Save this uc to corresponding feature type
+ 			ittotalU = totalUtilityFeats.find(currentInst.feature);
+ 			if (ittotalU != totalUtilityFeats.end())
+@@ -231,7 +233,7 @@
+ 					{						
+ 						// Calculate nomorlized utiltiy of this instances
+ 						itminmaxU = minmaxU.find(checkInst.feature);
+-						uc = (checkInst.u - itminmaxU->second[0]) / (itminmaxU->second[1] - itminmaxU->second[0]);
++						uc = g_total_score ? checkInst.u : (checkInst.u - itminmaxU->second[0]) / (itminmaxU->second[1] - itminmaxU->second[0]);
+ 						// Save this uc to corresponding feature type
+ 						ObjWithoutCoord starN = {
+ 							checkInst.feature,
+@@ -449,6 +451,14 @@
+ 			// Clear tree for the next instances
+ 			ITree.clear();
+ 		}
++		else if (n == 2) // FIX (UHUCPM paper): a head with a single star neighbour forms the 2-clique {head, neighbour}
++		{
++			std::vector<ObjWithoutCoord> pair2(vertices.begin(), vertices.end());
++			std::sort(pair2.begin(), pair2.end());
++			timeBuildHash = clock();
++			createCoLoHM(pair2);
++			totalTimeBuildHash = totalTimeBuildHash + double(clock() - timeBuildHash);
++		}
+ 	}
+ }
+ 
+@@ -532,6 +542,13 @@
+ 		}
+ 	}
+ 
++	if (g_total_score)
++	{
++		double tot = 0.0;
++		for (size_t t = 0; t < sizeofPatttern; ++t)
++			for (auto const& inst : UTAll[t]) tot += inst.u;
++		return (float)(tot / g_norm);
++	}
+ 	// 2. Calculate intra utility
+ 	std::vector<float> intraU(sizeofPatttern);
+ 	for (size_t t = 0; t < sizeofPatttern; ++t)
+diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm cq_cpp/CQ-HUCPM/toolFunctions.h cq_total_fix/toolFunctions.h
+--- cq_cpp/CQ-HUCPM/toolFunctions.h	2026-11-21 09:45:18.937270051 +0700
++++ cq_total_fix/toolFunctions.h	2026-11-21 10:37:00.328524155 +0700
+@@ -12,7 +12,7 @@
+ 
+ #include"tree.hh"
+ 
+-#include <boost/algorithm/string.hpp>
++
+ 
+ 
+ #ifndef TOOLFUNCTIONS_H
+@@ -23,6 +23,10 @@
+ extern std::unordered_map<std::string, std::vector<std::unordered_set<ObjWithoutCoord, myHashFunc>>> coHM;
+ extern clock_t timeBuildHash;
+ extern double totalTimeBuildHash;
++// Added for the comparison in the UHUCPM paper: score a pattern by the total utility of its participating instances
++// divided by g_norm (the measure of the CQ-HUCPM.py released with PSO-MUCP), with the raw utilities of column 5.
++extern bool g_total_score;
++extern double g_norm;
+ 
+ 
+ /**
