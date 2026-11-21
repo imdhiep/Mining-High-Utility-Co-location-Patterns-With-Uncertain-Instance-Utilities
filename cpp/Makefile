@@ -25,3 +25,8 @@ all: $(BIN)/fsq_prep
 $(BIN)/fsq_prep: fsq_prep.cpp utm.hpp
 	mkdir -p $(BIN)
 	$(CXX) $(CXXFLAGS) -o $@ fsq_prep.cpp
+
+all: $(BIN)/yelp_prep
+$(BIN)/yelp_prep: yelp_prep.cpp io.hpp json_lite.hpp utm.hpp
+	mkdir -p $(BIN)
+	$(CXX) $(CXXFLAGS) -o $@ yelp_prep.cpp
