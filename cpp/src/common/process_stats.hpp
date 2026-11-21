@@ -14,7 +14,7 @@ private:
     std::chrono::steady_clock::time_point start_;
 };
 
-// peak resident set size in kilobytes (getrusage)
+// peak resident set size of this process in kilobytes (VmHWM; getrusage where /proc is missing)
 long long peakMemoryKb();
 
 }  // namespace colocation

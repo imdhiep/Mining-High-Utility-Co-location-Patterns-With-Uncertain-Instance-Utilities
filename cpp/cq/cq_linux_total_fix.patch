@@ -77,8 +77,8 @@ diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/CQ-H
 -	SIZE_T physPeackMemUsedByMe = memCounter.PeakWorkingSetSize;
 -	std::cout << "Memory usage: " << physMemUsedByMe / 1024 << " (kB)" << std::endl;
 -	std::cout << "Peack memory usage: " << physPeackMemUsedByMe / 1024 << " (kB)" << std::endl;
-+	struct rusage ru; getrusage(RUSAGE_SELF, &ru);
-+	std::cout << "Peack memory usage: " << ru.ru_maxrss << " (kB)" << std::endl;
++	long peakKb = 0; { FILE* st = std::fopen("/proc/self/status", "r"); char ln[256]; while (st && std::fgets(ln, sizeof ln, st)) if (std::sscanf(ln, "VmHWM: %ld", &peakKb) == 1) break; if (st) std::fclose(st); }
++	std::cout << "Peack memory usage: " << peakKb << " (kB)" << std::endl;
  
  	// 9. Count the number of each size
  	std::vector<int> maxsize;

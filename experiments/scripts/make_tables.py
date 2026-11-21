@@ -129,10 +129,10 @@ def table_pso(tm, path):
     d = tm[tm.experiment.str.startswith("C4")]
     rows = []
     for ds in sorted(d.dataset.unique()):
-        for v in sorted(d[d.dataset == ds].value.unique(), key=float):
+        for j, v in enumerate(sorted(d[d.dataset == ds].value.unique(), key=float)):
             s = d[(d.dataset == ds) & (d.value == v)]
             get = lambda m, col: s[s.program == m][col].iloc[0] if (s.program == m).any() else None
-            cells = [name(ds) if not rows or rows[-1][0] != name(ds) else "", f"{float(v):g}"]
+            cells = [name(ds) if j == 0 else "", f"{float(v):g}"]
             cells += [fmt(get(m, "mean_seconds"), 2) for m, _ in METHODS]
             cells += [fmt(None if get(m, "max_rss_kb") is None else get(m, "max_rss_kb") / 1024, 0) for m, _ in METHODS]
             rows.append(cells)

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Builds the authors' CQ-HUCPM (github.com/hatrasn/High-Utility-Co-location-Pattern-Mining, commit d5dcae8, MIT) on Linux.
-#   cq_original : the authors' mining code; only I/O for Linux (command-line arguments, getrusage, no boost CSV split,
+#   cq_original : the authors' mining code; only I/O for Linux (command-line arguments, peak memory from VmHWM, no boost CSV split,
 #                 MSVC-like FNV-1a hash) is changed  -> cq_linux_original.patch
 #   cq_fixed    : the same plus (i) --score total --norm N, the total-utility score of the CQ-HUCPM.py released with
 #                 PSO-MUCP, and (ii) the missing 2-cliques: a head with a single star neighbour never enters the
