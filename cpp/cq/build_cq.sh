@@ -4,7 +4,8 @@
 #                 MSVC-like FNV-1a hash) is changed  -> cq_linux_original.patch
 #   cq_fixed    : the same plus (i) --score total --norm N, the total-utility score of the CQ-HUCPM.py released with
 #                 PSO-MUCP, and (ii) the missing 2-cliques: a head with a single star neighbour never enters the
-#                 clique-hash table in generateCliques (if (n > 2)), so these pairs are added -> cq_linux_total_fix.patch
+#                 clique-hash table in generateCliques (if (n > 2)), so these pairs are added, and (iii) pattern scores
+#                 printed with 9 significant digits (every float exactly) -> cq_linux_total_fix.patch
 # Usage: sh build_cq.sh OUT_DIR
 set -e
 OUT=${1:-cq_build}; HERE=$(cd "$(dirname "$0")" && pwd)
