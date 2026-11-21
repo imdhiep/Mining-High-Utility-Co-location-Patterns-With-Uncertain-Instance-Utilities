@@ -7,13 +7,31 @@
 namespace colocation {
 
 std::map<char, double> PsoMucpConfig::parseUtility(std::string text) {
-    std::string compact;
-    for (char c : text)
-        if (c != '{' && c != '}' && c != '\'' && c != '"' && c != ' ') compact += c;
+    // "L:value,L:value,..." with one-character labels L (any label of feature_labels.hpp, ':' and '{' included), or a
+    // Python dict literal {'L': value, ...}; parsed by position so that a label equal to ':' or '{' is read correctly
+    const bool dict = text.size() >= 2 && text.front() == '{' && text.back() == '}';
+    if (dict) text = text.substr(1, text.size() - 2);
     std::map<char, double> out;
-    for (const std::string& item : CsvTable::splitLine(compact, ',')) {
-        const std::size_t colon = item.find(':');
-        if (colon != std::string::npos && colon > 0) out[item[0]] = std::stod(item.substr(colon + 1));
+    std::size_t i = 0;
+    while (i < text.size()) {
+        while (i < text.size() && (text[i] == ' ' || text[i] == ',')) ++i;   // never labels
+        if (i >= text.size()) break;
+        char label;
+        if (dict) {
+            if ((text[i] != '\'' && text[i] != '"') || i + 2 >= text.size() || text[i + 2] != text[i])
+                throw std::invalid_argument("utility: expected a quoted one-character label at " + std::to_string(i));
+            label = text[i + 1];
+            i += 3;
+        } else {
+            label = text[i++];
+        }
+        while (i < text.size() && text[i] == ' ') ++i;
+        if (i >= text.size() || text[i] != ':') throw std::invalid_argument(std::string("utility: expected ':' after ") + label);
+        ++i;
+        std::size_t end = text.find(',', i);
+        if (end == std::string::npos) end = text.size();
+        out[label] = std::stod(text.substr(i, end - i));
+        i = end;
     }
     return out;
 }

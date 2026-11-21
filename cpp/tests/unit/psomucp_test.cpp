@@ -45,6 +45,12 @@ TEST(psomucp_parses_both_utility_formats) {
     const auto b = PsoMucpConfig::parseUtility("{'A': 2, 'B': -1.5}");
     CHECK(a == b);
     CHECK(a.at('B') == -1.5);
+    // labels beyond the 52 letters (feature_labels.hpp) include ':', '{' and '}', as written by the harness
+    const auto c = PsoMucpConfig::parseUtility("::0.25,A:1,{:-2,}:3e-1,~:4");
+    CHECK(c.size() == 5 && c.at(':') == 0.25 && c.at('{') == -2 && c.at('}') == 0.3 && c.at('~') == 4);
+    const auto d = PsoMucpConfig::parseUtility("{':': 0.25, '{': -2, '}': 0.3}");
+    CHECK(d.size() == 3 && d.at(':') == 0.25 && d.at('{') == -2 && d.at('}') == 0.3);
+    CHECK_THROWS(PsoMucpConfig::parseUtility("AB:1"));
 }
 
 // with positive utilities every pruning strategy of PSO-MUCP is safe, so the port must return exactly the patterns whose
