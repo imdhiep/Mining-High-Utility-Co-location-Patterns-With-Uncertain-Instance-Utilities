@@ -24,6 +24,10 @@ class Programs:
         return self._json("post_counts", [data_csv, count_column, repr(float(exposure)), out, "--t", truncation, "--B", samples,
                                           "--seed", seed, "--prior", prior, "--center", center])
 
+    def post_ratings(self, data_csv, out, samples=20, seed=0):
+        """rating posterior (4) of an instance file with a stars column"""
+        return self._json("post_ratings", [data_csv, out, "--B", samples, "--seed", seed])
+
     def mine(self, data_csv, posterior, gamma, distance, z, top=None, set_level=None, top_probability=None, rule=None):
         """uhucpm_mine; with top_probability the scores are the probabilities p of reaching gamma; rule = "sum" or
         "global" applies one of the local pruning rules of Section IV (not safe, used only to count what they miss)"""

@@ -8,7 +8,7 @@ CPPFLAGS += -Isrc
 
 BUILD = build
 BIN = bin
-APPS = uhucpm_mine pso_mucp post_counts fsq_prep yelp_prep yelp_reviews pattern_scores
+APPS = uhucpm_mine pso_mucp post_counts post_ratings fsq_prep yelp_prep yelp_reviews pattern_scores
 
 LIB_SRC = $(shell find src -name '*.cpp' | sort)
 LIB_OBJ = $(LIB_SRC:%.cpp=$(BUILD)/%.o)

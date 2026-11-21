@@ -86,6 +86,7 @@ def table_model(acc, path):
             ("Spatial correlation $\\ell = 200$~m", "B2_spatial", 200.0), ("Spatial correlation $\\ell = 500$~m", "B2_spatial", 500.0),
             ("Truncation $t = 1$", "B2_truncation", 1)]
     items = [(lab if i == 0 else "", city, e, v) for lab, e, v in scen for i, city in enumerate(["Tampa", "New_York"])]
+    items.append(("Star ratings", "Tampa", "B2_rating", 1))       # rating model (4): Yelp layouts only
     top, rules, sub = method_header([("p", "Precision"), ("r", "Recall")])
     write(path, "Precision and recall when the data depart from the check-in model, with $c = 1$, $K = 100$ and $d = 50$~m.",
           "tab:model", "ll" + "rr" * len(METHODS), [f" & & {top} \\\\", rules, f"Scenario & City & {sub} \\\\"],

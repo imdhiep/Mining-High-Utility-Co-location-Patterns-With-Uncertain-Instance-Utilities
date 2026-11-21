@@ -18,6 +18,8 @@ For one layout, one setting and one seed:
   6. coverage of the lower bound of UHUCPM, the set rule S_delta, and (when "extras") the configurations reported in one
      sentence each: per-instance lower bound with CQ-HUCPM, PSO-MUCP with the true feature utilities, prior-median
      center, Gamma-Poisson prior, V_T without its shared term, sum of positive means as normalizer.
+An experiment with "data": "rating" uses semi-synthetic star ratings on a Yelp layout (harness/ratingsim.py) and the
+rating posterior (4) (cpp/bin/post_ratings) in step 2, with the same methods afterwards.
 One JSON line per (layout, setting, seed) goes to results/raw/<experiment>/<start time>.jsonl.
 
 Usage: python run_accuracy.py CONFIG EXPERIMENT [--seeds N] [--layouts LAYOUT,...]"""
@@ -27,7 +29,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
-from harness import layouts, metrics, posterior_file, semisyn  # noqa: E402
+from harness import layouts, metrics, posterior_file, ratingsim, semisyn  # noqa: E402
 from harness.programs import Programs  # noqa: E402
 from harness.results import RawWriter  # noqa: E402
 
@@ -93,10 +95,15 @@ class SeedRun:
         lower = [mined["score_of"][q] * Z for q in pats]
         return dict(coverage=metrics.coverage(lower, true["M"]), sizes=[len(q) for q in pats], lower=lower, true=true["M"])
 
+    def make_posterior(self, post_path):
+        """posterior of Definition 4 from the semi-synthetic counts"""
+        g = self.g
+        return self.p.posterior(self.data, "count", g["exposure"], post_path, truncation=self.s["t"], samples=self.samples, seed=g["seed"])
+
     def run(self, Ks, deltas):
         t0 = time.time(); g = self.g
         post_path = os.path.join(self.work, "post.bin")
-        post = self.p.posterior(self.data, "count", g["exposure"], post_path, truncation=self.s["t"], samples=self.samples, seed=g["seed"])
+        post = self.make_posterior(post_path)
         Z = post["Z"]; P = posterior_file.read(post_path)
         mu, s2 = P["mean"], P["variance"]
         Z_true = float(np.clip(g["utility"], 0, None).sum())
@@ -104,7 +111,7 @@ class SeedRun:
         truth = self.p.mine(self.data, truth_post, TOP_START, self.d, 0.0, top=max(Ks))
         true_scores = sorted(truth["scores"], reverse=True)
         cq_all = self.p.cq(self._write_instances("cq.csv", "Checkin", mu), self.d, -1e30, Z)
-        out = dict(n=len(mu), Z=Z, Z_true=Z_true, local_edge_mass_max=post["local_edge_mass_max"],
+        out = dict(n=len(mu), Z=Z, Z_true=Z_true, local_edge_mass_max=post.get("local_edge_mass_max"),
                    posterior_seconds=post["seconds"], cq_seconds=cq_all["seconds"], per_K={})
         for K in Ks:
             if len(true_scores) < K:
@@ -180,6 +187,29 @@ class SeedRun:
                     sizes=lbc["sizes"], lower=lbc["lower"], true=lbc["true"])
 
 
+class RatingSeedRun(SeedRun):
+    """the same methods on the rating posterior (4) of semi-synthetic star ratings (harness/ratingsim.py)"""
+
+    def make_posterior(self, post_path):
+        path = os.path.join(self.work, "ratings.csv"); xy = self.g["xy"] - self.g["xy"].min(0); counter = {}
+        with open(path, "w") as f:
+            f.write("Feature,Instance,LocX,LocY,a,stars\n")
+            for lab, (x, y), a, st in zip(self.labels, xy, self.g["counts"], self.g["stars"]):
+                counter[lab] = counter.get(lab, 0) + 1
+                f.write(f"{lab},{counter[lab]},{float(x)!r},{float(y)!r},{float(a)!r},{';'.join(map(str, st))}\n")
+        return self.p.post_ratings(path, post_path, samples=self.samples, seed=self.g["seed"])
+
+
+def rating_layout(path):
+    """Yelp layout with its rating statistics: labels, xy, a, n, S, SS"""
+    import csv
+    with open(path, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    col = lambda c: np.array([float(r[c]) for r in rows])
+    return np.array([r["Feature"] for r in rows]), np.array([(float(r["LocX"]), float(r["LocY"])) for r in rows]), \
+        col("a"), col("n_r"), col("S"), col("SS")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("config"); ap.add_argument("experiment")
@@ -199,14 +229,21 @@ def main():
         for name in names:
             entry = index[f"{name}_k{setting['k']}"]
             layout = layouts.load(os.path.join(root, entry["file"]), name, entry["exposure"])
-            loc, scale = layouts.truth_law(layout)
+            rating = exp.get("data") == "rating"
+            if rating:
+                labels, xy, a_real, n_r, S_r, SS_r = rating_layout(os.path.join(root, entry["file"]))
+            else:
+                loc, scale = layouts.truth_law(layout)
             for seed in range(seeds):
                 if (name, json.dumps(value), seed) in done:
                     continue
-                draw = semisyn.draw(layout, loc, scale, setting, seed)
+                if rating:
+                    draw = ratingsim.draw(layout.feature_index(), xy, a_real, n_r, S_r, SS_r, setting, seed)
+                else:
+                    draw = semisyn.draw(layout, loc, scale, setting, seed)
                 with tempfile.TemporaryDirectory() as work:
-                    out = SeedRun(programs, layout, setting, draw, work, cfg["z"], cfg["bootstrap"], exp.get("extras", False)).run(
-                        setting["Ks"], setting["deltas"])
+                    out = (RatingSeedRun if rating else SeedRun)(programs, layout, setting, draw, work, cfg["z"], cfg["bootstrap"],
+                                                                 exp.get("extras", False)).run(setting["Ks"], setting["deltas"])
                 writer.write(dict(layout=name, vary=exp["vary"], value=value, setting=setting, seed=seed, result=out))
                 k0 = out["per_K"][setting["Ks"][0]]
                 brief = {m: (k0[m] or {}).get("precision") for m in ("uhucpm", "cq", "pso")} if "gamma" in k0 else k0

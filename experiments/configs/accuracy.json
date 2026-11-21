@@ -16,6 +16,7 @@
     "B2_law":          {"layouts": ["Tampa", "New_York"], "vary": "law", "values": ["gamma", "mixture"]},
     "B2_spatial":      {"layouts": ["Tampa", "New_York"], "vary": "ell", "values": [200.0, 500.0]},
     "B2_truncation":   {"layouts": ["Tampa", "New_York"], "vary": "t", "values": [1]},
+    "B2_rating":       {"layouts": ["Tampa"], "vary": "c", "values": [1], "data": "rating"},
     "B3_threshold":    {"layouts": ["Philadelphia", "New_York"], "vary": "Ks", "values": [[100, 300, 1000]],
                         "set": {"deltas": [0.01, 0.05, 0.1, 0.2, 0.3]}},
     "B3_distance":     {"layouts": ["New_Orleans"], "vary": "d", "values": [30.0, 50.0, 70.0]},

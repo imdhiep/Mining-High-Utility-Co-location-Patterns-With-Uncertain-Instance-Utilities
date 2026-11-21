@@ -19,7 +19,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 from harness.processed import mean_sd, ranked, raw_records, write_csv  # noqa: E402
 
-EXPERIMENTS = ["B1_evidence", "B1_pr", "B2_overdispersion", "B2_law", "B2_spatial", "B2_truncation", "B3_threshold", "B3_distance",
+EXPERIMENTS = ["B1_evidence", "B1_pr", "B2_overdispersion", "B2_law", "B2_spatial", "B2_truncation", "B2_rating", "B3_threshold", "B3_distance",
                "B3_features", "B3_share"]
 METRICS = ["precision", "recall", "n", "precision_at_k", "coverage", "size_max"]
 COLUMNS = ["experiment", "layout", "vary", "value", "K", "method", "delta", "seeds", "empty", "not_run"] + \
