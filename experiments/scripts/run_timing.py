@@ -15,8 +15,9 @@ Each record also keeps the programs' own statistics (cliques, evaluated candidat
 Datasets: "synthetic" (harness/synthetic.py, n and k given), a layout of data/layouts/index.json (New_York, Tampa, ...)
 with an optional share of its instances, or a dataset released with PSO-MUCP (feature-level problem: the authors'
 utilities, every method on the same feature utilities).
-Usage: python run_timing.py CONFIG EXPERIMENT [--reps N]"""
-import argparse, json, os, statistics, subprocess, sys, tempfile, time
+With --counts nothing is timed: every program runs once and its candidate counts are recorded (pruning ratio).
+Usage: python run_timing.py CONFIG EXPERIMENT [--reps N] [--counts]"""
+import argparse, json, os, re, statistics, subprocess, sys, tempfile, time
 
 import numpy as np
 
@@ -41,6 +42,22 @@ def timed(cmd, reps):
     once()
     runs = [once() for _ in range(reps)]
     return [t for t, _ in runs], runs[-1][1]
+
+
+def candidate_counts(cmd, name):
+    """one untimed run: number of patterns whose score is computed (evaluated) and the other counts of the program.
+    CQ-HUCPM computes the utility of every pattern that has a row instance, so its count is also the number of
+    candidate patterns, the denominator of the pruning ratio (definition (7) of PSO-MUCP)."""
+    p = subprocess.run(cmd, capture_output=True, text=True)
+    if p.returncode not in (0, 3):
+        raise RuntimeError(f"{os.path.basename(cmd[0])} failed: {p.stderr[-1500:]}")
+    if name == "cq":
+        m = re.search(r"Number of evaluated patterns: (\d+)", p.stdout)
+        k = re.search(r"The number of patterns: (\d+)", p.stdout)
+        return dict(evaluated=int(m.group(1)) if m else None, n=int(k.group(1)) if k else None)
+    st = last_json(p.stdout)
+    return dict(evaluated=st.get("evaluated"), visited=st.get("visited"), n=len(st.get("patterns", [])),
+                all_pattern_num=st.get("all_pattern_num"), cliques=st.get("cliques"))
 
 
 def last_json(text):
@@ -125,13 +142,15 @@ def load_dataset(spec, value, index, root):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("config"); ap.add_argument("experiment"); ap.add_argument("--reps", type=int)
+    ap.add_argument("--counts", action="store_true",
+                    help="no timing: run every program once and record its candidate counts (results/raw/EXPERIMENT_counts)")
     a = ap.parse_args()
     cfg = json.load(open(a.config)); root = os.path.dirname(os.path.dirname(os.path.abspath(a.config)))
     exp = cfg["experiments"][a.experiment]; reps = a.reps or cfg["reps"]
     index_path = os.path.join(root, cfg["layout_index"]); index = json.load(open(index_path)) if os.path.exists(index_path) else {}
     bin_dir = os.path.join(root, cfg["bin_dir"]); cq_binary = os.path.join(root, cfg["cq_binary"])
     programs = Programs(bin_dir, cq_binary)
-    writer = RawWriter(os.path.join(root, cfg["results_dir"]), a.experiment, os.path.join(root, ".."))
+    writer = RawWriter(os.path.join(root, cfg["results_dir"]), a.experiment + ("_counts" if a.counts else ""), os.path.join(root, ".."))
     for spec in exp["datasets"]:
         spec = dict(spec, vary=exp["vary"])
         for value in exp["values"]:
@@ -143,13 +162,17 @@ def main():
                 rec = dict(dataset=spec.get("name", spec["kind"]), vary=exp["vary"], value=value, n=len(labels),
                            features=len(set(labels.tolist())), d=d, K=K, gamma=pt.gamma, Z=pt.Z, programs={})
                 for name, cmd in pt.commands(bin_dir, cq_binary, cfg["delta"], cfg["z"]).items():
+                    if a.counts:
+                        rec["programs"][name] = candidate_counts(cmd, name)
+                        continue
                     times, out = timed(cmd, reps)
                     stats = last_json(out) if name != "cq" else {}
                     rec["programs"][name] = dict(seconds=times, median=statistics.median(times),
                                                  stats={k: v for k, v in stats.items() if k not in ("patterns", "scores", "probabilities")},
                                                  n=len(stats.get("patterns", [])) if stats else None, raw=out[-800:] if name == "cq" else None)
                 writer.write(rec)
-                print(a.experiment, rec["dataset"], exp["vary"], value, {k: round(v["median"], 3) for k, v in rec["programs"].items()}, flush=True)
+                print(a.experiment, rec["dataset"], exp["vary"], value,
+                      {k: (v.get("evaluated") if a.counts else round(v["median"], 3)) for k, v in rec["programs"].items()}, flush=True)
     print("raw results:", writer.path)
 
 

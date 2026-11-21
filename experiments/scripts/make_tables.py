@@ -102,23 +102,26 @@ def table_mining(acc, path):
           two_metric_rows(acc, items), wide=True)
 
 
-def table_count(acc, path):
-    cities = ["Philadelphia", "New_York"]
-    d = acc[(acc.experiment == "B3_threshold") & (acc.method == "set_rule")]
+def table_count(ans, path):
+    """number of patterns and largest pattern size of UHUCPM (S_delta) by K and delta on the real datasets of C.3"""
+    cities = ["New_Orleans", "Tampa", "New_York"]
+    d = ans[ans.rule == "set"]
     rows = []
     for K in sorted(d.K.unique()):
-        for delta in sorted(d.delta.dropna().unique()):
-            cells = [str(K) if not rows or rows[-1] == "MIDRULE" else "", f"{delta:g}"]
+        for j, delta in enumerate(sorted(d.delta.unique())):
+            cells = [str(K) if j == 0 else "", f"{delta:g}"]
             for c in cities:
-                r = d[(d.K == K) & (d.delta == delta) & (d.layout == c)]
-                cells += [fmt(r.n_mean.iloc[0] if not r.empty else None, 1), fmt(r.size_max_mean.iloc[0] if not r.empty else None, 1)]
+                r = d[(d.K == K) & (d.delta == delta) & (d.city == c)]
+                cells += [DASH if r.empty else str(int(r.patterns.iloc[0])),
+                          DASH if r.empty or pd.isna(r.largest.iloc[0]) else str(int(r.largest.iloc[0]))]
             rows.append(cells)
         rows.append("MIDRULE")
     rows = rows[:-1]
     head = " & ".join(f"\\multicolumn{{2}}{{c}}{{{name(c)}}}" for c in cities)
+    rules = " ".join(f"\\cmidrule(lr){{{3 + 2 * i}-{4 + 2 * i}}}" for i in range(len(cities)))
+    sub = " & ".join("Patterns & Largest" for _ in cities)
     write(path, "Number of patterns and largest pattern size of UHUCPM under different $K$ and $\\delta$.", "tab:count",
-          "ll" + "rr" * len(cities), [f" & & {head} \\\\", "\\cmidrule(lr){3-4} \\cmidrule(lr){5-6}",
-                                     "$K$ & $\\delta$ & Patterns & Largest size & Patterns & Largest size \\\\"], rows, colsep=4)
+          "ll" + "rr" * len(cities), [f" & & {head} \\\\", rules, f"$K$ & $\\delta$ & {sub} \\\\"], rows, colsep=4)
 
 
 def table_pso(tm, path):
@@ -168,7 +171,10 @@ def main():
     out = lambda f: os.path.join(a.out, f)
     if not acc.empty:
         table_accuracy(acc, out("tab_accuracy.tex")); table_model(acc, out("tab_model.tex"))
-        table_mining(acc, out("tab_mining.tex")); table_count(acc, out("tab_count.tex"))
+        table_mining(acc, out("tab_mining.tex"))
+    ans = read("answer_counts.csv")
+    if not ans.empty:
+        table_count(ans, out("tab_count.tex"))
     if not tm.empty:
         table_pso(tm, out("tab_psodata.tex"))
     if not curve.empty:

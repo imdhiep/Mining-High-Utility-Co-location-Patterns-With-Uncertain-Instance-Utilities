@@ -3,6 +3,7 @@
 // (posterior file with the true values and zero variances) and to check the coverage of the lower bound.
 // Usage: pattern_scores DATA_CSV POSTERIOR D Z PATTERNS_FILE
 //   PATTERNS_FILE: one pattern per line, feature names concatenated (one-character feature names)
+//   --instances   also print the participating instances of every pattern (row numbers of DATA_CSV, from 0)
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -35,7 +36,7 @@ std::vector<int> parsePattern(const std::string& text, const std::map<char, int>
 }
 
 int run(int argc, char** argv) {
-    const CommandLine cl(argc, argv);
+    const CommandLine cl(argc, argv, {"instances"});
     if (cl.positionalCount() < 5) {
         std::cerr << "usage: pattern_scores DATA_CSV POSTERIOR D Z PATTERNS_FILE\n";
         return kExitUsage;
@@ -55,6 +56,7 @@ int run(int argc, char** argv) {
     if (!in) throw std::runtime_error("cannot open " + cl.positional(4));
     std::vector<std::string> names;
     std::vector<double> M, V, scores, counts;
+    std::vector<JsonLineWriter> members;
     for (std::string line; std::getline(in, line);) {
         if (!line.empty() && line.back() == '\r') line.pop_back();
         if (line.empty()) continue;
@@ -64,10 +66,15 @@ int run(int argc, char** argv) {
         V.push_back(utilities.totalVariance(instances));
         scores.push_back(utilities.score(instances, z));
         counts.push_back(static_cast<double>(instances.size()));
+        if (cl.has("instances")) {
+            members.emplace_back();
+            members.back().field("instances", std::vector<double>(instances.begin(), instances.end()));
+        }
     }
     JsonLineWriter out;
     out.field("patterns", names).field("M", M).field("V", V).field("scores", scores).field("participating", counts)
         .field("Z", utilities.normalizer());
+    if (cl.has("instances")) out.field("members", members);
     std::cout << out.str() << std::endl;
     return 0;
 }

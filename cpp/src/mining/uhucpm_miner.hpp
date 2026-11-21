@@ -58,13 +58,16 @@ public:
     MiningResult mineTop(int k, double startGamma);
     static constexpr double kSmallestTopGamma = 1e-12;
     // the patterns ranked by p = Phi((M - gamma Z) / sqrt(V)), the posterior probability of reaching config.gamma, down
-    // to the k-th (ties included); the result maps each pattern to its p. Exact: p >= Phi(z) holds exactly when
+    // to the k-th (ties included); the result maps each pattern to its standardized margin t = (M - gamma Z) / sqrt(V)
+    // (p = Phi(t); t keeps the order where p rounds to 1 in double precision, from t > 8.3; V = 0 gives +-kInfiniteMargin
+    // by the sign of M - gamma Z). Exact: p >= Phi(z) holds exactly when
     // Lambda_z >= gamma, so the search mines at gamma with z = kTopZStart, kTopZStart - kTopZStep, ... until at least k
     // patterns reach it (or z falls below kTopZEnd). For z < 0 the subtree bounds do not hold, so no pruning is used.
     MiningResult mineTopProbability(int k);
     static constexpr double kTopZStart = 3.0;
     static constexpr double kTopZStep = 0.5;
     static constexpr double kTopZEnd = -4.0;
+    static constexpr double kInfiniteMargin = 1e300;
 
 private:
     class Search;                       // state of one run of the depth-first search

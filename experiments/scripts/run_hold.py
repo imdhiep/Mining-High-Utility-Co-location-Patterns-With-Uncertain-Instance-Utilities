@@ -8,7 +8,8 @@ Per city:
   the test ratings; instances without a test value count as 0; Z_test = sum of the positive test utilities.
   gamma_K = the K-th largest training point score.
 Methods at gamma_K: UHUCPM (S_delta, default delta), CQ-HUCPM (authors' code, posterior means), PSO-MUCP (C++ port,
-its K highest feature-level scores). Rankings kept for the comparison at the same number of patterns: UHUCPM by p,
+its K highest feature-level scores); the CQ-HUCPM decision is checked against the point scores of UHUCPM (z = 0).
+Rankings kept for the comparison at the same number of patterns: UHUCPM by p (stored as the margin t, p = Phi(t)),
 CQ-HUCPM by its total, PSO-MUCP by its feature-level score (first RANKING_DEPTH * K patterns each).
 For every pattern that appears anywhere, its test score (test total / Z_test) is stored, so that hold rates (test score
 >= gamma_K) are computed afterwards for any set and any n.
@@ -25,6 +26,7 @@ from harness.results import RawWriter  # noqa: E402
 
 TOP_START = 0.05
 TIE_MARGIN = 1 - 1e-9
+CQ_MARGIN = 1 - 1e-6        # CQ-HUCPM adds utilities in float32: its total of the K-th pattern can fall just below gamma
 RANKING_DEPTH = 3
 
 
@@ -33,15 +35,22 @@ def read_csv(path):
         return list(csv.DictReader(f))
 
 
+def translated(rows):
+    """coordinates translated to the origin: CQ-HUCPM stores them in float32, which loses centimetres at UTM magnitudes
+    and changes neighbour relations at the distance threshold (the other programs read doubles)"""
+    x0 = min(float(r["LocX"]) for r in rows); y0 = min(float(r["LocY"]) for r in rows)
+    return [(float(r["LocX"]) - x0, float(r["LocY"]) - y0) for r in rows]
+
+
 def prepare_city(city, cfg, root, programs, work):
-    """instance file, training posterior file and test utilities of one city"""
+    """instance file (coordinates translated to the origin), training posterior file and test utilities of one city"""
     data = os.path.join(work, "data.csv")
     if city["source"] == "foursquare":
         rows = read_csv(os.path.join(root, city["layout"]))
         with open(data, "w") as f:
             f.write("Feature,Instance,LocX,LocY,a,a_test\n")
-            for r in rows:
-                f.write(f"{r['Feature']},{r['Instance']},{r['LocX']},{r['LocY']},{r['a']},{r['a_test']}\n")
+            for r, (x, y) in zip(rows, translated(rows)):
+                f.write(f"{r['Feature']},{r['Instance']},{x!r},{y!r},{r['a']},{r['a_test']}\n")
         post = os.path.join(work, "post.bin")
         programs.posterior(data, "a", city["exposure"], post, truncation=1, samples=cfg["bootstrap"], seed=0)
         test_post = os.path.join(work, "test.bin")
@@ -51,8 +60,8 @@ def prepare_city(city, cfg, root, programs, work):
         rows = read_csv(os.path.join(root, city["csv"]))
         with open(data, "w") as f:
             f.write("Feature,Instance,LocX,LocY\n")
-            for r in rows:
-                f.write(f"{r['Feature']},{r['Instance']},{r['LocX']},{r['LocY']}\n")
+            for r, (x, y) in zip(rows, translated(rows)):
+                f.write(f"{r['Feature']},{r['Instance']},{x!r},{y!r}\n")
         post = os.path.join(root, city["post"])
         test = np.array([float(r["mu_test"]) for r in rows])
     return data, post, np.nan_to_num(test, nan=0.0)
@@ -95,7 +104,8 @@ def main():
                     rec["per_K"][K] = dict(skipped=True); continue
                 gamma = point_scores[K - 1]
                 S_u = set(programs.mine(data, post, gamma, d, 0.0, set_level=delta)["patterns"])
-                S_cq = {q for q, s in cq_all.items() if s >= gamma}
+                S_cq = {q for q, s in cq_all.items() if s >= gamma * CQ_MARGIN}
+                S_point = set(programs.mine(data, post, gamma, d, 0.0)["patterns"])   # same decision as CQ-HUCPM (check)
                 rank_u = programs.mine(data, post, gamma, d, 0.0, top_probability=RANKING_DEPTH * K)["score_of"]
                 rank_cq = dict(sorted(cq_all.items(), key=lambda kv: -kv[1])[:RANKING_DEPTH * K])
                 S_pso, rank_pso = None, {}
@@ -108,6 +118,7 @@ def main():
                 every = sorted(set().union(S_u, S_cq, S_pso or set(), rank_u, rank_cq, rank_pso))
                 ts = programs.pattern_scores(data, test_post, d, 0.0, every, work) if every else dict(patterns=[], scores=[])
                 rec["per_K"][K] = dict(gamma=gamma, uhucpm=sorted(S_u), cq=sorted(S_cq), pso=None if S_pso is None else sorted(S_pso),
+                                       cq_equals_point=S_cq == S_point,
                                        ranking=dict(uhucpm=rank_u, cq=rank_cq, pso=rank_pso),
                                        test_score=dict(zip(ts["patterns"], ts["scores"])))
             writer.write(rec)

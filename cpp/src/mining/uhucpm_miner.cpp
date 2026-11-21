@@ -350,7 +350,7 @@ MiningResult UhucpmMiner::mineTopProbability(int k) {
     for (auto& kv : result.patterns) {
         const std::vector<int> instances = table_.participatingInstances(kv.first);
         const double v = utilities_.totalVariance(instances), m = utilities_.totalMean(instances);
-        kv.second = v > 0 ? SpecialFunctions::normalCdf((m - threshold) / std::sqrt(v)) : (m >= threshold ? 1.0 : 0.0);
+        kv.second = v > 0 ? (m - threshold) / std::sqrt(v) : (m >= threshold ? kInfiniteMargin : -kInfiniteMargin);
     }
     keepTop(result.patterns, k);
     return result;

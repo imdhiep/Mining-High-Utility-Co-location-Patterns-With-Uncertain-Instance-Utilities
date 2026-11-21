@@ -24,9 +24,12 @@ class Programs:
         return self._json("post_counts", [data_csv, count_column, repr(float(exposure)), out, "--t", truncation, "--B", samples,
                                           "--seed", seed, "--prior", prior, "--center", center])
 
-    def mine(self, data_csv, posterior, gamma, distance, z, top=None, set_level=None, top_probability=None):
-        """uhucpm_mine; with top_probability the scores are the probabilities p of reaching gamma"""
+    def mine(self, data_csv, posterior, gamma, distance, z, top=None, set_level=None, top_probability=None, rule=None):
+        """uhucpm_mine; with top_probability the scores are the probabilities p of reaching gamma; rule = "sum" or
+        "global" applies one of the local pruning rules of Section IV (not safe, used only to count what they miss)"""
         args = [data_csv, posterior, repr(float(gamma)), repr(float(distance)), repr(float(z)), "--scores"]
+        if rule is not None:
+            args += ["--rule", rule]
         if top is not None:
             args += ["--top", int(top)]
         if top_probability is not None:
@@ -37,11 +40,14 @@ class Programs:
         r["score_of"] = dict(zip(r["patterns"], r.get("scores", [])))
         return r
 
-    def pattern_scores(self, data_csv, posterior, distance, z, patterns, work_dir):
+    def pattern_scores(self, data_csv, posterior, distance, z, patterns, work_dir, instances=False):
+        """M, V, Lambda_z and the number of participating instances of the given patterns (and, with instances, the
+        participating instances themselves: row numbers of data_csv)"""
         path = os.path.join(work_dir, "patterns.txt")
         with open(path, "w") as f:
             f.write("".join(p + "\n" for p in patterns))
-        return self._json("pattern_scores", [data_csv, posterior, repr(float(distance)), repr(float(z)), path])
+        return self._json("pattern_scores", [data_csv, posterior, repr(float(distance)), repr(float(z)), path]
+                          + (["--instances"] if instances else []))
 
     def pso(self, data_csv, utility, min_utility, distance, normalizer):
         spec = ",".join(f"{k}:{float(v)!r}" for k, v in sorted(utility.items()))

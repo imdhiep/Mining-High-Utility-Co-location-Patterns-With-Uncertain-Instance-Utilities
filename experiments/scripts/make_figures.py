@@ -72,23 +72,21 @@ def accuracy_figure(acc, experiment, layouts, xcol, xlabel, path, width, metric=
     finish(fig, axes, [name(l) for l in layouts], method_handles(METHODS), path)
 
 
-def pr_figure(pr, acc, path):
+def pr_figure(pr, path):
+    """each method's ranking by its own score (B1_pr keeps the three rankings on the same draws)"""
     layouts = ["New_York", "Tokyo"]
-    d = pr[(pr.experiment == "B1_evidence") & (pr.value.astype(str) == "1") & (pr.K == 100)]
+    d = pr[(pr.experiment == "B1_pr") & (pr.K == 100)]
     if d.empty:
         print("no data for", path); return
     fig, axes = panels(len(layouts), SINGLE, 1.9)
     for ax, lay in zip(axes, layouts):
-        for m in ("uhucpm", "cq"):
+        for m in METHODS:
             s = d[(d.layout == lay) & (d.method == m)].sort_values("n")
-            ax.plot(s.recall_mean, s.precision_mean, color=METHODS[m][1], linestyle=METHODS[m][3])
-        p = acc[(acc.experiment == "B1_evidence") & (acc.value.astype(str) == "1") & (acc.K == 100) & (acc.layout == lay) & (acc.method == "pso")]
-        if not p.empty and pd.notna(p.precision_mean.iloc[0]):
-            ax.plot(p.recall_mean, p.precision_mean, color=METHODS["pso"][1], marker=METHODS["pso"][2], linestyle="none", markersize=5)
+            if not s.empty:
+                ax.plot(s.recall_mean, s.precision_mean, color=METHODS[m][1], linestyle=METHODS[m][3])
         ax.set_xlabel("Recall"); ax.set_xlim(0, 1); ax.set_ylim(0, 1.02)
     axes[0].set_ylabel("Precision")
-    handles = [Line2D([], [], color=METHODS[m][1], linestyle=METHODS[m][3], label=METHODS[m][0]) for m in ("uhucpm", "cq")] + \
-              [Line2D([], [], color=METHODS["pso"][1], marker=METHODS["pso"][2], linestyle="none", label="PSO-MUCP")]
+    handles = [Line2D([], [], color=METHODS[m][1], linestyle=METHODS[m][3], label=METHODS[m][0]) for m in METHODS]
     finish(fig, axes, [name(l) for l in layouts], handles, path)
 
 
@@ -176,7 +174,7 @@ def main():
             accuracy_figure_k(k, out("fig_threshold.pdf"))
         delta_figure(acc, out("fig_level.pdf"))
     if not pr.empty:
-        pr_figure(pr, acc, out("fig_precision_recall.pdf"))
+        pr_figure(pr, out("fig_precision_recall.pdf"))
     if not tm.empty:
         timing_figure(tm, [("C1_features", "Synthetic"), ("C1_features", "New_York")], "features", "Number of features",
                       out("fig_time_features.pdf"), SINGLE)

@@ -7,7 +7,8 @@ Files written to results/processed/:
                  of seeds where the method did not run. Methods: uhucpm (S_delta), cq, pso, uhucpm_threshold (with the
                  coverage of its lower bound), set_rule at every level delta, and the configurations stated only in the
                  text (extras of B.1).
-  pr_curve.csv   precision and recall of the first n patterns of each ranking (UHUCPM by p, CQ-HUCPM by its total),
+  pr_curve.csv   precision and recall of the first n patterns of each ranking (UHUCPM by p, CQ-HUCPM by its total, PSO-MUCP by its
+                 feature-level score where recorded),
                  n = 1 .. RANKING_DEPTH * K, averaged over the seeds whose ranking has at least n patterns.
   posterior.csv  largest posterior mass on the local-grid edges and the posterior time, per experiment and layout.
 Usage: python aggregate_accuracy.py [--results DIR] [EXPERIMENT ...]"""
@@ -18,7 +19,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))
 from harness.processed import mean_sd, ranked, raw_records, write_csv  # noqa: E402
 
-EXPERIMENTS = ["B1_evidence", "B2_overdispersion", "B2_law", "B2_spatial", "B2_truncation", "B3_threshold", "B3_distance",
+EXPERIMENTS = ["B1_evidence", "B1_pr", "B2_overdispersion", "B2_law", "B2_spatial", "B2_truncation", "B3_threshold", "B3_distance",
                "B3_features", "B3_share"]
 METRICS = ["precision", "recall", "n", "precision_at_k", "coverage", "size_max"]
 COLUMNS = ["experiment", "layout", "vary", "value", "K", "method", "delta", "seeds", "empty", "not_run"] + \

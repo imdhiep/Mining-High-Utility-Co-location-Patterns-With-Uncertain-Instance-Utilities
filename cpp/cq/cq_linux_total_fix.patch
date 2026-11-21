@@ -1,6 +1,6 @@
 diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/CQ-HUCPM.cpp cq_total_fix/CQ-HUCPM.cpp
---- cq_cpp/CQ-HUCPM/CQ-HUCPM.cpp	2026-11-21 09:45:18.936472380 +0700
-+++ cq_total_fix/CQ-HUCPM.cpp	2026-11-21 10:37:00.328372490 +0700
+--- cq_cpp/CQ-HUCPM/CQ-HUCPM.cpp	2026-11-21 13:02:44.433063486 +0700
++++ cq_total_fix/CQ-HUCPM.cpp	2026-11-21 15:17:30.686411820 +0700
 @@ -28,10 +28,10 @@
  #include "tree.hh"
  
@@ -49,7 +49,15 @@ diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/CQ-H
  
  	// 2.1 Load the dataset
  	CSVReader reader(file_name); // Creating an object of CSVReader/CSVWriter	
-@@ -121,7 +126,7 @@
+@@ -112,6 +117,7 @@
+ 	// 5. Calculate the utility of each pattern		
+ 	std::unordered_map<std::string, float> Pk; // saves all patterns and their utilities
+ 	calculateUtility(totalUtilityFeats, Pk);
++	std::cout << "Number of evaluated patterns: " << Pk.size() << endl;
+ 	
+ 	timeCalcUitility = clock();
+ 	totalTimeCalcUtility = totalTimeCalcUtility + double(timeCalcUitility - timeBuildTree);
+@@ -121,7 +127,7 @@
  	filterHighUtilityPatterns(Pk, HUPk, prev_thres);
  
  	std::cout << "The number of patterns: " << HUPk.size() << endl;
@@ -58,7 +66,7 @@ diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/CQ-H
  
  	timeFilHighPat = clock();
  	totalTimeFilHighPat = totalTimeFilHighPat + double(timeFilHighPat - timeCalcUitility);
-@@ -139,13 +144,8 @@
+@@ -139,13 +145,8 @@
  	std::cout << "Time taken by the program is : " << time_taken / CLOCKS_PER_SEC << " s." << endl;
  
  	// 8. Show memory usage
@@ -74,7 +82,7 @@ diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/CQ-H
  
  	// 9. Count the number of each size
  	std::vector<int> maxsize;
-@@ -170,7 +170,7 @@
+@@ -170,7 +171,7 @@
  		// Terminate
  		++itAllPats;
  	}
@@ -84,8 +92,8 @@ diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/CQ-H
  	std::cout << "Patters by sizes: \n";
  	printPattbySize(sizePats);
 diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/Object.cpp cq_total_fix/Object.cpp
---- cq_cpp/CQ-HUCPM/Object.cpp	2026-11-21 09:45:18.937270051 +0700
-+++ cq_total_fix/Object.cpp	2026-11-21 10:37:00.328429174 +0700
+--- cq_cpp/CQ-HUCPM/Object.cpp	2026-11-21 13:02:44.433763168 +0700
++++ cq_total_fix/Object.cpp	2026-11-21 13:02:48.703918621 +0700
 @@ -33,8 +33,11 @@
  // Hash function for unordered_map
  std::size_t myHashFunc::operator()(const ObjWithoutCoord& inst) const
@@ -102,8 +110,8 @@ diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/Obje
  }
 \ No newline at end of file
 diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/printFunction.cpp cq_total_fix/printFunction.cpp
---- cq_cpp/CQ-HUCPM/printFunction.cpp	2026-11-21 09:45:18.937270051 +0700
-+++ cq_total_fix/printFunction.cpp	2026-11-21 12:59:15.891868035 +0700
+--- cq_cpp/CQ-HUCPM/printFunction.cpp	2026-11-21 13:02:44.433763168 +0700
++++ cq_total_fix/printFunction.cpp	2026-11-21 13:02:48.704057582 +0700
 @@ -1,4 +1,5 @@
  #include <iostream>
 +#include <iomanip>
@@ -119,8 +127,8 @@ diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/prin
  	{
  		std::cout << item.first << " : " << item.second << endl;
 diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/readerCSV.cpp cq_total_fix/readerCSV.cpp
---- cq_cpp/CQ-HUCPM/readerCSV.cpp	2026-11-21 09:45:18.937270051 +0700
-+++ cq_total_fix/readerCSV.cpp	2026-11-21 10:37:00.328447433 +0700
+--- cq_cpp/CQ-HUCPM/readerCSV.cpp	2026-11-21 13:02:44.433763168 +0700
++++ cq_total_fix/readerCSV.cpp	2026-11-21 13:02:48.704130602 +0700
 @@ -5,7 +5,7 @@
  #include <ostream>
  #include <fstream>
@@ -143,8 +151,8 @@ diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/read
  	}
  	// Close the File
 diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/toolFunctions.cpp cq_total_fix/toolFunctions.cpp
---- cq_cpp/CQ-HUCPM/toolFunctions.cpp	2026-11-21 09:45:18.937270051 +0700
-+++ cq_total_fix/toolFunctions.cpp	2026-11-21 10:37:00.345896854 +0700
+--- cq_cpp/CQ-HUCPM/toolFunctions.cpp	2026-11-21 13:02:44.433763168 +0700
++++ cq_total_fix/toolFunctions.cpp	2026-11-21 13:02:48.704229535 +0700
 @@ -16,7 +16,7 @@
  
  #include"tree.hh"
@@ -211,8 +219,8 @@ diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/tool
  	std::vector<float> intraU(sizeofPatttern);
  	for (size_t t = 0; t < sizeofPatttern; ++t)
 diff -ruN -x '*.vcxproj*' -x '*.sln' -x cq_hucpm -x tree.hh cq_cpp/CQ-HUCPM/toolFunctions.h cq_total_fix/toolFunctions.h
---- cq_cpp/CQ-HUCPM/toolFunctions.h	2026-11-21 09:45:18.937270051 +0700
-+++ cq_total_fix/toolFunctions.h	2026-11-21 10:37:00.328524155 +0700
+--- cq_cpp/CQ-HUCPM/toolFunctions.h	2026-11-21 13:02:44.433763168 +0700
++++ cq_total_fix/toolFunctions.h	2026-11-21 13:02:48.704343858 +0700
 @@ -12,7 +12,7 @@
  
  #include"tree.hh"

@@ -6,7 +6,8 @@
 //   --set-level DELTA the set rule S_delta: candidates are the patterns whose point score (z = 0) reaches GAMMA; the
 //                     output also lists the probability p of every selected pattern
 //   --top-probability K  the patterns ranked by p = P(Lambda >= GAMMA) down to the K-th (ties included); the scores
-//                     printed are the probabilities p (Z argument ignored)
+//                     printed are the standardized margins t = (M - GAMMA Z) / sqrt(V), p = Phi(t), which keep the
+//                     order where p rounds to 1 (Z argument ignored)
 // Exit code 3 when the deadline was reached (the pattern list is then incomplete).
 #include <algorithm>
 #include <iostream>

@@ -153,12 +153,13 @@ TEST(mine_top_probability_equals_brute_force_ranking) {
         const CliqueTable table = CliqueTable::build(data, d);
         const InstanceUtilities u(p);
         const double gamma = 0.03 + 0.02 * (it % 4);
-        std::vector<double> probs;
+        std::vector<double> probs;   // standardized margins t (p = Phi(t) is increasing in t)
         for (const auto& kv : unit::brutePatterns(data, d)) {
             const double m = unit::bruteScore(p, kv.second, 0.0, 1.0);                         // M
             const double v = std::pow((m - unit::bruteScore(p, kv.second, 1.0, 1.0)), 2.0);   // V
-            const double pr = SpecialFunctions::normalCdf((m - gamma * normalizer) / std::sqrt(v));
-            if (pr >= SpecialFunctions::normalCdf(UhucpmMiner::kTopZEnd)) probs.push_back(pr);
+            const double t = v > 0 ? (m - gamma * normalizer) / std::sqrt(v)
+                                   : (m >= gamma * normalizer ? UhucpmMiner::kInfiniteMargin : -UhucpmMiner::kInfiniteMargin);
+            if (t >= UhucpmMiner::kTopZEnd) probs.push_back(t);
         }
         std::sort(probs.begin(), probs.end(), std::greater<double>());
         for (int k : {1, 5, 15}) {
@@ -168,9 +169,9 @@ TEST(mine_top_probability_equals_brute_force_ranking) {
             const MiningResult r = UhucpmMiner(table, u, c).mineTopProbability(k);
             const double kth = probs[k - 1];
             std::size_t expected = 0;
-            for (double x : probs) expected += x >= kth - 1e-12;
+            for (double x : probs) expected += x >= kth - 1e-9;
             CHECK(r.patterns.size() == expected);
-            for (const auto& kv : r.patterns) CHECK(kv.second >= kth - 1e-12);
+            for (const auto& kv : r.patterns) CHECK(kv.second >= kth - 1e-9);
             ++checked;
         }
     }

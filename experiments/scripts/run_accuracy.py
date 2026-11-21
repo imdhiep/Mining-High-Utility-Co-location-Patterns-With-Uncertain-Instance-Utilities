@@ -13,7 +13,8 @@ For one layout, one setting and one seed:
        PSO-MUCP  its K highest feature-level scores               (C++ port of the authors' code; feature utility =
                  mean posterior mean of the feature; its threshold is the K-th feature-level score)
   5. top K of every method by its own score (precision@K): UHUCPM by the posterior probability p of reaching gamma
-     (uhucpm_mine --top-probability), CQ-HUCPM by its total, PSO-MUCP by its feature-level score;
+     (uhucpm_mine --top-probability), CQ-HUCPM by its total, PSO-MUCP by its feature-level score; the first
+     RANKING_DEPTH * K patterns of each ranking are kept (precision-recall curves);
   6. coverage of the lower bound of UHUCPM, the set rule S_delta, and (when "extras") the configurations reported in one
      sentence each: per-instance lower bound with CQ-HUCPM, PSO-MUCP with the true feature utilities, prior-median
      center, Gamma-Poisson prior, V_T without its shared term, sum of positive means as normalizer.
@@ -32,6 +33,7 @@ from harness.results import RawWriter  # noqa: E402
 
 TOP_START = 0.05            # first threshold of the top-K search (halved until K patterns reach it)
 TIE_MARGIN = 1 - 1e-9       # thresholds passed to programs that compare in a different precision
+CQ_MARGIN = 1 - 1e-6        # CQ-HUCPM adds utilities in float32: its total of the K-th pattern can fall just below gamma
 RANKING_DEPTH = 3           # scores of the first RANKING_DEPTH * K patterns of each ranking are kept (precision-recall curves)
 
 
@@ -73,12 +75,14 @@ class SeedRun:
         v, per_instance = self.feature_level(values)
         if max(v.values()) <= 0:
             return None
-        exact = self.p.mine(self.data, self._posterior("fl.post", per_instance, normalizer=Z), TOP_START, self.d, 0.0, top=K)
-        if not exact["scores"]:
+        ranking = self.p.mine(self.data, self._posterior("fl.post", per_instance, normalizer=Z), TOP_START, self.d, 0.0,
+                              top=RANKING_DEPTH * K)["score_of"]
+        if not ranking:
             return None
-        threshold = min(exact["scores"])
+        scores = sorted(ranking.values(), reverse=True)
+        threshold = scores[min(K, len(scores)) - 1]          # the K-th feature-level score
         r = self.p.pso(self.data, v, threshold * TIE_MARGIN, self.d, Z)
-        return dict(patterns=set(r["patterns"]), threshold=threshold, seconds=r["seconds"])
+        return dict(patterns=set(r["patterns"]), threshold=threshold, seconds=r["seconds"], ranking=ranking)
 
     def lower_bound_check(self, mined, Z, truth_post):
         """coverage of the lower bound: true total of every reported pattern against Lambda_z * Z"""
@@ -111,7 +115,7 @@ class SeedRun:
             u = self.p.mine(self.data, post_path, gamma, self.d, 0.0, set_level=self.s["delta"])
             point = self.p.mine(self.data, post_path, gamma, self.d, 0.0)
             S_u, S_point = set(u["patterns"]), set(point["patterns"])
-            S_cq = {q for q, sc in cq_all["scores"].items() if sc >= gamma}
+            S_cq = {q for q, sc in cq_all["scores"].items() if sc >= gamma * CQ_MARGIN}
             ranked_u = self.p.mine(self.data, post_path, gamma, self.d, 0.0, top_probability=RANKING_DEPTH * K)["score_of"]
             top_u = metrics.top_k(ranked_u, K)
             top_cq = metrics.top_k(cq_all["scores"], K)
@@ -135,7 +139,7 @@ class SeedRun:
             k_out = dict(gamma=gamma, n_true=len(T), true=sorted(T),
                          uhucpm=rec(S_u, top_u), cq=rec(S_cq, top_cq), pso=rec(S_pso, S_pso),
                          cq_equals_point=S_cq == S_point, point_n=len(S_point),
-                         ranking=dict(uhucpm=ranked_u, cq=ranked_cq),
+                         ranking=dict(uhucpm=ranked_u, cq=ranked_cq, **({} if pso is None else dict(pso=pso["ranking"]))),
                          uhucpm_threshold=rec(set(u_threshold["patterns"])),
                          uhucpm_lower_bound=self.lower_bound_check(u_threshold, Z, truth_post),
                          true_score_of_reported=true_of, set_rule={})
