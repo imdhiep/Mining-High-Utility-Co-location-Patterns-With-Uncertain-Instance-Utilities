@@ -1,7 +1,8 @@
 """Accuracy experiments (Section VI-B): raw -> processed. Means and standard deviations over the seeds (design 5.1).
 
 Files written to results/processed/:
-  accuracy.csv   one row per (experiment, layout, value, K, method): precision, recall, |R| and precision@K (mean and
+  accuracy.csv   one row per (experiment, layout, value, K, method): precision, recall, |R|, precision@K and the largest
+                 pattern size (mean and
                  standard deviation over the seeds with a non-empty answer), the number of seeds, of empty answers and
                  of seeds where the method did not run. Methods: uhucpm (S_delta), cq, pso, uhucpm_threshold (with the
                  coverage of its lower bound), set_rule at every level delta, and the configurations stated only in the
@@ -19,7 +20,7 @@ from harness.processed import mean_sd, ranked, raw_records, write_csv  # noqa: E
 
 EXPERIMENTS = ["B1_evidence", "B2_overdispersion", "B2_law", "B2_spatial", "B2_truncation", "B3_threshold", "B3_distance",
                "B3_features", "B3_share"]
-METRICS = ["precision", "recall", "n", "precision_at_k", "coverage"]
+METRICS = ["precision", "recall", "n", "precision_at_k", "coverage", "size_max"]
 COLUMNS = ["experiment", "layout", "vary", "value", "K", "method", "delta", "seeds", "empty", "not_run"] + \
           [f"{m}_{s}" for m in METRICS for s in ("mean", "sd")]
 
@@ -48,6 +49,9 @@ def summarize(records, experiment):
         ran = [x for x in results if x is not None]
         row = dict(experiment=experiment, layout=layout, vary=vary, value=value, K=K, method=method, delta=delta,
                    seeds=len(results), not_run=len(results) - len(ran), empty=sum(1 for x in ran if not x.get("n")))
+        for x in ran:                          # largest pattern size (number of features) in the reported set
+            if x.get("patterns"):
+                x["size_max"] = max(len(q) for q in x["patterns"])
         for m in METRICS:
             row[f"{m}_mean"], row[f"{m}_sd"] = mean_sd([x.get(m) for x in ran])
         rows.append(row)
