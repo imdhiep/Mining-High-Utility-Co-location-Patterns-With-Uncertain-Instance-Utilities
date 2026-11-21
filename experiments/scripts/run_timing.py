@@ -204,7 +204,7 @@ def main():
     exp = cfg["experiments"][a.experiment]; reps = a.reps or cfg["reps"]
     index_path = os.path.join(root, cfg["layout_index"]); index = json.load(open(index_path)) if os.path.exists(index_path) else {}
     bin_dir = os.path.join(root, cfg["bin_dir"]); cq_binary = os.path.join(root, cfg["cq_binary"])
-    programs = Programs(bin_dir, cq_binary)
+    programs = Programs(bin_dir, cq_binary, a.run_timeout)   # the preparation runs have the same limit
     writer = RawWriter(os.path.join(root, cfg["results_dir"]), a.experiment + ("_counts" if a.counts else ""), os.path.join(root, ".."))
     for spec in exp["datasets"]:
         spec = dict(spec, vary=exp["vary"])

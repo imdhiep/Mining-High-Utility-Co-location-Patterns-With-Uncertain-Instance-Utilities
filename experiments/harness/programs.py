@@ -8,13 +8,20 @@ class ProgramError(RuntimeError):
 
 
 class Programs:
-    def __init__(self, bin_dir, cq_binary):
+    def __init__(self, bin_dir, cq_binary, timeout=None):
         self.bin_dir = bin_dir
         self.cq_binary = cq_binary
+        self.timeout = timeout                 # seconds allowed for one program run (None: no limit)
+
+    def _run(self, cmd):
+        try:
+            return subprocess.run(cmd, capture_output=True, text=True, timeout=self.timeout)
+        except subprocess.TimeoutExpired:
+            raise ProgramError(f"{os.path.basename(cmd[0])} exceeded {self.timeout} s")
 
     def _json(self, name, args):
         cmd = [os.path.join(self.bin_dir, name)] + [str(a) for a in args]
-        p = subprocess.run(cmd, capture_output=True, text=True)
+        p = self._run(cmd)
         if p.returncode not in (0, 3):
             raise ProgramError(f"{name} failed ({p.returncode}): {p.stderr[-2000:]}")
         return json.loads(p.stdout.strip().splitlines()[-1])
@@ -61,7 +68,7 @@ class Programs:
         """the authors' CQ-HUCPM (fixed build) with the total-utility score; returns {pattern: score} and seconds"""
         cmd = [self.cq_binary, data_csv, repr(float(distance)), repr(float(threshold)), "--patterns", "--score", "total",
                "--norm", repr(float(normalizer))]
-        p = subprocess.run(cmd, capture_output=True, text=True)
+        p = self._run(cmd)
         if p.returncode != 0:
             raise ProgramError(f"CQ-HUCPM failed ({p.returncode}): {p.stderr[-2000:]}")
         scores, seconds, memory = {}, None, None
