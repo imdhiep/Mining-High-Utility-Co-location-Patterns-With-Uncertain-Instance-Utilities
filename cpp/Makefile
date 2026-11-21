@@ -20,3 +20,8 @@ all: $(BIN)/post_counts
 $(BIN)/post_counts: post_counts.cpp ceb.cpp ceb.hpp io.hpp
 	mkdir -p $(BIN)
 	$(CXX) $(CXXFLAGS) -o $@ post_counts.cpp ceb.cpp
+
+all: $(BIN)/fsq_prep
+$(BIN)/fsq_prep: fsq_prep.cpp utm.hpp
+	mkdir -p $(BIN)
+	$(CXX) $(CXXFLAGS) -o $@ fsq_prep.cpp
