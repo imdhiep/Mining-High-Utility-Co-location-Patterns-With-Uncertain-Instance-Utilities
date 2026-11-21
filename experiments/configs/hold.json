@@ -1,0 +1,13 @@
+{
+  "comment": "Hold rates on real data, Section VI-D.1 (claude/EXPERIMENT_DESIGN_UHUCPM.md, Part 4). Paths relative to experiments/.",
+  "bin_dir": "../cpp/bin",
+  "cq_binary": "../cpp/cq_build/total_fix/cq_hucpm",
+  "hold_index": "data/hold/index.json",
+  "results_dir": "results",
+  "bootstrap": 20,
+  "d": 50.0,
+  "delta": 0.1,
+  "Ks": [100, 300, 1000],
+  "hold_cities": ["Philadelphia", "New_Orleans", "Tampa", "New_York", "Tokyo", "Tucson", "Indianapolis", "Nashville", "Reno",
+                  "Saint_Louis", "Edmonton", "Santa_Barbara", "Boise"]
+}
