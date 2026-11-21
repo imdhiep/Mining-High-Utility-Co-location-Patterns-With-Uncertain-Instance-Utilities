@@ -5,6 +5,8 @@
 //   --top K           the patterns ranked by Lambda_z down to the K-th (ties included), searching from threshold GAMMA
 //   --set-level DELTA the set rule S_delta: candidates are the patterns whose point score (z = 0) reaches GAMMA; the
 //                     output also lists the probability p of every selected pattern
+//   --top-probability K  the patterns ranked by p = P(Lambda >= GAMMA) down to the K-th (ties included); the scores
+//                     printed are the probabilities p (Z argument ignored)
 // Exit code 3 when the deadline was reached (the pattern list is then incomplete).
 #include <algorithm>
 #include <iostream>
@@ -73,6 +75,8 @@ int run(int argc, char** argv) {
                 p[patterns[i]] = sel.probability[i];
             }
         for (const auto& kv : result.patterns) probabilities.push_back(p[kv.first]);
+    } else if (cl.has("top-probability")) {
+        result = UhucpmMiner(table, utilities, config).mineTopProbability(cl.option("top-probability", 0));
     } else if (cl.has("top")) {
         result = UhucpmMiner(table, utilities, config).mineTop(cl.option("top", 0), config.gamma);
     } else {

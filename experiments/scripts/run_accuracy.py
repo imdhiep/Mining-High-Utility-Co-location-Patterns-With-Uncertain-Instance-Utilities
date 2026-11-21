@@ -7,11 +7,13 @@ For one layout, one setting and one seed:
   3. true patterns T: the K patterns with the highest true score (cpp/bin/uhucpm_mine --top on the true values);
      gamma = the K-th true score;
   4. decision of every method at gamma, with the same posterior means and normalizer Z:
-       UHUCPM    Lambda_z* >= gamma                               (uhucpm_mine)
+       UHUCPM    the set rule S_delta at the default level delta    (uhucpm_mine --set-level); the threshold rule
+                 Lambda_z* >= gamma is also recorded, with the coverage of its lower bound
        CQ-HUCPM  total of the posterior means >= gamma Z          (authors' C++ code, fixed build, total score)
        PSO-MUCP  its K highest feature-level scores               (C++ port of the authors' code; feature utility =
                  mean posterior mean of the feature; its threshold is the K-th feature-level score)
-  5. top K of every method by its own score (precision@K);
+  5. top K of every method by its own score (precision@K): UHUCPM by the posterior probability p of reaching gamma
+     (uhucpm_mine --top-probability), CQ-HUCPM by its total, PSO-MUCP by its feature-level score;
   6. coverage of the lower bound of UHUCPM, the set rule S_delta, and (when "extras") the configurations reported in one
      sentence each: per-instance lower bound with CQ-HUCPM, PSO-MUCP with the true feature utilities, prior-median
      center, Gamma-Poisson prior, V_T without its shared term, sum of positive means as normalizer.
@@ -105,11 +107,12 @@ class SeedRun:
                 out["per_K"][K] = dict(skipped=True, n_true=len(true_scores)); continue
             gamma = true_scores[K - 1]
             T = {q for q, sc in truth["score_of"].items() if sc >= gamma}
-            u = self.p.mine(self.data, post_path, gamma, self.d, self.z)
+            u_threshold = self.p.mine(self.data, post_path, gamma, self.d, self.z)
+            u = self.p.mine(self.data, post_path, gamma, self.d, 0.0, set_level=self.s["delta"])
             point = self.p.mine(self.data, post_path, gamma, self.d, 0.0)
             S_u, S_point = set(u["patterns"]), set(point["patterns"])
             S_cq = {q for q, sc in cq_all["scores"].items() if sc >= gamma}
-            ranked_u = self.p.mine(self.data, post_path, TOP_START, self.d, self.z, top=RANKING_DEPTH * K)["score_of"]
+            ranked_u = self.p.mine(self.data, post_path, gamma, self.d, 0.0, top_probability=RANKING_DEPTH * K)["score_of"]
             top_u = metrics.top_k(ranked_u, K)
             top_cq = metrics.top_k(cq_all["scores"], K)
             ranked_cq = {q: cq_all["scores"][q] for q in metrics.top_k(cq_all["scores"], RANKING_DEPTH * K)}
@@ -124,7 +127,7 @@ class SeedRun:
                     r.update(precision_at_k=metrics.precision(top, T), n_top=len(top), top=sorted(top))
                 return r
 
-            reported = set().union(S_u, S_cq, S_pso or set())
+            reported = set().union(S_u, set(u_threshold["patterns"]), S_cq, S_pso or set())
             true_of = {}
             if reported:
                 ts = self.p.pattern_scores(self.data, truth_post, self.d, 0.0, sorted(reported), self.work)
@@ -133,7 +136,8 @@ class SeedRun:
                          uhucpm=rec(S_u, top_u), cq=rec(S_cq, top_cq), pso=rec(S_pso, S_pso),
                          cq_equals_point=S_cq == S_point, point_n=len(S_point),
                          ranking=dict(uhucpm=ranked_u, cq=ranked_cq),
-                         uhucpm_lower_bound=self.lower_bound_check(u, Z, truth_post),
+                         uhucpm_threshold=rec(set(u_threshold["patterns"])),
+                         uhucpm_lower_bound=self.lower_bound_check(u_threshold, Z, truth_post),
                          true_score_of_reported=true_of, set_rule={})
             for delta in deltas:
                 sd = self.p.mine(self.data, post_path, gamma, self.d, 0.0, set_level=delta)
@@ -165,8 +169,9 @@ class SeedRun:
         return ex
 
     def _decision(self, post_path, gamma, T, Z, truth_post):
-        m = self.p.mine(self.data, post_path, gamma, self.d, self.z)
-        S = set(m["patterns"]); lbc = self.lower_bound_check(m, Z, truth_post)
+        """S_delta at the default level, and the coverage of the lower bound of the threshold rule, under one posterior"""
+        S = set(self.p.mine(self.data, post_path, gamma, self.d, 0.0, set_level=self.s["delta"])["patterns"])
+        lbc = self.lower_bound_check(self.p.mine(self.data, post_path, gamma, self.d, self.z), Z, truth_post)
         return dict(n=len(S), precision=metrics.precision(S, T), recall=metrics.recall(S, T), coverage=lbc["coverage"],
                     sizes=lbc["sizes"], lower=lbc["lower"], true=lbc["true"])
 

@@ -3,9 +3,11 @@
 #include <functional>
 
 #include <algorithm>
+#include <cmath>
 #include <stdexcept>
 
 #include "common/process_stats.hpp"
+#include "stats/special_functions.hpp"
 
 namespace colocation {
 
@@ -315,6 +317,42 @@ MiningResult UhucpmMiner::mineTop(int k, double startGamma) {
         const double kth = scores[k - 1];
         for (auto it = result.patterns.begin(); it != result.patterns.end();) it = it->second < kth ? result.patterns.erase(it) : std::next(it);
     }
+    return result;
+}
+
+namespace {
+
+// keeps the entries whose value is at least the k-th largest value (ties included)
+void keepTop(std::map<std::vector<int>, double>& m, int k) {
+    if (static_cast<int>(m.size()) <= k) return;
+    std::vector<double> values;
+    for (const auto& kv : m) values.push_back(kv.second);
+    std::nth_element(values.begin(), values.begin() + (k - 1), values.end(), std::greater<double>());
+    const double kth = values[k - 1];
+    for (auto it = m.begin(); it != m.end();) it = it->second < kth ? m.erase(it) : std::next(it);
+}
+
+}  // namespace
+
+MiningResult UhucpmMiner::mineTopProbability(int k) {
+    const MinerConfig original = config_;
+    const double threshold = config_.gamma * utilities_.normalizer();
+    MiningResult result;
+    for (double z = kTopZStart;; z -= kTopZStep) {
+        config_.z = z;
+        if (z < 0) config_.boundTest = BoundTest::None;
+        bound_ = SubtreeBound(config_.boundTest, config_.z);
+        result = mine();
+        if (static_cast<int>(result.patterns.size()) >= k || z - kTopZStep < kTopZEnd) break;
+    }
+    config_ = original;
+    bound_ = SubtreeBound(config_.boundTest, config_.z);
+    for (auto& kv : result.patterns) {
+        const std::vector<int> instances = table_.participatingInstances(kv.first);
+        const double v = utilities_.totalVariance(instances), m = utilities_.totalMean(instances);
+        kv.second = v > 0 ? SpecialFunctions::normalCdf((m - threshold) / std::sqrt(v)) : (m >= threshold ? 1.0 : 0.0);
+    }
+    keepTop(result.patterns, k);
     return result;
 }
 

@@ -140,3 +140,39 @@ TEST(gamma_poisson_model_matches_closed_form_and_monte_carlo) {
     CHECK(b.samples() == 5 && b.instances() == 400);
     CHECK(model.bootstrap(5, 9).values() == b.values());
 }
+
+TEST(mine_top_probability_equals_brute_force_ranking) {
+    std::mt19937_64 rng(24);
+    int checked = 0;
+    for (int it = 0; it < 120; ++it) {
+        const auto data = unit::randomDataset(rng, 15 + it % 35, 3 + it % 4, 60.0);
+        const double d = 14.0 + (it % 3) * 6.0;
+        const UtilityPosterior p = unit::randomPosterior(rng, data.size(), it % 2 ? 0 : 8, 0.5);
+        const double normalizer = unit::positiveSum(p.mean);
+        if (normalizer <= 0) continue;
+        const CliqueTable table = CliqueTable::build(data, d);
+        const InstanceUtilities u(p);
+        const double gamma = 0.03 + 0.02 * (it % 4);
+        std::vector<double> probs;
+        for (const auto& kv : unit::brutePatterns(data, d)) {
+            const double m = unit::bruteScore(p, kv.second, 0.0, 1.0);                         // M
+            const double v = std::pow((m - unit::bruteScore(p, kv.second, 1.0, 1.0)), 2.0);   // V
+            const double pr = SpecialFunctions::normalCdf((m - gamma * normalizer) / std::sqrt(v));
+            if (pr >= SpecialFunctions::normalCdf(UhucpmMiner::kTopZEnd)) probs.push_back(pr);
+        }
+        std::sort(probs.begin(), probs.end(), std::greater<double>());
+        for (int k : {1, 5, 15}) {
+            if (static_cast<int>(probs.size()) < k) continue;
+            MinerConfig c;
+            c.gamma = gamma;
+            const MiningResult r = UhucpmMiner(table, u, c).mineTopProbability(k);
+            const double kth = probs[k - 1];
+            std::size_t expected = 0;
+            for (double x : probs) expected += x >= kth - 1e-12;
+            CHECK(r.patterns.size() == expected);
+            for (const auto& kv : r.patterns) CHECK(kv.second >= kth - 1e-12);
+            ++checked;
+        }
+    }
+    CHECK(checked > 100);
+}

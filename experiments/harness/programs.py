@@ -24,10 +24,13 @@ class Programs:
         return self._json("post_counts", [data_csv, count_column, repr(float(exposure)), out, "--t", truncation, "--B", samples,
                                           "--seed", seed, "--prior", prior, "--center", center])
 
-    def mine(self, data_csv, posterior, gamma, distance, z, top=None, set_level=None):
+    def mine(self, data_csv, posterior, gamma, distance, z, top=None, set_level=None, top_probability=None):
+        """uhucpm_mine; with top_probability the scores are the probabilities p of reaching gamma"""
         args = [data_csv, posterior, repr(float(gamma)), repr(float(distance)), repr(float(z)), "--scores"]
         if top is not None:
             args += ["--top", int(top)]
+        if top_probability is not None:
+            args += ["--top-probability", int(top_probability)]
         if set_level is not None:
             args += ["--set-level", repr(float(set_level))]
         r = self._json("uhucpm_mine", args)
