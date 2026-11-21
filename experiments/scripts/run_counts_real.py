@@ -49,7 +49,7 @@ def main():
                 for lab, (x, y), v in zip(lay.labels, xy, lay.counts):
                     c[lab] = c.get(lab, 0) + 1; f.write(f"{lab},{c[lab]},{float(x)!r},{float(y)!r},{float(v)!r}\n")
             post = os.path.join(work, "post.bin")
-            programs.posterior(data, "count", lay.exposure, post, truncation=0, samples=cfg["bootstrap"], seed=0)
+            programs.posterior(data, "count", lay.exposure, post, truncation=0, samples=cfg.get("bootstrap", 20), seed=0)
             point = sorted(programs.mine(data, post, TOP_START, d, 0.0, top=max(KS))["scores"], reverse=True)
             rec = dict(city=name, n=len(lay.labels), d=d, per_K={})
             for K in KS:

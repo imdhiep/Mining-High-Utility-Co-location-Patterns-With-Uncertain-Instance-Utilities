@@ -15,7 +15,7 @@ python3 "$EXP/scripts/prepare_layouts.py" --fsq-dir "$WORK/tsmc2014" --yelp-dir 
     --yelp-cities "Philadelphia|Tampa|New Orleans" > "$WORK/prepare.log"
 mkdir -p "$WORK/logs"; cd "$EXP"
 for e in "$@"; do
-  python3 scripts/run_timing.py configs/timing.json "$e" > "$WORK/logs/$e.log" 2>&1 && echo "finished $e" || echo "failed $e"
+  python3 scripts/run_timing.py configs/timing.json "$e" > "$WORK/logs/$e.log" 2>&1 && echo "finished $e" || { echo "failed $e"; tail -5 "$WORK/logs/$e.log"; }
 done
 tar czf "$WORK/timing_raw.tar.gz" -C "$EXP" results/raw
 ls -la "$WORK"

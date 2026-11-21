@@ -3,6 +3,7 @@
   "bin_dir": "../cpp/bin",
   "cq_binary": "../cpp/cq_build/total_fix/cq_hucpm",
   "hold_index": "data/hold/index.json",
+  "layout_index": "data/layouts/index.json",
   "results_dir": "results",
   "bootstrap": 20,
   "d": 50.0,
