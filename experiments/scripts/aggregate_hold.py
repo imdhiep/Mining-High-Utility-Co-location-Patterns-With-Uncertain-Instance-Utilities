@@ -6,6 +6,7 @@ Files written to results/processed/:
                      its feature-level score), n = 10, 20, ... and the full ranking.
   hold_disagree.csv  at the same n (and for the decision sets): patterns kept by CQ-HUCPM only, by UHUCPM only, by both;
                      size and hold rate of each part.
+  case.json          the case study of D.2 (run_case.py), unchanged.
   hold_diff.csv      difference of hold rates at the same n between UHUCPM and each other method: mean over the
                      cities and a 95% percentile bootstrap interval over the cities (design 5.1; BOOT resamples).
 Usage: python aggregate_hold.py [--results DIR] [--n 100]"""
@@ -82,6 +83,12 @@ def main():
     write_csv(os.path.join(out, "hold_curve.csv"), curve, ["city", "K", "method", "n", "held", "hold_rate"])
     write_csv(os.path.join(out, "hold_disagree.csv"), dis, ["city", "K", "compared", "n", "part", "size", "held", "hold_rate"])
     write_csv(os.path.join(out, "hold_diff.csv"), diff, ["K", "n", "compared", "cities", "mean_difference", "ci_low", "ci_high"])
+    case = raw_records(a.results, "D2_case")
+    if case:                                   # case study (D.2): the last run, as recorded
+        import json
+        with open(os.path.join(out, "case.json"), "w") as f:
+            json.dump({k: v for k, v in case[-1].items() if k not in ("host", "machine")}, f)
+        print("case study:", os.path.join(out, "case.json"))
     skipped = [r["city"] for r in raw_records(a.results, "D1_hold") if "skipped" in r]
     print(len(records), "cities", "skipped:", skipped, "processed:", out)
 

@@ -4,6 +4,8 @@ boxes in the data area, missing points left blank. Reads only the processed CSV 
 Usage: python make_figures.py [--results DIR] [--out DIR]"""
 import argparse, json, os
 
+import numpy as np
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -152,6 +154,32 @@ def hold_figure(curve, path, K=300):
     finish(fig, axes, [name(c) for c in layouts], handles, path)
 
 
+def case_figure(case, path, pair="ranking"):
+    """participating instances of the two patterns of one pair of the case study (first: kept by UHUCPM, second: the
+    other one); darker points have smaller posterior variance; the other venues of the city in light gray"""
+    if pair not in case["pairs"]:
+        print("no pair", pair, "for", path); return
+    roles = case["pairs"][pair]
+    fig, axes = panels(2, SINGLE, 2.0)
+    vmax = max(max(case["patterns"][q]["variance"]) for q in roles)
+    for ax, q in zip(axes, roles):
+        v = case["patterns"][q]
+        ax.scatter(np.array(case["all_x"]) / 1000, np.array(case["all_y"]) / 1000, s=0.2, color="#d9d9d9", linewidths=0, rasterized=True)
+        shade = 1 - 0.75 * np.sqrt(np.array(v["variance"]) / vmax)
+        ax.scatter(np.array(v["x"]) / 1000, np.array(v["y"]) / 1000, s=5, c=METHODS["uhucpm"][1], alpha=None, linewidths=0)
+        ax.collections[-1].set_alpha(shade)
+        cx, cy = np.mean(v["x"]) / 1000, np.mean(v["y"]) / 1000
+        span = max(max(np.ptp(v["x"]), np.ptp(v["y"])) / 2000 + 0.5, 2.0)
+        ax.set_xlim(cx - span, cx + span); ax.set_ylim(cy - span, cy + span); ax.set_aspect("equal")
+        ax.set_xlabel("x (km)"); ax.tick_params(labelsize=6)
+    axes[0].set_ylabel("y (km)")
+    labels = [f"Kept pattern\n({len(case['patterns'][roles[0]]['instances'])} venues)",
+              f"Rejected pattern\n({len(case['patterns'][roles[1]]['instances'])} venues)"]
+    handles = [Line2D([], [], marker="o", color="w", markerfacecolor=METHODS["uhucpm"][1], label="Participating venue"),
+               Line2D([], [], marker="o", color="w", markerfacecolor="#d9d9d9", label="Other venue")]
+    finish(fig, axes, labels, handles, path)
+
+
 def read(proc, f):
     p = os.path.join(proc, f)
     return pd.read_csv(p) if os.path.exists(p) else pd.DataFrame()
@@ -161,6 +189,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     root = os.path.dirname(HERE)
     ap.add_argument("--results", default=os.path.join(root, "results")); ap.add_argument("--out", default=os.path.join(root, "figures"))
+    ap.add_argument("--case-pair", default="ranking", help="pair of the case study shown in fig_case.pdf (see run_case.py)")
     a = ap.parse_args()
     proc = os.path.join(a.results, "processed"); os.makedirs(a.out, exist_ok=True)
     acc, pr, tm, curve = (read(proc, f) for f in ("accuracy.csv", "pr_curve.csv", "timing.csv", "hold_curve.csv"))
@@ -184,6 +213,8 @@ def main():
                       out("fig_time_threshold.pdf"), DOUBLE)
     if not curve.empty:
         hold_figure(curve, out("fig_hold.pdf"))
+    if os.path.exists(os.path.join(proc, "case.json")):
+        case_figure(json.load(open(os.path.join(proc, "case.json"))), out("fig_case.pdf"), a.case_pair)
 
 
 def accuracy_figure_k(k, path):
