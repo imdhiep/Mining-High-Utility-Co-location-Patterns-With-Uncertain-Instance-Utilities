@@ -4,6 +4,7 @@
 // fine grid for counts whose likelihood is narrower than the grid, and the two centers.
 #pragma once
 
+#include <string>
 #include <vector>
 
 namespace colocation {
@@ -74,12 +75,19 @@ public:
                                     bool keepDistributions, const NpmleSettings& s);
 };
 
+// center c_f subtracted from the log-rates: the moment center of Definition 4, or the median of the estimated prior
+// (the alternative of the earlier literature, used only for comparison)
+enum class CenterRule { Moment, PriorMedian };
+CenterRule parseCenterRule(const std::string& name);   // "moment", "median"
+
 class RateCenter {
 public:
     // c = ln m - 0.5 ln(1 + v / m^2), m and v unbiased from the factorial moments of the counts (t = 0)
     static double fromCounts(const std::vector<double>& counts, double exposure);
     // c = 2 ln E[lambda] - 0.5 ln E[lambda^2] under the grid prior (t > 0)
     static double fromPrior(const std::vector<double>& grid, const std::vector<double>& weights);
+    // median of the grid prior: first grid point where the cumulative weight reaches 1/2
+    static double priorMedian(const std::vector<double>& grid, const std::vector<double>& weights);
 };
 
 }  // namespace colocation

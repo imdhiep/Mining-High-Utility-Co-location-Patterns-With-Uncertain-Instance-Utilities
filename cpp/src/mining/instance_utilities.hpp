@@ -21,8 +21,10 @@ public:
     double normalizer() const { return normalizer_; }
     int bootstrapSamples() const { return samples_; }
 
-    // score of the set of participating instances A (distinct ids)
+    // score of the set of participating instances A (distinct ids): (totalMean - z sqrt(totalVariance)) / normalizer
     double score(const std::vector<int>& instances, double z) const;
+    double totalMean(const std::vector<int>& instances) const;       // M(A)
+    double totalVariance(const std::vector<int>& instances) const;   // V(A), with the shared-error term
 
     // rank of a positive-mean instance in the order of increasing variance / mean, -1 for the others
     int rank(int i) const { return rank_[i]; }

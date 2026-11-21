@@ -1,5 +1,7 @@
 #include "posterior/npmle.hpp"
 
+#include <stdexcept>
+
 #include <algorithm>
 #include <cmath>
 
@@ -205,6 +207,21 @@ double RateCenter::fromPrior(const std::vector<double>& grid, const std::vector<
         second += w[j] * rate * rate;
     }
     return 2 * std::log(first) - 0.5 * std::log(second);
+}
+
+double RateCenter::priorMedian(const std::vector<double>& grid, const std::vector<double>& w) {
+    double cumulative = 0;
+    for (std::size_t j = 0; j < grid.size(); ++j) {
+        cumulative += w[j];
+        if (cumulative >= 0.5) return grid[j];
+    }
+    return grid.back();
+}
+
+CenterRule parseCenterRule(const std::string& name) {
+    if (name == "moment") return CenterRule::Moment;
+    if (name == "median") return CenterRule::PriorMedian;
+    throw std::invalid_argument("unknown center rule " + name);
 }
 
 }  // namespace colocation

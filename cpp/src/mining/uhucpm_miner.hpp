@@ -50,7 +50,13 @@ public:
     static constexpr double kThresholdTolerance = 1e-12;
 
     UhucpmMiner(const CliqueTable& table, const InstanceUtilities& utilities, MinerConfig config);
+    // all patterns with Lambda_z >= config.gamma
     MiningResult mine();
+    // the patterns ranked by Lambda_z down to the k-th: mines at startGamma, halves the threshold until at least k
+    // patterns reach it (or it falls below kSmallestTopGamma), and keeps the patterns whose score is at least the k-th
+    // largest score (ties included; all patterns found when fewer than k)
+    MiningResult mineTop(int k, double startGamma);
+    static constexpr double kSmallestTopGamma = 1e-12;
 
 private:
     class Search;                       // state of one run of the depth-first search

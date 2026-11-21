@@ -1,13 +1,15 @@
 // Posterior of the count utility (Definition 4) for an instance file with a count column: posterior means and
 // variances, the bootstrap matrix of the total variance and the expected normalizer, written as a posterior file.
 // Usage: post_counts DATA_CSV COUNT_COLUMN E OUT_POSTERIOR [--t T] [--B B] [--seed S] [--J J] [--iters I]
-//                    [--boot-iters I] [--ep FILE]
+//                    [--boot-iters I] [--ep FILE] [--prior npmle|gamma] [--center moment|median]
 //   --ep FILE  also writes E[u+ | data] of every instance, one per line
+//   --prior gamma, --center median: the alternatives compared in the experiments (Definition 4 is npmle + moment)
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <map>
+#include <memory>
 #include <stdexcept>
 
 #include "common/command_line.hpp"
@@ -16,6 +18,7 @@
 #include "common/process_stats.hpp"
 #include "common/utility_posterior.hpp"
 #include "posterior/count_posterior_model.hpp"
+#include "posterior/gamma_poisson_model.hpp"
 
 using namespace colocation;
 
@@ -51,13 +54,25 @@ int run(int argc, char** argv) {
         features.push_back(featureIndex[r[cf]]);
         counts.push_back(std::stod(r[cc]));
     }
-    CountPosteriorModel model(counts, features, cl.positionalDouble(2), truncation, settings);
-    const PosteriorEstimate estimate = model.estimate();
+    const std::string priorName = cl.option("prior", std::string("npmle"));
+    if (priorName != "npmle" && priorName != "gamma") throw std::invalid_argument("unknown prior " + priorName);
+    if (priorName == "gamma" && truncation > 0) throw std::invalid_argument("the Gamma prior needs t = 0");
+    const CenterRule center = parseCenterRule(cl.option("center", std::string("moment")));
+    std::unique_ptr<PosteriorModel> model;
+    CountPosteriorModel* npmleModel = nullptr;
+    if (priorName == "gamma") {
+        model = std::make_unique<GammaPoissonPosteriorModel>(counts, features, cl.positionalDouble(2));
+    } else {
+        auto m = std::make_unique<CountPosteriorModel>(counts, features, cl.positionalDouble(2), truncation, settings, center);
+        npmleModel = m.get();
+        model = std::move(m);
+    }
+    const PosteriorEstimate estimate = model->estimate();
     UtilityPosterior posterior;
     posterior.mean = estimate.mean;
     posterior.variance = estimate.variance;
     posterior.normalizer = estimate.expectedNormalizer();
-    if (samples > 0) posterior.bootstrap = model.bootstrap(samples, seed);
+    if (samples > 0) posterior.bootstrap = model->bootstrap(samples, seed);
     UtilityPosteriorFile::write(cl.positional(3), posterior);
     if (cl.has("ep")) {
         std::ofstream ep(cl.option("ep", std::string()));
@@ -66,7 +81,8 @@ int run(int argc, char** argv) {
     }
     JsonLineWriter out;
     out.field("n", counts.size()).field("features", k).field("B", samples).field("Z", posterior.normalizer)
-        .field("local_edge_mass_max", model.maxLocalEdgeMass()).field("seconds", clock.seconds());
+        .field("local_edge_mass_max", npmleModel ? npmleModel->maxLocalEdgeMass() : 0.0).field("prior", priorName)
+        .field("seconds", clock.seconds());
     std::cout << out.str() << std::endl;
     return 0;
 }

@@ -16,7 +16,7 @@ class CountPosteriorModel : public PosteriorModel {
 public:
     // features: any integer labels; features are processed in increasing label order
     CountPosteriorModel(std::vector<double> counts, std::vector<int> features, double exposure, int truncation,
-                        NpmleSettings settings = {});
+                        NpmleSettings settings = {}, CenterRule center = CenterRule::Moment);
 
     PosteriorEstimate estimate() override;
     BootstrapMatrix bootstrap(int samples, uint64_t seed) override;
@@ -38,6 +38,7 @@ private:
     double exposure_;
     int truncation_;
     NpmleSettings settings_;
+    CenterRule center_;
     std::vector<FeatureFit> fits_;
     double maxLocalEdgeMass_ = 0.0;
 

@@ -4,31 +4,12 @@
 #include "posterior/count_posterior_model.hpp"
 #include "posterior/npmle.hpp"
 #include "posterior/rating_posterior_model.hpp"
+#include "stats/special_functions.hpp"
 #include "test_framework.hpp"
 
 using namespace colocation;
 
 namespace {
-
-double digamma(double x) {
-    double r = 0;
-    while (x < 10) {
-        r -= 1 / x;
-        x += 1;
-    }
-    const double f = 1 / (x * x);
-    return r + std::log(x) - 0.5 / x - f * (1.0 / 12 - f * (1.0 / 120 - f * (1.0 / 252 - f * (1.0 / 240 - f / 132))));
-}
-
-double trigamma(double x) {
-    double r = 0;
-    while (x < 10) {
-        r += 1 / (x * x);
-        x += 1;
-    }
-    const double f = 1 / (x * x);
-    return r + 1 / x + f / 2 + f / x * (1.0 / 6 - f * (1.0 / 30 - f * (1.0 / 42 - f / 30)));
-}
 
 // Gamma(a, b) prior of lambda as weights on a log-rate grid: density of theta = ln lambda is prop. to exp(a theta - b e^theta)
 std::vector<double> gammaPriorOnGrid(const std::vector<double>& grid, double a, double b) {
@@ -40,13 +21,6 @@ std::vector<double> gammaPriorOnGrid(const std::vector<double>& grid, double a, 
 }
 
 }  // namespace
-
-TEST(digamma_and_trigamma_reference_values) {
-    CHECK_NEAR(digamma(1.0), -0.5772156649015329, 1e-12);
-    CHECK_NEAR(digamma(0.5), -1.9635100260214235, 1e-12);
-    CHECK_NEAR(trigamma(1.0), 1.6449340668482264, 1e-10);
-    CHECK_NEAR(trigamma(10.0), 0.10516633568168575, 1e-10);
-}
 
 // Gamma-Poisson conjugacy: with a Gamma(a, b) prior and x ~ Poisson(lambda E), lambda | x ~ Gamma(a + x, b + E), so
 // E[ln lambda | x] = digamma(a + x) - ln(b + E) and Var[ln lambda | x] = trigamma(a + x). The prior is chosen so that
@@ -65,8 +39,8 @@ TEST(grid_posterior_matches_gamma_poisson_closed_form) {
         CHECK(m.local.empty() != g.expectLocal);
         for (const LocalPosterior& lp : m.local) CHECK(lp.edgeMass < 1e-6);
         for (std::size_t i = 0; i < counts.size(); ++i) {
-            CHECK_NEAR(m.mean[i], digamma(a + counts[i]) - std::log(b + E), g.tolMean);
-            CHECK_NEAR(m.variance[i], trigamma(a + counts[i]), g.tolVar);
+            CHECK_NEAR(m.mean[i], SpecialFunctions::digamma(a + counts[i]) - std::log(b + E), g.tolMean);
+            CHECK_NEAR(m.variance[i], SpecialFunctions::trigamma(a + counts[i]), g.tolVar);
         }
     }
 }

@@ -14,7 +14,7 @@ add_library(colocation STATIC ${LIBRARY_SOURCES})
 target_include_directories(colocation PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-foreach(app uhucpm_mine pso_mucp post_counts fsq_prep yelp_prep)
+foreach(app uhucpm_mine pso_mucp post_counts fsq_prep yelp_prep yelp_reviews pattern_scores)
   add_executable(${app} apps/${app}.cpp)
   target_link_libraries(${app} PRIVATE colocation)
 endforeach()

@@ -7,15 +7,16 @@
 namespace colocation {
 
 CountPosteriorModel::CountPosteriorModel(std::vector<double> counts, std::vector<int> features, double exposure, int truncation,
-                                         NpmleSettings settings)
+                                         NpmleSettings settings, CenterRule center)
     : counts_(std::move(counts)), features_(std::move(features)), exposure_(exposure), truncation_(truncation),
-      settings_(settings) {
+      settings_(settings), center_(center) {
     if (counts_.size() != features_.size()) throw std::invalid_argument("counts and features differ in size");
     if (exposure_ <= 0) throw std::invalid_argument("exposure must be positive");
 }
 
 double CountPosteriorModel::centerOf(const std::vector<double>& counts, const std::vector<double>& grid,
                                      const std::vector<double>& weights) const {
+    if (center_ == CenterRule::PriorMedian) return RateCenter::priorMedian(grid, weights);
     return truncation_ == 0 ? RateCenter::fromCounts(counts, exposure_) : RateCenter::fromPrior(grid, weights);
 }
 

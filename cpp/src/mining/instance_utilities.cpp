@@ -51,12 +51,15 @@ void InstanceUtilities::buildRankOrder() {
     }
 }
 
-double InstanceUtilities::score(const std::vector<int>& instances, double z) const {
-    double total = 0, var = 0;
-    for (int a : instances) {
-        total += mean_[a];
-        var += variance_[a];
-    }
+double InstanceUtilities::totalMean(const std::vector<int>& instances) const {
+    double total = 0;
+    for (int a : instances) total += mean_[a];
+    return total;
+}
+
+double InstanceUtilities::totalVariance(const std::vector<int>& instances) const {
+    double var = 0;
+    for (int a : instances) var += variance_[a];
     const int n = size();
     for (int b = 0; b < samples_; ++b) {
         const double* row = &deviations_[static_cast<std::size_t>(b) * n];
@@ -64,7 +67,11 @@ double InstanceUtilities::score(const std::vector<int>& instances, double z) con
         for (int a : instances) shared += row[a];
         var += shared * shared;
     }
-    return (total - z * std::sqrt(std::max(var, 0.0))) / normalizer_;
+    return var;
+}
+
+double InstanceUtilities::score(const std::vector<int>& instances, double z) const {
+    return (totalMean(instances) - z * std::sqrt(std::max(totalVariance(instances), 0.0))) / normalizer_;
 }
 
 }  // namespace colocation

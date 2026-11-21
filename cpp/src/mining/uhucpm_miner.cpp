@@ -1,5 +1,7 @@
 #include "mining/uhucpm_miner.hpp"
 
+#include <functional>
+
 #include <algorithm>
 #include <stdexcept>
 
@@ -294,6 +296,25 @@ UhucpmMiner::UhucpmMiner(const CliqueTable& table, const InstanceUtilities& util
 MiningResult UhucpmMiner::mine() {
     MiningResult result;
     Search(*this, result).run();
+    return result;
+}
+
+MiningResult UhucpmMiner::mineTop(int k, double startGamma) {
+    const MinerConfig original = config_;
+    config_.gamma = startGamma;
+    MiningResult result = mine();
+    while (static_cast<int>(result.patterns.size()) < k && config_.gamma >= kSmallestTopGamma) {
+        config_.gamma /= 2;
+        result = mine();
+    }
+    config_ = original;
+    if (static_cast<int>(result.patterns.size()) > k) {
+        std::vector<double> scores;
+        for (const auto& kv : result.patterns) scores.push_back(kv.second);
+        std::nth_element(scores.begin(), scores.begin() + (k - 1), scores.end(), std::greater<double>());
+        const double kth = scores[k - 1];
+        for (auto it = result.patterns.begin(); it != result.patterns.end();) it = it->second < kth ? result.patterns.erase(it) : std::next(it);
+    }
     return result;
 }
 
