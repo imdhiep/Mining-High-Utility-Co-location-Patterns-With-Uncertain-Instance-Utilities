@@ -74,6 +74,14 @@ JsonLineWriter& JsonLineWriter::field(const std::string& k, const std::vector<do
     return *this;
 }
 
+JsonLineWriter& JsonLineWriter::field(const std::string& k, const std::vector<JsonLineWriter>& objects) {
+    key(k);
+    out_ << "[";
+    for (std::size_t i = 0; i < objects.size(); ++i) out_ << (i ? ", " : "") << objects[i].str();
+    out_ << "]";
+    return *this;
+}
+
 std::string JsonLineWriter::str() const { return out_.str() + "}"; }
 
 }  // namespace colocation

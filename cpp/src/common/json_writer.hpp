@@ -19,6 +19,8 @@ public:
     JsonLineWriter& field(const std::string& key, bool value);
     JsonLineWriter& field(const std::string& key, const std::vector<std::string>& values);
     JsonLineWriter& field(const std::string& key, const std::vector<double>& values);
+    // an array of objects built by other writers
+    JsonLineWriter& field(const std::string& key, const std::vector<JsonLineWriter>& objects);
     std::string str() const;
 
     static std::string escape(const std::string& s);

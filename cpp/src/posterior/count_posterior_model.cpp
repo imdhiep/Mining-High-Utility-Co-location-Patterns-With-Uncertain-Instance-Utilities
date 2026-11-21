@@ -26,6 +26,7 @@ PosteriorEstimate CountPosteriorModel::estimate() {
     est.variance.assign(n, 0.0);
     est.expectedPositive.assign(n, 0.0);
     fits_.clear();
+    maxLocalEdgeMass_ = 0.0;
     const std::set<int> labels(features_.begin(), features_.end());
     for (int label : labels) {
         std::vector<int> idx;
@@ -49,6 +50,7 @@ PosteriorEstimate CountPosteriorModel::estimate() {
             est.expectedPositive[idx[a]] = e;
         }
         for (const LocalPosterior& lp : pm.local) {
+            maxLocalEdgeMass_ = std::max(maxLocalEdgeMass_, lp.edgeMass);
             double e = 0;
             for (std::size_t k = 0; k < lp.grid.size(); ++k) e += lp.weights[k] * std::max(lp.grid[k] - c, 0.0);
             est.expectedPositive[idx[lp.instance]] = e;

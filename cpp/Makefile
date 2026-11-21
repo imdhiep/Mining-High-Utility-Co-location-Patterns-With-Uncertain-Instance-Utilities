@@ -1,32 +1,44 @@
+# Build without CMake (same sources, flags and outputs as CMakeLists.txt).
+#   make            programs in bin/
+#   make test       unit tests (bin/unit_tests)
+#   make clean
 CXX ?= g++
-CXXFLAGS ?= -O2 -std=c++17 -Wall -Wextra -Wno-unused-parameter
+CXXFLAGS ?= -O2 -std=c++17 -Wall -Wextra
+CPPFLAGS += -Isrc
 
+BUILD = build
 BIN = bin
-all: $(BIN)/uhucpm_mine
+APPS = uhucpm_mine pso_mucp post_counts fsq_prep yelp_prep
 
-$(BIN)/uhucpm_mine: uhucpm_mine.cpp miner.cpp miner.hpp io.hpp
-	mkdir -p $(BIN)
-	$(CXX) $(CXXFLAGS) -o $@ uhucpm_mine.cpp miner.cpp
+LIB_SRC = $(shell find src -name '*.cpp' | sort)
+LIB_OBJ = $(LIB_SRC:%.cpp=$(BUILD)/%.o)
+TEST_SRC = $(sort $(wildcard tests/unit/*.cpp))
+TEST_OBJ = $(TEST_SRC:%.cpp=$(BUILD)/%.o)
+
+all: $(APPS:%=$(BIN)/%)
+
+$(BUILD)/libcolocation.a: $(LIB_OBJ)
+	ar rcs $@ $^
+
+$(BUILD)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+$(BIN)/%: $(BUILD)/apps/%.o $(BUILD)/libcolocation.a
+	@mkdir -p $(BIN)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+$(BIN)/unit_tests: CPPFLAGS += -Itests/unit
+$(BIN)/unit_tests: $(TEST_OBJ) $(BUILD)/libcolocation.a
+	@mkdir -p $(BIN)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+test: $(BIN)/unit_tests
+	./$(BIN)/unit_tests
 
 clean:
-	rm -rf $(BIN)
+	rm -rf $(BUILD) $(BIN)
 
-all: $(BIN)/pso_mucp
-$(BIN)/pso_mucp: pso_mucp.cpp io.hpp
-	mkdir -p $(BIN)
-	$(CXX) $(CXXFLAGS) -o $@ pso_mucp.cpp
-
-all: $(BIN)/post_counts
-$(BIN)/post_counts: post_counts.cpp ceb.cpp ceb.hpp io.hpp
-	mkdir -p $(BIN)
-	$(CXX) $(CXXFLAGS) -o $@ post_counts.cpp ceb.cpp
-
-all: $(BIN)/fsq_prep
-$(BIN)/fsq_prep: fsq_prep.cpp utm.hpp
-	mkdir -p $(BIN)
-	$(CXX) $(CXXFLAGS) -o $@ fsq_prep.cpp
-
-all: $(BIN)/yelp_prep
-$(BIN)/yelp_prep: yelp_prep.cpp io.hpp json_lite.hpp utm.hpp
-	mkdir -p $(BIN)
-	$(CXX) $(CXXFLAGS) -o $@ yelp_prep.cpp
+.PHONY: all test clean
+.PRECIOUS: $(BUILD)/%.o
+-include $(LIB_OBJ:.o=.d) $(TEST_OBJ:.o=.d) $(APPS:%=$(BUILD)/apps/%.d)

@@ -20,6 +20,8 @@ public:
 
     PosteriorEstimate estimate() override;
     BootstrapMatrix bootstrap(int samples, uint64_t seed) override;
+    // largest posterior mass on the edges of a local grid in the last estimate() (see LocalPosterior::edgeMass)
+    double maxLocalEdgeMass() const { return maxLocalEdgeMass_; }
 
 private:
     struct FeatureFit {                  // what the bootstrap needs for one feature
@@ -37,6 +39,7 @@ private:
     int truncation_;
     NpmleSettings settings_;
     std::vector<FeatureFit> fits_;
+    double maxLocalEdgeMass_ = 0.0;
 
     double centerOf(const std::vector<double>& counts, const std::vector<double>& grid, const std::vector<double>& weights) const;
     std::vector<double> redrawCounts(const std::vector<double>& counts, std::mt19937_64& rng) const;

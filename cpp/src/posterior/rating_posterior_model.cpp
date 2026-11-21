@@ -28,9 +28,7 @@ double pooledWithinVariance(const std::vector<RatedBusiness>& businesses) {
         const auto& v = b.trainingStars;
         if (v.size() < 2) continue;
         const double m = sumOf(v) / v.size();
-        double squares = 0;
-        for (double x : v) squares += (x - m) * (x - m);
-        num += squares;
+        for (double x : v) num += (x - m) * (x - m);   // accumulated term by term, as in yelp_full.py
         den += static_cast<double>(v.size()) - 1;
     }
     return num / den;
@@ -67,10 +65,9 @@ RatingPosteriorModel::RatingPosteriorModel(std::vector<RatedBusiness> businesses
     : businesses_(std::move(businesses)), settings_(settings) {}
 
 double RatingPosteriorModel::expectedPositivePart(double mean, double variance) {
+    // mean Phi(z) + sd phi(z), z = mean / sd (operations ordered as in yelp_full.py)
     const double sd = std::sqrt(std::max(variance, 1e-300)), z = mean / sd;
-    const double cdf = 0.5 * std::erfc(-z / std::sqrt(2.0));
-    const double pdf = std::exp(-0.5 * z * z) / std::sqrt(2 * M_PI);
-    return mean * cdf + sd * pdf;
+    return mean * 0.5 * std::erfc(-z / std::sqrt(2.0)) + sd * std::exp(-0.5 * z * z) / std::sqrt(2 * M_PI);
 }
 
 double RatingPosteriorModel::testUtility(double testCheckins, const std::vector<double>& testStars, const RatingSettings& s) {

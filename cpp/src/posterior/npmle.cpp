@@ -173,6 +173,8 @@ PosteriorMoments GridPosterior::compute(const std::vector<double>& x, double E, 
         }
         out.mean[i] = m;
         out.variance[i] = std::max(m2 - m * m, s.varianceFloor);
+        const int edge = std::min(s.localEdgePoints, s.localPoints / 2);
+        for (int k = 0; k < edge; ++k) lp.edgeMass += lp.weights[k] + lp.weights[s.localPoints - 1 - k];
         if (!keep) {
             lp.grid.clear();
             lp.weights.clear();

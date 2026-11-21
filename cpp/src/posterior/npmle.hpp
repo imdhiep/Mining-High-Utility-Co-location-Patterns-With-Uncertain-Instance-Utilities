@@ -17,6 +17,7 @@ struct NpmleSettings {
     int localPoints = 201;              // local grid of a sharp instance
     double localHalfWidthSd = 7.0;      // in likelihood standard deviations 1 / sqrt(x + 0.5)
     double localStepsThreshold = 5.0;   // local grid when the likelihood sd is below this many grid steps
+    int localEdgePoints = 5;            // outer points on each side of a local grid whose posterior mass is monitored
     double bandwidthFactor = 0.9;
     double weightFloor = 1e-300;
     double varianceFloor = 1e-12;
@@ -55,6 +56,9 @@ public:
 struct LocalPosterior {
     int instance = 0;                    // row of the likelihood matrix
     std::vector<double> grid, weights;   // local grid and normalized posterior on it
+    // posterior mass on the localEdgePoints outer points of each side: the local grid is centred on the likelihood,
+    // so it is only accurate while this stays negligible (it grows when the prior is far from the count)
+    double edgeMass = 0.0;
 };
 
 struct PosteriorMoments {
