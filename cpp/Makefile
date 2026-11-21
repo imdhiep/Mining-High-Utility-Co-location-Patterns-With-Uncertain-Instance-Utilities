@@ -15,3 +15,8 @@ all: $(BIN)/pso_mucp
 $(BIN)/pso_mucp: pso_mucp.cpp io.hpp
 	mkdir -p $(BIN)
 	$(CXX) $(CXXFLAGS) -o $@ pso_mucp.cpp
+
+all: $(BIN)/post_counts
+$(BIN)/post_counts: post_counts.cpp ceb.cpp ceb.hpp io.hpp
+	mkdir -p $(BIN)
+	$(CXX) $(CXXFLAGS) -o $@ post_counts.cpp ceb.cpp
