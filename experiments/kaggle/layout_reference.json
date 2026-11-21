@@ -1,0 +1,50 @@
+{
+ "New_York_k10.csv": {
+  "other_columns_md5": "3260338b1781c697be8d2f9fe03b0a71",
+  "rows": 9380,
+  "sum_x": 5503848674.454038,
+  "sum_y": 42318587743.53513
+ },
+ "New_York_k20.csv": {
+  "other_columns_md5": "146870c977c5e71af40a7f6bd51ab66d",
+  "rows": 13932,
+  "sum_x": 8174509353.959146,
+  "sum_y": 62856379107.72908
+ },
+ "New_York_k30.csv": {
+  "other_columns_md5": "6561be8495f85b95ca9a68646ab24d36",
+  "rows": 16864,
+  "sum_x": 9896358368.448683,
+  "sum_y": 76082512144.35732
+ },
+ "New_York_k40.csv": {
+  "other_columns_md5": "fa8ba069b54add05fe8f7d1e902c88c5",
+  "rows": 19097,
+  "sum_x": 11205206311.756292,
+  "sum_y": 86157924719.95499
+ },
+ "Tokyo_k10.csv": {
+  "other_columns_md5": "bd18ce1c100f12ed258a30fc51395a49",
+  "rows": 22320,
+  "sum_x": 8554349444.319081,
+  "sum_y": 88141233346.58315
+ },
+ "Tokyo_k20.csv": {
+  "other_columns_md5": "e027f43603ce429598f0786bd7d97bf6",
+  "rows": 29774,
+  "sum_x": 11406606419.323843,
+  "sum_y": 117576413638.77238
+ },
+ "Tokyo_k30.csv": {
+  "other_columns_md5": "f88b774f5ed736394bd01d111c1af109",
+  "rows": 33621,
+  "sum_x": 12880663032.972181,
+  "sum_y": 132769056524.00377
+ },
+ "Tokyo_k40.csv": {
+  "other_columns_md5": "92a048faa931ada06c7e51d975c30792",
+  "rows": 36435,
+  "sum_x": 13959718884.740253,
+  "sum_y": 143881588765.97998
+ }
+}

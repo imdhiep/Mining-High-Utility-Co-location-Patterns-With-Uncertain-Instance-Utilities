@@ -180,6 +180,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("config"); ap.add_argument("experiment")
     ap.add_argument("--seeds", type=int); ap.add_argument("--layouts")
+    ap.add_argument("--skip-done", action="store_true", help="skip (layout, value, seed) already in results/raw/EXPERIMENT")
     a = ap.parse_args()
     cfg = json.load(open(a.config)); root = os.path.dirname(os.path.dirname(os.path.abspath(a.config)))   # experiments/
     exp = cfg["experiments"][a.experiment]
@@ -187,6 +188,7 @@ def main():
     programs = Programs(os.path.join(root, cfg["bin_dir"]), os.path.join(root, cfg["cq_binary"]))
     writer = RawWriter(os.path.join(root, cfg["results_dir"]), a.experiment, os.path.join(root, ".."))
     seeds = a.seeds or cfg["seeds"]
+    done = writer.completed() if a.skip_done else set()
     names = a.layouts.split(",") if a.layouts else exp["layouts"]
     for value in exp["values"]:
         setting = dict(cfg["defaults"], **exp.get("set", {}), **{exp["vary"]: value})
@@ -195,6 +197,8 @@ def main():
             layout = layouts.load(os.path.join(root, entry["file"]), name, entry["exposure"])
             loc, scale = layouts.truth_law(layout)
             for seed in range(seeds):
+                if (name, json.dumps(value), seed) in done:
+                    continue
                 draw = semisyn.draw(layout, loc, scale, setting, seed)
                 with tempfile.TemporaryDirectory() as work:
                     out = SeedRun(programs, layout, setting, draw, work, cfg["z"], cfg["bootstrap"], exp.get("extras", False)).run(
