@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.ticker  # noqa: E402
 import pandas as pd  # noqa: E402
 from matplotlib.lines import Line2D  # noqa: E402
 
@@ -131,6 +132,9 @@ def timing_figure(tm, parts, xcol, xlabel, path, width):
             if not s.empty:
                 line(ax, s[xcol], s.mean_seconds, m); any_data = True
         ax.set_xlabel(xlabel); ax.set_yscale("log")
+        if xcol == "K" and not d.empty:        # K = 100, 300, 1000: log scale with the values as ticks
+            ks = sorted(d.K.unique()); ax.set_xscale("log"); ax.set_xticks(ks); ax.set_xticklabels([str(int(v)) for v in ks])
+            ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
     if not any_data:
         plt.close(fig); print("no data for", path); return
     axes[0].set_ylabel("Running time (s)")
