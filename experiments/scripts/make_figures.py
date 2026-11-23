@@ -199,7 +199,7 @@ def case_figure(case, path, pair="ranking", delta=0.01):
     first, second = (case["patterns"][q] for q in case["pairs"][pair])
     Z, g = case["Z"], case["gamma"]
     colors = (METHODS["uhucpm"][1], METHODS["cq"][1]); w = 0.36
-    fig, axes = plt.subplots(1, 2, figsize=(SINGLE, 2.0))
+    fig, axes = plt.subplots(1, 2, figsize=(SINGLE, 1.8))
     score = lambda v: [v["point_score"] * 1e3, (v["M"] - z * np.sqrt(v["V"])) / Z * 1e3, v["test_score"] * 1e3]
     x = np.arange(3)
     for i, (v, col) in enumerate(zip((first, second), colors)):
