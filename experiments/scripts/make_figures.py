@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import matplotlib.ticker  # noqa: E402
 import pandas as pd  # noqa: E402
 from matplotlib.lines import Line2D  # noqa: E402
+from matplotlib.patches import Patch  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 # categorical slots 1-3 of the validated palette, fixed per method, with a marker and a line style per method
@@ -52,6 +53,26 @@ def method_handles(keys):
     return [Line2D([], [], color=METHODS[m][1], marker=METHODS[m][2], linestyle=METHODS[m][3], label=METHODS[m][0]) for m in keys]
 
 
+HATCH = {"uhucpm": "", "cq": "////", "pso": "...."}      # bars: hatch as a second cue besides color (print, CVD)
+
+
+def bar_handles(keys):
+    return [Patch(facecolor=METHODS[m][1], edgecolor="white", hatch=HATCH[m], label=METHODS[m][0]) for m in keys]
+
+
+def bars(ax, cats, values, errors=None):
+    """grouped columns: one group per category, one column per method, 2 px white gap between neighbouring columns"""
+    n = len(METHODS); w = 0.8 / n; x = np.arange(len(cats))
+    for i, m in enumerate(METHODS):
+        y = values.get(m)
+        if y is None:
+            continue
+        e = None if errors is None else errors.get(m)
+        ax.bar(x + (i - (n - 1) / 2) * w, y, w, color=METHODS[m][1], edgecolor="white", linewidth=0.6, hatch=HATCH[m],
+               yerr=e, error_kw=dict(elinewidth=0.6, capsize=1.5, ecolor="#404040"))
+    ax.set_xticks(x); ax.set_xticklabels(cats); ax.grid(axis="x", visible=False)
+
+
 def line(ax, x, y, m, err=None):
     _, color, marker, style = METHODS[m]
     if err is not None:
@@ -60,7 +81,8 @@ def line(ax, x, y, m, err=None):
         ax.plot(x, y, color=color, marker=marker, linestyle=style)
 
 
-def accuracy_figure(acc, experiment, layouts, xcol, xlabel, path, width, metric="precision_at_k", K=100, log2=False, levels=None):
+def accuracy_figure(acc, experiment, layouts, xcol, xlabel, path, width, metric="precision_at_k", K=100, log2=False, levels=None,
+                    style="line"):
     d = acc[(acc.experiment == experiment) & (acc.K == K) & acc.method.isin(METHODS)].copy()
     if d.empty:
         print("no data for", path); return
@@ -69,6 +91,14 @@ def accuracy_figure(acc, experiment, layouts, xcol, xlabel, path, width, metric=
         d = d[d.x.isin([float(v) for v in levels])]
     fig, axes = panels(len(layouts), width)
     for ax, lay in zip(axes, layouts):
+        if style == "bar":
+            cats = sorted(d.x.unique()); vals, errs = {}, {}
+            for m in METHODS:
+                s = d[(d.layout == lay) & (d.method == m)].set_index("x")
+                vals[m] = [s[f"{metric}_mean"].get(c, np.nan) for c in cats]; errs[m] = [s[f"{metric}_sd"].get(c, np.nan) for c in cats]
+            bars(ax, [f"{c:g}" for c in cats], vals, errs)
+            ax.set_xlabel(xlabel); ax.set_ylim(0, 1.02)
+            continue
         for m in METHODS:
             s = d[(d.layout == lay) & (d.method == m)].dropna(subset=[f"{metric}_mean"]).sort_values("x")
             if not s.empty:
@@ -77,15 +107,29 @@ def accuracy_figure(acc, experiment, layouts, xcol, xlabel, path, width, metric=
         if log2:
             ax.set_xscale("log", base=2); ax.set_xticks(sorted(d.x.unique())); ax.set_xticklabels([f"{v:g}" for v in sorted(d.x.unique())])
     axes[0].set_ylabel("Precision@K")
-    finish(fig, axes, [name(l) for l in layouts], method_handles(METHODS), path)
+    finish(fig, axes, [name(l) for l in layouts], bar_handles(METHODS) if style == "bar" else method_handles(METHODS), path)
 
 
-def timing_figure(tm, parts, xcol, xlabel, path, width):
+def timing_figure(tm, parts, xcol, xlabel, path, width, style="line"):
     """parts: [(experiment, dataset, values of the varied parameter)], one subplot each"""
     fig, axes = panels(len(parts), width)
     any_data = False
+    label = lambda v: f"{v / 1000:.3g}k" if v >= 1000 and xcol == "n" else f"{v:g}"
     for ax, (e, ds, levels) in zip(axes, parts):
         d = tm[(tm.experiment == e) & (tm.dataset == ds) & tm.value.astype(float).isin([float(v) for v in levels])]
+        if style == "bar":
+            cats = sorted(d[xcol].unique())
+            vals = {m: [d[(d.program == m) & (d[xcol] == c)].mean_seconds.mean() for c in cats] for m in METHODS}
+            any_data = any_data or not d.empty
+            bars(ax, [label(c) for c in cats], vals)
+            ax.set_xlabel(xlabel); ax.set_yscale("log")
+            lo = np.nanmin([v for vs in vals.values() for v in vs])     # columns start at a power of ten below the smallest
+            if np.isfinite(lo) and lo > 0:
+                ax.set_ylim(bottom=10 ** np.floor(np.log10(lo * 0.9)))
+            ax.yaxis.set_major_locator(matplotlib.ticker.LogLocator(base=10, subs=(1.0, 2.0, 5.0)))
+            ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:g}"))
+            ax.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+            continue
         for m in METHODS:
             s = d[d.program == m].sort_values(xcol)
             s = s.dropna(subset=["mean_seconds"])
@@ -103,7 +147,7 @@ def timing_figure(tm, parts, xcol, xlabel, path, width):
     if not any_data:
         plt.close(fig); print("no data for", path); return
     axes[0].set_ylabel("Running time (s)")
-    finish(fig, axes, [name(ds) for _, ds, _ in parts], method_handles(METHODS), path)
+    finish(fig, axes, [name(ds) for _, ds, _ in parts], bar_handles(METHODS) if style == "bar" else method_handles(METHODS), path)
 
 
 def hold_figure(curve, path, K=300):
@@ -165,7 +209,7 @@ def main():
     out = lambda f: os.path.join(a.out, f)
     if not acc.empty:
         accuracy_figure(acc, "B1_evidence", ["Philadelphia", "Tampa", "New_York", "Tokyo"], "value", "Evidence factor c",
-                        out("fig_evidence.pdf"), DOUBLE, log2=True, levels=LEVELS["c"])
+                        out("fig_evidence.pdf"), DOUBLE, levels=LEVELS["c"], style="bar")
         k = acc[acc.experiment == "B3_threshold"]
         if not k.empty:
             accuracy_figure_k(k, out("fig_threshold.pdf"))
@@ -174,9 +218,9 @@ def main():
                       "features", "Number of features", out("fig_time_features.pdf"), SINGLE)
         timing_figure(tm, [("C2_instances_synthetic", "Synthetic", LEVELS["instances"]),
                            ("C2_instances_new_york", "New_York", LEVELS["share"])], "n",
-                      "Number of instances", out("fig_time_instances.pdf"), SINGLE)
+                      "Number of instances", out("fig_time_instances.pdf"), SINGLE, style="bar")
         timing_figure(tm, [("C3_threshold", c, LEVELS["K"]) for c in ("New_Orleans", "New_York")], "K",
-                      "Threshold K", out("fig_time_threshold.pdf"), SINGLE)
+                      "Threshold K", out("fig_time_threshold.pdf"), SINGLE, style="bar")
         timing_figure(tm, [("C4_california", "California", LEVELS["d_california"])], "d", "Distance threshold d (m)",
                       out("fig_time_distance.pdf"), SINGLE)
     if not curve.empty:
