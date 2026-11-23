@@ -17,7 +17,8 @@ Each record also keeps the programs' own statistics (cliques, evaluated candidat
 Datasets: "synthetic" (harness/synthetic.py, n and k given), a layout of data/layouts/index.json (New_York, Tampa, ...)
 with an optional share of its instances, or a dataset released with PSO-MUCP (feature-level problem: the authors'
 utilities, every method on the same feature utilities).
-With --counts nothing is timed: every program runs once and its candidate counts and peak memory are recorded.
+With --counts nothing is timed: every program runs once and its candidate counts, number and largest size of the
+reported patterns and peak memory are recorded.
 Peak memory is the program's own VmHWM (one process image; see cpp/src/common/process_stats.cpp), so it does not
 include the memory of this harness.
 A point whose inputs cannot be prepared (the top-K search for gamma fails) is recorded with "failed"; a program that
@@ -79,12 +80,14 @@ def candidate_counts(cmd, name, timeout=None):
     if name == "cq":
         m = re.search(r"Number of evaluated patterns: (\d+)", out)
         k = re.search(r"The number of patterns: (\d+)", out)
+        z = re.search(r"The maximal size of patterns is: (\d+)", out)
         return dict(evaluated=int(m.group(1)) if m else None, n=int(k.group(1)) if k else None, max_rss_kb=cq_memory(out),
-                    seconds=seconds)
+                    largest=int(z.group(1)) if z and k and int(k.group(1)) > 0 else None, seconds=seconds)
     st = last_json(out)
-    return dict(evaluated=st.get("evaluated"), visited=st.get("visited"), n=len(st.get("patterns", [])),
+    pats = st.get("patterns", [])
+    return dict(evaluated=st.get("evaluated"), visited=st.get("visited"), n=len(pats),
                 all_pattern_num=st.get("all_pattern_num"), cliques=st.get("cliques"), max_rss_kb=st.get("max_rss_kb"),
-                seconds=seconds)
+                largest=max((len(q) for q in pats), default=None), seconds=seconds)
 
 
 def last_json(text):

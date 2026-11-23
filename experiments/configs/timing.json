@@ -19,7 +19,7 @@
                               "datasets": [{"kind": "layout", "name": "New_York", "k": 20, "d": 50.0}]},
     "C3_threshold": {"vary": "K", "values": [100, 300, 1000],
                      "datasets": [{"kind": "layout", "name": "New_Orleans", "k": 20, "d": 50.0},
-                                  {"kind": "layout", "name": "Tampa", "k": 20, "d": 50.0},
+                                  {"kind": "layout", "name": "Philadelphia", "k": 20, "d": 50.0},
                                   {"kind": "layout", "name": "New_York", "k": 20, "d": 50.0}]},
     "C4_las_vegas": {"vary": "d", "values": [100, 200, 300, 400],
                      "datasets": [{"kind": "psomucp", "name": "Las_Vegas", "file": "data/psomucp/DATA/LasVegas_POI 10f.csv",
