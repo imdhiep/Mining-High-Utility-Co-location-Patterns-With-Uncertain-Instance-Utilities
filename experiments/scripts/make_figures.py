@@ -175,8 +175,6 @@ def main():
         timing_figure(tm, [("C2_instances_synthetic", "Synthetic", LEVELS["instances"]),
                            ("C2_instances_new_york", "New_York", LEVELS["share"])], "n",
                       "Number of instances", out("fig_time_instances.pdf"), SINGLE)
-        timing_figure(tm, [("C3_threshold", c, LEVELS["K"]) for c in ("New_Orleans", "New_York")], "K",
-                      "Threshold K", out("fig_time_threshold.pdf"), SINGLE)
         timing_figure(tm, [("C4_california", "California", LEVELS["d_california"])], "d", "Distance threshold d (m)",
                       out("fig_time_distance.pdf"), SINGLE)
     if not curve.empty:
