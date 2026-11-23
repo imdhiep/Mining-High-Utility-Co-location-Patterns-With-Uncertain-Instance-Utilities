@@ -63,8 +63,8 @@ def table_mining(acc, path):
         r = [pick(acc, e, city, v, m) for m, _ in METHODS]
         rows.append([label, name(city) if i % 3 == 0 else ""] + [fmt(None if x is None else x["precision_at_k_mean"]) for x in r])
     names = " & ".join(lab for _, lab in METHODS)
-    write(path, "Precision@$K$ under different distance thresholds $d$, numbers of features and shares of instances, "
-          "with $c = 1$ and $K = 100$.", "tab:mining", "@{}ll" + "r" * len(METHODS) + "@{}", [f"Setting & City & {names} \\\\"], rows,
+    write(path, "Precision@$K$ under different $d$, numbers of features and shares of instances "
+          "(all cases $c=1$, $K=100$).", "tab:mining", "@{}ll" + "r" * len(METHODS) + "@{}", [f"Setting & City & {names} \\\\"], rows,
           colsep=3)
 
 def table_count(cn, path):
