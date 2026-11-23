@@ -5,6 +5,7 @@ Usage: python make_figures.py [--results DIR] [--out DIR]"""
 import argparse, json, os
 
 import numpy as np
+from statistics import NormalDist
 
 import matplotlib
 matplotlib.use("Agg")
@@ -186,46 +187,46 @@ def hold_figure(curve, path, K=300):
     finish(fig, axes, [name(c) for c in layouts], bar_handles(METHODS), path)
 
 
-def case_figure(case, path, pair="ranking"):
+def case_figure(case, path, pair="ranking", delta=0.01):
     """the two patterns of one pair of the case study (first: kept by UHUCPM, second: the other one), which have the
-    same point score: (a) point score with its 90% posterior interval, the threshold and the score in the later part;
-    (b) check-ins of their participating venues (one dot per venue, log scale)"""
+    same point score, as grouped columns: (a) point score, lower bound at the level delta of the pair and score in the
+    later part, with the threshold; (b) share of their participating venues by number of check-ins"""
     if pair not in case["pairs"]:
         print("no pair", pair, "for", path); return
-    roles = case["pairs"][pair]
+    if pair.startswith("set_rule_"):
+        delta = float(pair.split("_")[-1])
+    z = NormalDist().inv_cdf(1 - delta)
+    first, second = (case["patterns"][q] for q in case["pairs"][pair])
     Z, g = case["Z"], case["gamma"]
-    kept, other = "#1f9a55", "#6b6b6b"
-    colors = [kept, other]
-    fig, axes = plt.subplots(1, 2, figsize=(SINGLE, 1.55), gridspec_kw=dict(width_ratios=[1.15, 1]))
-    rows = [1, 0]                                          # kept pattern on top
-    labels = []
-    for q, y, col in zip(roles, rows, colors):
-        v = case["patterns"][q]
-        m, sd = v["M"] / Z * 1e3, np.sqrt(v["V"]) / Z * 1e3
-        axes[0].plot([m - 1.645 * sd, m + 1.645 * sd], [y, y], color=col, lw=2.2, solid_capstyle="butt")
-        axes[0].plot(m, y, "o", color="white", mec=col, mew=1.2, ms=5)
-        axes[0].plot(v["test_score"] * 1e3, y, "D", color=col, ms=4)
-        c = np.array(v["count"], float)
-        jit = np.random.default_rng(0).uniform(-0.18, 0.18, len(c))
-        axes[1].scatter(c, y + jit, s=5, color=col, linewidths=0, alpha=0.8)
-        axes[1].plot([np.median(c)] * 2, [y - 0.3, y + 0.3], color="black", lw=1.0)
-        labels.append(f"{'Kept' if y == 1 else 'Rejected'}\n({len(v['instances'])} venues)")
-    axes[0].axvline(g * 1e3, color="#d62f2f", ls="--", lw=1.0)
+    colors = (METHODS["uhucpm"][1], METHODS["cq"][1]); w = 0.36
+    fig, axes = plt.subplots(1, 2, figsize=(SINGLE, 2.0))
+    score = lambda v: [v["point_score"] * 1e3, (v["M"] - z * np.sqrt(v["V"])) / Z * 1e3, v["test_score"] * 1e3]
+    x = np.arange(3)
+    for i, (v, col) in enumerate(zip((first, second), colors)):
+        axes[0].bar(x + (i - 0.5) * w, score(v), w * 0.92, color=col, edgecolor="none")
+    axes[0].axhline(g * 1e3, color="black", ls="--", lw=0.9); axes[0].axhline(0, color="#b0b0b0", lw=0.6)
+    axes[0].set_xticks(x); axes[0].set_xticklabels(["Point\nscore", "Lower\nbound", "Later\nscore"])
+    axes[0].set_ylabel("Score ($\\times10^{-3}$)")
+    lo = min(0.0, min(score(first) + score(second))); hi = max(score(first) + score(second))
+    axes[0].set_ylim(lo - 0.12 * (hi - lo) if lo < 0 else 0, hi * 1.5)
+    bins = [(1, 2, "1-2"), (3, 10, "3-10"), (11, 50, "11-50"), (51, np.inf, ">50")]
+    share = lambda v: [((np.array(v["count"]) >= a_) & (np.array(v["count"]) <= b_)).mean() for a_, b_, _ in bins]
+    x = np.arange(len(bins))
+    for i, (v, col) in enumerate(zip((first, second), colors)):
+        axes[1].bar(x + (i - 0.5) * w, share(v), w * 0.92, color=col, edgecolor="none")
+    axes[1].set_xticks(x); axes[1].set_xticklabels([t for _, _, t in bins]); axes[1].set_xlabel("Check-ins per venue")
+    axes[1].set_ylabel("Share of venues"); axes[1].set_ylim(0, 1.02); axes[1].set_yticks([0, 0.25, 0.5, 0.75, 1.0])
     for ax in axes:
-        ax.set_ylim(-0.6, 1.6); ax.set_yticks([0, 1]); ax.grid(axis="y", visible=False)
-    axes[0].set_yticklabels(labels[::-1]); axes[1].set_yticklabels([])
-    axes[0].set_xlabel("Score ($\\times10^{-3}$)"); axes[1].set_xscale("log"); axes[1].set_xlabel("Check-ins per venue")
-    handles = [Line2D([], [], color="#808080", lw=2.2, label="90% interval"),
-               Line2D([], [], marker="o", color="w", mec="#808080", mew=1.2, label="Point score"),
-               Line2D([], [], marker="D", color="w", markerfacecolor="#808080", label="Later score"),
-               Line2D([], [], color="#d62f2f", ls="--", lw=1.0, label="Threshold"),
-               Line2D([], [], color="black", lw=1.0, label="Median")]
+        ax.grid(axis="x", visible=False)
     for i, (ax, t) in enumerate(zip(axes, ["Scores", "Evidence"])):
-        ax.annotate(f"({chr(97 + i)}) {t}", xy=(0.5, 0), xycoords="axes fraction", xytext=(0, -27), textcoords="offset points",
+        ax.annotate(f"({chr(97 + i)}) {t}", xy=(0.5, 0), xycoords="axes fraction", xytext=(0, -30), textcoords="offset points",
                     ha="center", va="top", fontsize=8.5, family="serif")
-    fig.legend(handles=handles, loc="upper center", ncol=5, frameon=False, bbox_to_anchor=(0.5, 1.02), fontsize=6,
-               handlelength=1.4, columnspacing=0.8, handletextpad=0.4)
-    fig.tight_layout(rect=(0, 0, 1, 0.88), w_pad=0.8)
+    handles = [Patch(facecolor=colors[0], edgecolor="none", label=f"Kept pattern ({len(first['instances'])} venues)"),
+               Patch(facecolor=colors[1], edgecolor="none", label=f"Rejected pattern ({len(second['instances'])} venues)"),
+               Line2D([], [], color="black", ls="--", lw=0.9, label="Threshold")]
+    fig.legend(handles=handles, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.02), fontsize=6,
+               handlelength=1.2, columnspacing=0.8)
+    fig.tight_layout(rect=(0, 0, 1, 0.9), w_pad=1.0)
     fig.savefig(path, bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
     print("figure:", path)
