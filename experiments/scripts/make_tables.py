@@ -18,7 +18,7 @@ def fmt(v, digits=2):
 
 
 def name(s):
-    return s.replace("_", " ")
+    return {"Saint_Louis": "St. Louis"}.get(s, s.replace("_", " "))
 
 
 def value_of(v):
@@ -55,7 +55,7 @@ def table_mining(acc, path):
     """precision@K under three values of d, of the number of features and of the share of instances"""
     items = [(f"$d = {v:g}$~m", "New_Orleans", "B3_distance", v) for v in (30.0, 50.0, 70.0)] + \
             [(f"{v} features", "New_York", "B3_features", v) for v in (10, 20, 40)] + \
-            [(f"{v:.0%} of instances".replace("%", "\\%"), "New_York", "B3_share", v) for v in (0.25, 0.5, 1.0)]
+            [(f"{v:.0%} instances".replace("%", "\\%"), "New_York", "B3_share", v) for v in (0.25, 0.5, 1.0)]
     rows = []
     for i, (label, city, e, v) in enumerate(items):
         if i and i % 3 == 0:
@@ -63,8 +63,9 @@ def table_mining(acc, path):
         r = [pick(acc, e, city, v, m) for m, _ in METHODS]
         rows.append([label, name(city) if i % 3 == 0 else ""] + [fmt(None if x is None else x["precision_at_k_mean"]) for x in r])
     names = " & ".join(lab for _, lab in METHODS)
-    write(path, "Precision@K under different distance thresholds $d$, numbers of features and shares of instances, "
-          "with $c = 1$ and $K = 100$.", "tab:mining", "ll" + "r" * len(METHODS), [f"Setting & City & {names} \\\\"], rows)
+    write(path, "Precision@$K$ under different distance thresholds $d$, numbers of features and shares of instances, "
+          "with $c = 1$ and $K = 100$.", "tab:mining", "@{}ll" + "r" * len(METHODS) + "@{}", [f"Setting & City & {names} \\\\"], rows,
+          colsep=3)
 
 def table_count(cn, path):
     """number of reported patterns and largest pattern size of every method under the three values of K (C.3 counts)"""
@@ -84,7 +85,7 @@ def table_count(cn, path):
             rows.append(cells)
     top, rules, sub = method_header([("n", "Patterns"), ("l", "Largest")])
     write(path, "Number of reported patterns and largest pattern size under different threshold values $K$.", "tab:count",
-          "ll" + "rr" * len(METHODS), [f" & & {top} \\\\", rules, f"City & $K$ & {sub} \\\\"], rows, colsep=4)
+          "ll" + "rr" * len(METHODS), [f" & & {top} \\\\", rules, f"City & $K$ & {sub} \\\\"], rows, wide=True)
 
 def table_hold(curve, dis, path, K=300, n=100):
     cities = ["Philadelphia", "New_Orleans", "Tampa", "New_York", "Tokyo", "Tucson", "Indianapolis", "Nashville", "Reno",

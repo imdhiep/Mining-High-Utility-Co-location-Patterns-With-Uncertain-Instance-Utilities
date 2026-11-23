@@ -92,11 +92,14 @@ def timing_figure(tm, parts, xcol, xlabel, path, width):
             if not s.empty:
                 line(ax, s[xcol], s.mean_seconds, m); any_data = True
         ax.set_xlabel(xlabel); ax.set_yscale("log")
-        if not d.empty:                        # the three values as ticks (K on a log scale)
+        ax.yaxis.set_major_locator(matplotlib.ticker.LogLocator(base=10, subs=(1.0, 2.0, 5.0)))
+        ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:g}"))
+        ax.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
+        if not d.empty:                        # the three values as ticks (K and the instances on a log scale)
             ticks = sorted(d[xcol].unique())
-            if xcol == "K":
+            if xcol in ("K", "n"):
                 ax.set_xscale("log"); ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
-            ax.set_xticks(ticks); ax.set_xticklabels([f"{v:,.0f}" if v >= 1000 else f"{v:g}" for v in ticks])
+            ax.set_xticks(ticks); ax.set_xticklabels([f"{v / 1000:.3g}k" if v >= 1000 and xcol == "n" else f"{v:g}" for v in ticks])
     if not any_data:
         plt.close(fig); print("no data for", path); return
     axes[0].set_ylabel("Running time (s)")
@@ -175,7 +178,7 @@ def main():
         timing_figure(tm, [("C3_threshold", c, LEVELS["K"]) for c in ("New_Orleans", "Philadelphia", "New_York")], "K",
                       "Threshold K", out("fig_time_threshold.pdf"), DOUBLE)
         timing_figure(tm, [("C4_california", "California", LEVELS["d_california"])], "d", "Distance threshold d (m)",
-                      out("fig_time_distance.pdf"), SINGLE / 1.6)
+                      out("fig_time_distance.pdf"), SINGLE)
     if not curve.empty:
         hold_figure(curve, out("fig_hold.pdf"))
     if os.path.exists(os.path.join(proc, "case.json")):
