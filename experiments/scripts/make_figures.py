@@ -187,29 +187,48 @@ def hold_figure(curve, path, K=300):
 
 
 def case_figure(case, path, pair="ranking"):
-    """participating instances of the two patterns of one pair of the case study (first: kept by UHUCPM, second: the
-    other one); darker points have smaller posterior variance; the other venues of the city in light gray"""
+    """the two patterns of one pair of the case study (first: kept by UHUCPM, second: the other one), which have the
+    same point score: (a) point score with its 90% posterior interval, the threshold and the score in the later part;
+    (b) check-ins of their participating venues (one dot per venue, log scale)"""
     if pair not in case["pairs"]:
         print("no pair", pair, "for", path); return
     roles = case["pairs"][pair]
-    fig, axes = panels(2, SINGLE, 2.0)
-    vmax = max(max(case["patterns"][q]["variance"]) for q in roles)
-    for ax, q in zip(axes, roles):
+    Z, g = case["Z"], case["gamma"]
+    kept, other = "#1f9a55", "#6b6b6b"
+    colors = [kept, other]
+    fig, axes = plt.subplots(1, 2, figsize=(SINGLE, 1.55), gridspec_kw=dict(width_ratios=[1.15, 1]))
+    rows = [1, 0]                                          # kept pattern on top
+    labels = []
+    for q, y, col in zip(roles, rows, colors):
         v = case["patterns"][q]
-        ax.scatter(np.array(case["all_x"]) / 1000, np.array(case["all_y"]) / 1000, s=0.2, color="#d9d9d9", linewidths=0, rasterized=True)
-        shade = 1 - 0.75 * np.sqrt(np.array(v["variance"]) / vmax)
-        ax.scatter(np.array(v["x"]) / 1000, np.array(v["y"]) / 1000, s=5, c=METHODS["uhucpm"][1], alpha=None, linewidths=0)
-        ax.collections[-1].set_alpha(shade)
-        cx, cy = np.mean(v["x"]) / 1000, np.mean(v["y"]) / 1000
-        span = max(max(np.ptp(v["x"]), np.ptp(v["y"])) / 2000 + 0.5, 2.0)
-        ax.set_xlim(cx - span, cx + span); ax.set_ylim(cy - span, cy + span); ax.set_aspect("equal")
-        ax.set_xlabel("x (km)"); ax.tick_params(labelsize=6)
-    axes[0].set_ylabel("y (km)")
-    labels = [f"Kept pattern\n({len(case['patterns'][roles[0]]['instances'])} venues)",
-              f"Rejected pattern\n({len(case['patterns'][roles[1]]['instances'])} venues)"]
-    handles = [Line2D([], [], marker="o", color="w", markerfacecolor=METHODS["uhucpm"][1], label="Participating venue"),
-               Line2D([], [], marker="o", color="w", markerfacecolor="#d9d9d9", label="Other venue")]
-    finish(fig, axes, labels, handles, path, inside=False)
+        m, sd = v["M"] / Z * 1e3, np.sqrt(v["V"]) / Z * 1e3
+        axes[0].plot([m - 1.645 * sd, m + 1.645 * sd], [y, y], color=col, lw=2.2, solid_capstyle="butt")
+        axes[0].plot(m, y, "o", color="white", mec=col, mew=1.2, ms=5)
+        axes[0].plot(v["test_score"] * 1e3, y, "D", color=col, ms=4)
+        c = np.array(v["count"], float)
+        jit = np.random.default_rng(0).uniform(-0.18, 0.18, len(c))
+        axes[1].scatter(c, y + jit, s=5, color=col, linewidths=0, alpha=0.8)
+        axes[1].plot([np.median(c)] * 2, [y - 0.3, y + 0.3], color="black", lw=1.0)
+        labels.append(f"{'Kept' if y == 1 else 'Rejected'}\n({len(v['instances'])} venues)")
+    axes[0].axvline(g * 1e3, color="#d62f2f", ls="--", lw=1.0)
+    for ax in axes:
+        ax.set_ylim(-0.6, 1.6); ax.set_yticks([0, 1]); ax.grid(axis="y", visible=False)
+    axes[0].set_yticklabels(labels[::-1]); axes[1].set_yticklabels([])
+    axes[0].set_xlabel("Score ($\\times10^{-3}$)"); axes[1].set_xscale("log"); axes[1].set_xlabel("Check-ins per venue")
+    handles = [Line2D([], [], color="#808080", lw=2.2, label="90% interval"),
+               Line2D([], [], marker="o", color="w", mec="#808080", mew=1.2, label="Point score"),
+               Line2D([], [], marker="D", color="w", markerfacecolor="#808080", label="Later score"),
+               Line2D([], [], color="#d62f2f", ls="--", lw=1.0, label="Threshold"),
+               Line2D([], [], color="black", lw=1.0, label="Median")]
+    for i, (ax, t) in enumerate(zip(axes, ["Scores", "Evidence"])):
+        ax.annotate(f"({chr(97 + i)}) {t}", xy=(0.5, 0), xycoords="axes fraction", xytext=(0, -27), textcoords="offset points",
+                    ha="center", va="top", fontsize=8.5, family="serif")
+    fig.legend(handles=handles, loc="upper center", ncol=5, frameon=False, bbox_to_anchor=(0.5, 1.02), fontsize=6,
+               handlelength=1.4, columnspacing=0.8, handletextpad=0.4)
+    fig.tight_layout(rect=(0, 0, 1, 0.88), w_pad=0.8)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.02)
+    plt.close(fig)
+    print("figure:", path)
 
 
 def read(proc, f):
