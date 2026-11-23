@@ -176,14 +176,14 @@ def hold_figure(curve, path, K=300):
         print("no data for", path); return
     fig, axes = panels(len(layouts), DOUBLE)
     for ax, city in zip(axes, layouts):
+        vals = {}
         for m in METHODS:
-            s = d[(d.city == city) & (d.method == m) & d.n.isin(LEVELS["n"])].sort_values("n")
-            if not s.empty:
-                line(ax, s.n, s.hold_rate, m)
+            s = d[(d.city == city) & (d.method == m)].set_index("n")
+            vals[m] = [s.hold_rate.get(n, np.nan) for n in LEVELS["n"]]
+        bars(ax, [str(n) for n in LEVELS["n"]], vals)       # grouped columns: the three methods side by side, no overlap
         ax.set_xlabel("Number of patterns n"); ax.set_ylim(0, 1.02)
-        ax.set_xticks(LEVELS["n"]); ax.set_xticklabels([str(v) for v in LEVELS["n"]])
     axes[0].set_ylabel("Hold rate")
-    finish(fig, axes, [name(c) for c in layouts], method_handles(METHODS), path)
+    finish(fig, axes, [name(c) for c in layouts], bar_handles(METHODS), path)
 
 
 def case_figure(case, path, pair="ranking"):
