@@ -87,6 +87,24 @@ def table_count(cn, path):
     write(path, "Number of reported patterns and largest pattern size under different threshold values $K$.", "tab:count",
           "ll" + "rr" * len(METHODS), [f" & & {top} \\\\", rules, f"City & $K$ & {sub} \\\\"], rows, wide=True)
 
+def table_fdp(acc, path, cities=("Philadelphia", "Tampa", "New_York", "Tokyo")):
+    """FDP and recall of the reported patterns at K = 100 and c = 1 (B1_evidence), with the per-instance lower bound"""
+    methods = METHODS + [("cq_instance_lower_bound", "Per-instance lower bound")]
+    rows = []
+    for c in cities:
+        cells = [name(c)]
+        for m, _ in methods:
+            r = pick(acc, "B1_evidence", c, 1, m)
+            prec = None if r is None or pd.isna(r.precision_mean) else 1 - r.precision_mean
+            cells += [fmt(prec), fmt(None if r is None else r.recall_mean)]
+        rows.append(cells)
+    top = " & ".join(f"\\multicolumn{{2}}{{c}}{{{label}}}" for _, label in methods)
+    rules = " ".join(f"\\cmidrule(lr){{{2 + 2 * i}-{3 + 2 * i}}}" for i in range(len(methods)))
+    sub = " & ".join("FDP & Recall" for _ in methods)
+    write(path, "FDP and recall on semi-synthetic data (all cases $c=1$, $K=100$).", "tab:fdp", "l" + "rr" * len(methods),
+          [f" & {top} \\\\", rules, f"City & {sub} \\\\"], rows, wide=True)
+
+
 def table_hold(curve, dis, path, K=300, n=100):
     cities = ["Philadelphia", "New_Orleans", "Tampa", "New_York", "Tokyo", "Tucson", "Indianapolis", "Nashville", "Reno",
               "Saint_Louis", "Edmonton", "Santa_Barbara", "Boise"]
@@ -96,14 +114,14 @@ def table_hold(curve, dis, path, K=300, n=100):
         for m, _ in METHODS:
             r = curve[(curve.city == c) & (curve.K == K) & (curve.method == m) & (curve.n == n)]
             cells.append(fmt(r.hold_rate.iloc[0] if not r.empty else None))
-        for part in ("cq_only", "both"):
+        for part in ("uhucpm_only", "cq_only"):
             r = dis[(dis.city == c) & (dis.K == K) & (dis.compared == "top") & (dis.part == part)]
             cells.append(fmt(r.hold_rate.iloc[0] if not r.empty else None))
         rows.append(cells)
     names = " & ".join(lab for _, lab in METHODS)
-    write(path, f"Hold rate of the top {n} patterns at $K = {K}$ on the 13 real datasets.", "tab:hold", "l" + "r" * 5,
+    write(path, f"Hold rate of the top {n} patterns at $K = {K}$ on the 13 real datasets.", "tab:hold", "@{}l" + "r" * 5 + "@{}",
           ["& \\multicolumn{3}{c}{Top " + str(n) + " patterns} & \\multicolumn{2}{c}{Disagreement} \\\\",
-           "\\cmidrule(lr){2-4} \\cmidrule(lr){5-6}", f"City & {names} & \\shortstack{{CQ-HUCPM\\\\only}} & Both \\\\"], rows, colsep=2)
+           "\\cmidrule(lr){2-4} \\cmidrule(lr){5-6}", f"City & {names} & \\shortstack{{UHUCPM\\\\only}} & \\shortstack{{CQ-HUCPM\\\\only}} \\\\"], rows, colsep=1)
 
 
 def main():
@@ -117,6 +135,7 @@ def main():
     out = lambda f: os.path.join(a.out, f)
     if not acc.empty:
         table_mining(acc, out("tab_mining.tex"))
+        table_fdp(acc, out("tab_fdp.tex"))
     cn = read("counts.csv")
     if not cn.empty:
         table_count(cn, out("tab_count.tex"))
