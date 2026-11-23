@@ -69,7 +69,7 @@ def table_mining(acc, path):
 
 def table_count(cn, path):
     """number of reported patterns and largest pattern size of every method under the three values of K (C.3 counts)"""
-    cities = ["New_Orleans", "Philadelphia", "New_York"]
+    cities = ["New_Orleans", "New_York"]
     d = cn[cn.experiment == "C3_threshold"]
     rows = []
     for i, c in enumerate(cities):
