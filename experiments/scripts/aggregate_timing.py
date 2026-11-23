@@ -36,9 +36,10 @@ def main():
     ap.add_argument("experiments", nargs="*"); ap.add_argument("--results", default=os.path.join(os.path.dirname(HERE), "results"))
     a = ap.parse_args()
     names = a.experiments or sorted(os.path.basename(p) for p in glob.glob(os.path.join(a.results, "raw", "C*")))
-    count_rows, memory = [], {}
+    count_rows, memory, count_points = [], {}, {}
     for e in [n for n in names if n.endswith("_counts")]:
         for r in latest(raw_records(a.results, e)):
+            count_points[(e[:-len("_counts")], r["dataset"], float(r["value"]))] = r
             total = (r["programs"].get("cq") or {}).get("evaluated")
             for prog, p in r["programs"].items():
                 ev = p.get("evaluated")
@@ -95,6 +96,17 @@ def main():
                                  visited=st.get("visited"),
                                  max_rss_kb=memory.get((e, r["dataset"], float(r["value"]), prog))))
         print(e, len(records), "points", "code", sorted({r.get("code") for r in records}))
+    timed_points = {(r["experiment"], r["dataset"], float(r["value"])) for r in rows}
+    for (e, ds, v), r in sorted(count_points.items()):   # points with an untimed run only (e.g. the session time ran out)
+        if e not in names or (e, ds, v) in timed_points:
+            continue
+        base = dict(experiment=e, dataset=ds, vary=r["vary"], value=r["value"], n=r["n"], features=r["features"], d=r["d"],
+                    K=r["K"], gamma=r.get("gamma"))
+        for prog in PROGRAMS:
+            p = r["programs"].get(prog)
+            if "failed" in r or p is not None:
+                rows.append(dict(base, program=prog, max_rss_kb=(p or {}).get("max_rss_kb"),
+                                 did_not_finish=1 if "failed" in r or "did_not_finish" in (p or {}) else None))
     spread = [r["relative_spread"] for r in rows if r.get("relative_spread") is not None and r["mean_seconds"] >= 0.1]
     if spread:
         print(f"largest relative spread between timed runs (runs of at least 0.1 s): {max(spread):.3f}")
