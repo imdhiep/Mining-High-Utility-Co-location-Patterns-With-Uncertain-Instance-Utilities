@@ -15,35 +15,57 @@ from matplotlib.lines import Line2D  # noqa: E402
 from matplotlib.patches import Patch  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-# categorical slots 1-3 of the validated palette, fixed per method, with a marker and a line style per method
-METHODS = {"uhucpm": ("UHUCPM", "#2a78d6", "o", "-"),
-           "cq": ("CQ-HUCPM", "#eb6834", "s", "--"),
-           "pso": ("PSO-MUCP", "#1baf7a", "^", ":")}
+# colors and markers of the sample figures chosen by the author (red, blue, green for our method), one marker per method
+METHODS = {"cq": ("CQ-HUCPM", "#d62f2f", "o", "-"),
+           "pso": ("PSO-MUCP", "#2c62d4", "s", "-"),
+           "uhucpm": ("UHUCPM", "#1f9a55", "D", "-")}
 SINGLE, DOUBLE = 3.5, 7.16          # IEEE column and page widths (in)
 # three values of every varied parameter (the default in the middle where there is one); other values stay in the results
 LEVELS = {"c": [0.5, 1, 4], "K": [100, 300, 1000], "features": [20, 40, 80], "instances": [40000, 80000, 120000],
           "share": [0.25, 0.5, 1.0], "d_california": [1000, 1500, 2000], "n": [100, 200, 300]}
-plt.rcParams.update({"font.family": "serif", "font.size": 8, "axes.labelsize": 8, "legend.fontsize": 8,
-                     "xtick.labelsize": 7, "ytick.labelsize": 7, "lines.linewidth": 1.2, "lines.markersize": 4,
-                     "axes.grid": True, "grid.color": "#d9d9d9", "grid.linewidth": 0.5, "axes.axisbelow": True,
-                     "pdf.fonttype": 42})
+plt.rcParams.update({"font.family": "sans-serif", "font.sans-serif": ["DejaVu Sans"], "font.size": 7.5, "axes.labelsize": 7.5,
+                     "legend.fontsize": 6.5, "xtick.labelsize": 6.5, "ytick.labelsize": 6.5, "lines.linewidth": 1.2,
+                     "lines.markersize": 3.5, "axes.grid": True, "grid.color": "#e3e3e3", "grid.linewidth": 0.6,
+                     "axes.edgecolor": "#b0b0b0", "axes.linewidth": 0.6, "xtick.color": "#404040", "ytick.color": "#404040",
+                     "axes.axisbelow": True, "pdf.fonttype": 42})
+HEADROOM = 1.55                    # axis range stretched by this factor above the data, for the legend inside each panel
 
 
 def name(dataset):
     return dataset.replace("_", " ")
 
 
-def panels(count, width, height=1.75):
+def panels(count, width, height=2.0):
     fig, axes = plt.subplots(1, count, figsize=(width, height), squeeze=False)
     return fig, list(axes[0])
 
 
-def finish(fig, axes, titles, handles, path, ncol=None):
+def headroom(ax):
+    lo, hi = ax.get_ylim()
+    if ax.get_yscale() == "log":
+        ax.set_ylim(lo, 10 ** (np.log10(lo) + (np.log10(hi) - np.log10(lo)) * HEADROOM))
+    else:
+        ax.set_ylim(lo, lo + (hi - lo) * HEADROOM)
+        if hi <= 1.05:                         # shares: ticks only up to 1
+            ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
+
+
+def finish(fig, axes, titles, handles, path, ncol=None, inside=True):
+    """legend inside every panel at the top (two columns, light frame); panel label "(a) Dataset" in serif below the
+    axis label, as in the sample figures"""
     for i, (ax, t) in enumerate(zip(axes, titles)):
-        ax.set_xlabel(f"{ax.get_xlabel()}\n({chr(97 + i)}) {t}")
-    fig.legend(handles=handles, loc="upper center", ncol=ncol or len(handles), frameon=False, bbox_to_anchor=(0.5, 1.0),
-               handlelength=2.2, columnspacing=1.2)
-    fig.tight_layout(rect=(0, 0, 1, 0.88 if (ncol or len(handles)) >= len(handles) else 0.8), w_pad=1.0)
+        ax.set_xlabel(ax.get_xlabel(), labelpad=1.5)
+        ax.annotate(f"({chr(97 + i)}) {t}", xy=(0.5, 0), xycoords="axes fraction", xytext=(0, -27), textcoords="offset points",
+                    ha="center", va="top", fontsize=8.5, family="serif")
+        if inside:
+            headroom(ax)
+            narrow = fig.get_figwidth() / len(axes) < 2.0     # panels of a one-column figure: a smaller legend
+            ax.legend(handles=handles, loc="upper center", ncol=ncol or 2, frameon=True, framealpha=0.9, edgecolor="#d0d0d0",
+                      handlelength=1.3 if narrow else 2.0, columnspacing=0.6 if narrow else 0.9, borderpad=0.3,
+                      labelspacing=0.2, handletextpad=0.3 if narrow else 0.4, fontsize=5.6 if narrow else 6.5)
+    if not inside:
+        fig.legend(handles=handles, loc="upper center", ncol=ncol or len(handles), frameon=False, bbox_to_anchor=(0.5, 1.0))
+    fig.tight_layout(rect=(0, 0, 1, 1 if inside else 0.88), w_pad=1.2)
     fig.savefig(path, bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
     print("figure:", path)
@@ -53,11 +75,8 @@ def method_handles(keys):
     return [Line2D([], [], color=METHODS[m][1], marker=METHODS[m][2], linestyle=METHODS[m][3], label=METHODS[m][0]) for m in keys]
 
 
-HATCH = {"uhucpm": "", "cq": "////", "pso": "...."}      # bars: hatch as a second cue besides color (print, CVD)
-
-
 def bar_handles(keys):
-    return [Patch(facecolor=METHODS[m][1], edgecolor="white", hatch=HATCH[m], label=METHODS[m][0]) for m in keys]
+    return [Patch(facecolor=METHODS[m][1], edgecolor="none", label=METHODS[m][0]) for m in keys]
 
 
 def bars(ax, cats, values, errors=None):
@@ -68,7 +87,7 @@ def bars(ax, cats, values, errors=None):
         if y is None:
             continue
         e = None if errors is None else errors.get(m)
-        ax.bar(x + (i - (n - 1) / 2) * w, y, w, color=METHODS[m][1], edgecolor="white", linewidth=0.6, hatch=HATCH[m],
+        ax.bar(x + (i - (n - 1) / 2) * w, y, w * 0.9, color=METHODS[m][1], edgecolor="none",
                yerr=e, error_kw=dict(elinewidth=0.6, capsize=1.5, ecolor="#404040"))
     ax.set_xticks(x); ax.set_xticklabels(cats); ax.grid(axis="x", visible=False)
 
@@ -126,8 +145,8 @@ def timing_figure(tm, parts, xcol, xlabel, path, width, style="line"):
             lo = np.nanmin([v for vs in vals.values() for v in vs])     # columns start at a power of ten below the smallest
             if np.isfinite(lo) and lo > 0:
                 ax.set_ylim(bottom=10 ** np.floor(np.log10(lo * 0.9)))
-            ax.yaxis.set_major_locator(matplotlib.ticker.LogLocator(base=10, subs=(1.0, 2.0, 5.0)))
-            ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:g}"))
+            ax.yaxis.set_major_locator(matplotlib.ticker.LogLocator(base=10))
+            ax.yaxis.set_major_formatter(matplotlib.ticker.LogFormatterMathtext())
             ax.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
             continue
         for m in METHODS:
@@ -136,8 +155,8 @@ def timing_figure(tm, parts, xcol, xlabel, path, width, style="line"):
             if not s.empty:
                 line(ax, s[xcol], s.mean_seconds, m); any_data = True
         ax.set_xlabel(xlabel); ax.set_yscale("log")
-        ax.yaxis.set_major_locator(matplotlib.ticker.LogLocator(base=10, subs=(1.0, 2.0, 5.0)))
-        ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:g}"))
+        ax.yaxis.set_major_locator(matplotlib.ticker.LogLocator(base=10))
+        ax.yaxis.set_major_formatter(matplotlib.ticker.LogFormatterMathtext())
         ax.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
         if not d.empty:                        # the three values as ticks (K and the instances on a log scale)
             ticks = sorted(d[xcol].unique())
@@ -190,7 +209,7 @@ def case_figure(case, path, pair="ranking"):
               f"Rejected pattern\n({len(case['patterns'][roles[1]]['instances'])} venues)"]
     handles = [Line2D([], [], marker="o", color="w", markerfacecolor=METHODS["uhucpm"][1], label="Participating venue"),
                Line2D([], [], marker="o", color="w", markerfacecolor="#d9d9d9", label="Other venue")]
-    finish(fig, axes, labels, handles, path)
+    finish(fig, axes, labels, handles, path, inside=False)
 
 
 def read(proc, f):
