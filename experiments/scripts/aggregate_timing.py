@@ -47,11 +47,12 @@ def main():
                 count_rows.append(dict(experiment=e[:-len("_counts")], dataset=r["dataset"], vary=r["vary"], value=r["value"], n=r["n"],
                                        features=r["features"], program=prog, evaluated=ev, candidates=total, patterns=p.get("n"),
                                        pruning_ratio=(1 - ev / total) if ev is not None and total else None,
-                                       max_rss_kb=p.get("max_rss_kb"), did_not_finish=1 if "did_not_finish" in p else None))
+                                       largest=p.get("largest"), max_rss_kb=p.get("max_rss_kb"),
+                                       did_not_finish=1 if "did_not_finish" in p else None))
     if count_rows:
         print("counts:", write_csv(os.path.join(a.results, "processed", "counts.csv"), count_rows,
                                    ["experiment", "dataset", "vary", "value", "n", "features", "program", "evaluated", "candidates",
-                                    "patterns", "pruning_ratio", "max_rss_kb", "did_not_finish"]))
+                                    "patterns", "largest", "pruning_ratio", "max_rss_kb", "did_not_finish"]))
     real = raw_records(a.results, "C0_counts_real")
     if real:
         lr, ans = [], []

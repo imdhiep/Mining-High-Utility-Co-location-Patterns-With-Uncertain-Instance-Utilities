@@ -19,6 +19,9 @@ METHODS = {"uhucpm": ("UHUCPM", "#2a78d6", "o", "-"),
            "cq": ("CQ-HUCPM", "#eb6834", "s", "--"),
            "pso": ("PSO-MUCP", "#1baf7a", "^", ":")}
 SINGLE, DOUBLE = 3.5, 7.16          # IEEE column and page widths (in)
+# three values of every varied parameter (the default in the middle where there is one); other values stay in the results
+LEVELS = {"c": [0.5, 1, 4], "K": [100, 300, 1000], "features": [20, 40, 80], "instances": [40000, 80000, 120000],
+          "share": [0.25, 0.5, 1.0], "d_california": [1000, 1500, 2000], "n": [100, 200, 300]}
 plt.rcParams.update({"font.family": "serif", "font.size": 8, "axes.labelsize": 8, "legend.fontsize": 8,
                      "xtick.labelsize": 7, "ytick.labelsize": 7, "lines.linewidth": 1.2, "lines.markersize": 4,
                      "axes.grid": True, "grid.color": "#d9d9d9", "grid.linewidth": 0.5, "axes.axisbelow": True,
@@ -57,11 +60,13 @@ def line(ax, x, y, m, err=None):
         ax.plot(x, y, color=color, marker=marker, linestyle=style)
 
 
-def accuracy_figure(acc, experiment, layouts, xcol, xlabel, path, width, metric="precision_at_k", K=100, log2=False):
+def accuracy_figure(acc, experiment, layouts, xcol, xlabel, path, width, metric="precision_at_k", K=100, log2=False, levels=None):
     d = acc[(acc.experiment == experiment) & (acc.K == K) & acc.method.isin(METHODS)].copy()
     if d.empty:
         print("no data for", path); return
     d["x"] = d[xcol].map(lambda v: float(json.loads(v)) if isinstance(v, str) else float(v))
+    if levels:
+        d = d[d.x.isin([float(v) for v in levels])]
     fig, axes = panels(len(layouts), width)
     for ax, lay in zip(axes, layouts):
         for m in METHODS:
@@ -75,70 +80,27 @@ def accuracy_figure(acc, experiment, layouts, xcol, xlabel, path, width, metric=
     finish(fig, axes, [name(l) for l in layouts], method_handles(METHODS), path)
 
 
-def pr_figure(pr, path):
-    """each method's ranking by its own score (B1_pr keeps the three rankings on the same draws)"""
-    layouts = ["New_York", "Tokyo"]
-    d = pr[(pr.experiment == "B1_pr") & (pr.K == 100)]
-    if d.empty:
-        print("no data for", path); return
-    fig, axes = panels(len(layouts), SINGLE, 1.9)
-    for ax, lay in zip(axes, layouts):
-        for m in METHODS:
-            s = d[(d.layout == lay) & (d.method == m)].sort_values("n")
-            if not s.empty:
-                ax.plot(s.recall_mean, s.precision_mean, color=METHODS[m][1], linestyle=METHODS[m][3])
-        ax.set_xlabel("Recall"); ax.set_xlim(0, 1); ax.set_ylim(0, 1.02)
-    axes[0].set_ylabel("Precision")
-    handles = [Line2D([], [], color=METHODS[m][1], linestyle=METHODS[m][3], label=METHODS[m][0]) for m in METHODS]
-    finish(fig, axes, [name(l) for l in layouts], handles, path)
-
-
-def delta_figure(acc, path):
-    layouts = ["Philadelphia", "New_York"]
-    d = acc[(acc.experiment == "B3_threshold") & (acc.K == 100)]
-    s_rule = d[d.method == "set_rule"]
-    if s_rule.empty:
-        print("no data for", path); return
-    blue, orange = METHODS["uhucpm"][1], METHODS["cq"][1]
-    fig, axes = panels(len(layouts), SINGLE, 1.9)
-    for ax, lay in zip(axes, layouts):
-        s = s_rule[s_rule.layout == lay].sort_values("delta")
-        ax.errorbar(s.delta, s.precision_mean, yerr=s.precision_sd, color=blue, marker="o", linestyle="-", capsize=2, elinewidth=0.7)
-        ax.errorbar(s.delta, s.recall_mean, yerr=s.recall_sd, color=blue, marker="o", markerfacecolor="white", linestyle="--",
-                    capsize=2, elinewidth=0.7)
-        ax.plot(s.delta, 1 - s.delta, color="#7f7f7f", linestyle=":", linewidth=1.0)
-        cq = d[(d.layout == lay) & (d.method == "cq")]
-        if not cq.empty:
-            ax.axhline(cq.precision_mean.iloc[0], color=orange, linestyle="-", linewidth=1.0)
-            ax.axhline(cq.recall_mean.iloc[0], color=orange, linestyle="--", linewidth=1.0)
-        ax.set_xlabel("Level δ"); ax.set_ylim(0, 1.02)
-    axes[0].set_ylabel("Precision, recall")
-    handles = [Line2D([], [], color=blue, marker="o", linestyle="-", label="UHUCPM precision"),
-               Line2D([], [], color=blue, marker="o", markerfacecolor="white", linestyle="--", label="UHUCPM recall"),
-               Line2D([], [], color=orange, linestyle="-", label="CQ-HUCPM precision"),
-               Line2D([], [], color=orange, linestyle="--", label="CQ-HUCPM recall"),
-               Line2D([], [], color="#7f7f7f", linestyle=":", label="1 − δ")]
-    finish(fig, axes, [name(l) for l in layouts], handles, path, ncol=3)
-
-
 def timing_figure(tm, parts, xcol, xlabel, path, width):
-    """parts: [(experiment, dataset)], one subplot each"""
+    """parts: [(experiment, dataset, values of the varied parameter)], one subplot each"""
     fig, axes = panels(len(parts), width)
     any_data = False
-    for ax, (e, ds) in zip(axes, parts):
-        d = tm[(tm.experiment == e) & (tm.dataset == ds)]
+    for ax, (e, ds, levels) in zip(axes, parts):
+        d = tm[(tm.experiment == e) & (tm.dataset == ds) & tm.value.astype(float).isin([float(v) for v in levels])]
         for m in METHODS:
             s = d[d.program == m].sort_values(xcol)
+            s = s.dropna(subset=["mean_seconds"])
             if not s.empty:
                 line(ax, s[xcol], s.mean_seconds, m); any_data = True
         ax.set_xlabel(xlabel); ax.set_yscale("log")
-        if xcol == "K" and not d.empty:        # K = 100, 300, 1000: log scale with the values as ticks
-            ks = sorted(d.K.unique()); ax.set_xscale("log"); ax.set_xticks(ks); ax.set_xticklabels([str(int(v)) for v in ks])
-            ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+        if not d.empty:                        # the three values as ticks (K on a log scale)
+            ticks = sorted(d[xcol].unique())
+            if xcol == "K":
+                ax.set_xscale("log"); ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+            ax.set_xticks(ticks); ax.set_xticklabels([f"{v:,.0f}" if v >= 1000 else f"{v:g}" for v in ticks])
     if not any_data:
         plt.close(fig); print("no data for", path); return
     axes[0].set_ylabel("Running time (s)")
-    finish(fig, axes, [name(ds) for _, ds in parts], method_handles(METHODS), path)
+    finish(fig, axes, [name(ds) for _, ds, _ in parts], method_handles(METHODS), path)
 
 
 def hold_figure(curve, path, K=300):
@@ -149,13 +111,13 @@ def hold_figure(curve, path, K=300):
     fig, axes = panels(len(layouts), DOUBLE)
     for ax, city in zip(axes, layouts):
         for m in METHODS:
-            s = d[(d.city == city) & (d.method == m) & (d.n <= K)].sort_values("n")
+            s = d[(d.city == city) & (d.method == m) & d.n.isin(LEVELS["n"])].sort_values("n")
             if not s.empty:
-                ax.plot(s.n, s.hold_rate, color=METHODS[m][1], linestyle=METHODS[m][3])
-        ax.set_xlabel("Number of patterns n"); ax.set_xlim(0, K); ax.set_ylim(0, 1.02)
+                line(ax, s.n, s.hold_rate, m)
+        ax.set_xlabel("Number of patterns n"); ax.set_ylim(0, 1.02)
+        ax.set_xticks(LEVELS["n"]); ax.set_xticklabels([str(v) for v in LEVELS["n"]])
     axes[0].set_ylabel("Hold rate")
-    handles = [Line2D([], [], color=METHODS[m][1], linestyle=METHODS[m][3], label=METHODS[m][0]) for m in METHODS]
-    finish(fig, axes, [name(c) for c in layouts], handles, path)
+    finish(fig, axes, [name(c) for c in layouts], method_handles(METHODS), path)
 
 
 def case_figure(case, path, pair="ranking"):
@@ -196,25 +158,24 @@ def main():
     ap.add_argument("--case-pair", default="ranking", help="pair of the case study shown in fig_case.pdf (see run_case.py)")
     a = ap.parse_args()
     proc = os.path.join(a.results, "processed"); os.makedirs(a.out, exist_ok=True)
-    acc, pr, tm, curve = (read(proc, f) for f in ("accuracy.csv", "pr_curve.csv", "timing.csv", "hold_curve.csv"))
+    acc, tm, curve = (read(proc, f) for f in ("accuracy.csv", "timing.csv", "hold_curve.csv"))
     out = lambda f: os.path.join(a.out, f)
     if not acc.empty:
         accuracy_figure(acc, "B1_evidence", ["Philadelphia", "Tampa", "New_York", "Tokyo"], "value", "Evidence factor c",
-                        out("fig_evidence.pdf"), DOUBLE, log2=True)
-        accuracy_figure(acc, "B2_overdispersion", ["Tampa", "New_York"], "value", "Overdispersion φ", out("fig_overdispersion.pdf"), SINGLE)
+                        out("fig_evidence.pdf"), DOUBLE, log2=True, levels=LEVELS["c"])
         k = acc[acc.experiment == "B3_threshold"]
         if not k.empty:
             accuracy_figure_k(k, out("fig_threshold.pdf"))
-        delta_figure(acc, out("fig_level.pdf"))
-    if not pr.empty:
-        pr_figure(pr, out("fig_precision_recall.pdf"))
     if not tm.empty:
-        timing_figure(tm, [("C1_features", "Synthetic"), ("C1_features", "New_York")], "features", "Number of features",
-                      out("fig_time_features.pdf"), SINGLE)
-        timing_figure(tm, [("C2_instances_synthetic", "Synthetic"), ("C2_instances_new_york", "New_York")], "n",
+        timing_figure(tm, [("C1_features", "Synthetic", LEVELS["features"]), ("C1_features", "New_York", LEVELS["features"])],
+                      "features", "Number of features", out("fig_time_features.pdf"), SINGLE)
+        timing_figure(tm, [("C2_instances_synthetic", "Synthetic", LEVELS["instances"]),
+                           ("C2_instances_new_york", "New_York", LEVELS["share"])], "n",
                       "Number of instances", out("fig_time_instances.pdf"), SINGLE)
-        timing_figure(tm, [("C3_threshold", c) for c in ("New_Orleans", "Tampa", "New_York")], "K", "Threshold K",
-                      out("fig_time_threshold.pdf"), DOUBLE)
+        timing_figure(tm, [("C3_threshold", c, LEVELS["K"]) for c in ("New_Orleans", "Philadelphia", "New_York")], "K",
+                      "Threshold K", out("fig_time_threshold.pdf"), DOUBLE)
+        timing_figure(tm, [("C4_california", "California", LEVELS["d_california"])], "d", "Distance threshold d (m)",
+                      out("fig_time_distance.pdf"), SINGLE / 1.6)
     if not curve.empty:
         hold_figure(curve, out("fig_hold.pdf"))
     if os.path.exists(os.path.join(proc, "case.json")):
