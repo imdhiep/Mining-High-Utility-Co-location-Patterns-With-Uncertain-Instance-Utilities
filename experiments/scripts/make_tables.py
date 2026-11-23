@@ -84,7 +84,7 @@ def table_count(cn, path):
                           str(int(r.largest.iloc[0])) if ok and not pd.isna(r.largest.iloc[0]) else DASH]
             rows.append(cells)
     top, rules, sub = method_header([("n", "Patterns"), ("l", "Largest")])
-    write(path, "Number of reported patterns and largest pattern size under different threshold values $K$.", "tab:count",
+    write(path, "Number of reported patterns and largest pattern size under different $K$.", "tab:count",
           "ll" + "rr" * len(METHODS), [f" & & {top} \\\\", rules, f"City & $K$ & {sub} \\\\"], rows, wide=True)
 
 def table_fdp(acc, path, cities=("Philadelphia", "Tampa", "New_York", "Tokyo")):
