@@ -9,6 +9,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 METHODS = [("uhucpm", "UHUCPM"), ("cq", "CQ-HUCPM"), ("pso", "PSO-MUCP")]
 DASH = "--"   # en dash in LaTeX
+PSO_EXCLUDED = {"Las_Vegas", "Las_Vegas_checkins"}   # not reported (decision of the author); runs kept in the raw results
 
 
 def fmt(v, digits=2):
@@ -126,7 +127,7 @@ def table_count(ans, path):
 
 
 def table_pso(tm, path):
-    d = tm[tm.experiment.str.startswith("C4")]
+    d = tm[tm.experiment.str.startswith("C4") & ~tm.dataset.isin(PSO_EXCLUDED)]
     rows = []
     for ds in sorted(d.dataset.unique()):
         for j, v in enumerate(sorted(d[d.dataset == ds].value.unique(), key=float)):
